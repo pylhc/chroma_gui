@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>614</width>
+    <height>255</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>New Measurement</string>
+  </property>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>591</width>
+     <height>188</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="3" column="0">
+     <widget class="QLabel" name="modelB1Label">
+      <property name="text">
+       <string>Model B1</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLineEdit" name="locationLineEdit"/>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="descriptionLabel">
+      <property name="text">
+       <string>Description</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="locationLabel">
+      <property name="text">
+       <string>Location</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QLineEdit" name="modelB1LineEdit"/>
+    </item>
+    <item row="1" column="1">
+     <widget class="QTextEdit" name="descriptionTextEdit"/>
+    </item>
+    <item row="0" column="2">
+     <widget class="QToolButton" name="openLocation">
+      <property name="text">
+       <string>...</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="2">
+     <widget class="QToolButton" name="openModelB1">
+      <property name="text">
+       <string>...</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="modelB2Label">
+      <property name="text">
+       <string>Model B2</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QLineEdit" name="modelB2LineEdit"/>
+    </item>
+    <item row="4" column="2">
+     <widget class="QToolButton" name="openModelB2">
+      <property name="text">
+       <string>...</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>220</y>
+     <width>291</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_2">
+    <property name="leftMargin">
+     <number>30</number>
+    </property>
+    <property name="rightMargin">
+     <number>30</number>
+    </property>
+    <property name="horizontalSpacing">
+     <number>30</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="QPushButton" name="cancelButton">
+      <property name="text">
+       <string>Cancel</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QPushButton" name="createButton">
+      <property name="text">
+       <string>Create</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>openLocation</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>openLocationClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>397</x>
+     <y>22</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>210</x>
+     <y>134</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>openModelB1</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>openModelB1Clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>587</x>
+     <y>196</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>306</x>
+     <y>134</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cancelButton</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>240</x>
+     <y>243</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>306</x>
+     <y>134</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>createButton</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>createMeasurement()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>370</x>
+     <y>243</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>306</x>
+     <y>134</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>openModelB2</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>openModelB2Clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>587</x>
+     <y>183</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>306</x>
+     <y>170</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>openLocationClicked()</slot>
+  <slot>openModelB1Clicked()</slot>
+  <slot>createMeasurement()</slot>
+  <slot>openModelB2Clicked()</slot>
+ </slots>
+</ui>
