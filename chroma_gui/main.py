@@ -7,7 +7,10 @@ from PyQt5.QtWidgets import (
     QDialog,
     QFileDialog,
     QWidget,
-    QMessageBox, QTableView,
+    QMessageBox,
+    QTableView,
+    QSizePolicy,
+    QHeaderView,
 )
 from PyQt5 import uic
 from PyQt5.QtCore import QDir, QDateTime, pyqtSignal, QThread, QAbstractTableModel, QModelIndex, Qt
@@ -656,7 +659,13 @@ class MainWindow(QMainWindow, main_window_class):
         # Set the model of the beam depending on the tab selected
         current_beam = self.beamChromaticityTabWidget.currentIndex() + 1  # index starts at 0
         self.beamChromaticityTableView.setModel(getattr(self, f"chromaB{current_beam}TableModel"))
-        self.beamChromaticityTableView.setSelectionBehavior(QTableView.SelectRows)
+        # Hide the indices
+        self.beamChromaticityTableView.verticalHeader().setVisible(False)
+        # Select an item when clicking on a cell, not the row
+        self.beamChromaticityTableView.setSelectionBehavior(QTableView.SelectItems)
+        # Take all the horizontal space
+        self.beamChromaticityTableView.horizontalHeader().resizeSections(QHeaderView.Stretch)
+
 
     def updateChromaPlots(self, measurement):
         """
