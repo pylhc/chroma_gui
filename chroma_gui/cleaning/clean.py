@@ -2,7 +2,7 @@ import tfs
 import numpy as np
 import pandas as pd
 
-from constants import CLEANED_DPP_FILE
+from .constants import DPP_FILE, CLEANED_DPP_FILE
 
 
 # Compute the plateaus via the F_RF
@@ -16,15 +16,17 @@ def append(df, df2, new_headers=None):
     return res_df
 
 
-def tune_window(data, plane):
-    qx = 0.27
-    qy = 0.31
-    tolerance = 0.03
-
+def tune_window(data, plane, qx, qy):
+    """
+    Returns the tune data without the points outside the defined windows
+    Arguments:
+        - qx: tuple of lower and upper bounds for Qx, e.g. (0.26, 0.28)
+        - qy: tuple of lower and upper bounds for Qy
+    """
     if plane == 'X':
-        clean = data.loc[(data < (qx + tolerance)) & (data > (qx - tolerance))]
+        clean = data.loc[(data < (qx[1])) & (data > (qx[0]))]
     if plane == 'Y':
-        clean = data.loc[(data < (qy + tolerance)) & (data > (qy - tolerance))]
+        clean = data.loc[(data < (qy[1])) & (data > (qy[0]))]
 
     return clean
 
@@ -46,9 +48,9 @@ def remove_bad_time(data, t0, t1):
     return data
 
 
-def reject_outliers(data, plane):
+def reject_outliers(data, plane, qx_window, qy_window):
     data = pd.Series(data)
-    data = tune_window(data, plane)
+    data = tune_window(data, plane, qx_window, qy_window)
     data = remove_bad_tune_line(data, plane, 0.26, 0.268)
 
     Q1 = data.quantile(0.2)
@@ -63,8 +65,8 @@ def reject_outliers(data, plane):
     return data_cleaned, std
 
 
-def get_cleaned_tune(tunes, plane):
-    cleaned_tunes, std = reject_outliers(tunes, plane)
+def get_cleaned_tune(tunes, plane, qx_window, qy_window):
+    cleaned_tunes, std = reject_outliers(tunes, plane, qx_window, qy_window)
 
     # if all the points are the same, the cleaned tunes would be empty
     if len(cleaned_tunes) == 0:
@@ -75,16 +77,16 @@ def get_cleaned_tune(tunes, plane):
     return sum(cleaned_tunes) / len(cleaned_tunes), std
 
 
-def add_points(tune_x, tune_y, i, j, fp, out_tfs, data):
+def add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, plateau_length):
     # Length of plateau
     length = i - fp - 1
     # If the plateau is shorter than (arbitrary) 15 measurements, drop it
-    if length < 15:
+    if length < plateau_length:
         print(f"Not logging plateau because of its short length: {i - fp - 1}")
         return out_tfs, j
 
-    tune_avg_x, std_x = get_cleaned_tune(tune_x, 'X')
-    tune_avg_y, std_y = get_cleaned_tune(tune_y, 'Y')
+    tune_avg_x, std_x = get_cleaned_tune(tune_x, 'X', qx_window, qy_window)
+    tune_avg_y, std_y = get_cleaned_tune(tune_y, 'Y', qx_window, qy_window)
 
     if tune_avg_x is None or tune_avg_y is None:
         print(f"Not logging plateau because of equal tune data: {tune_x[0]}")
@@ -106,8 +108,8 @@ def add_points(tune_x, tune_y, i, j, fp, out_tfs, data):
     return out_tfs, j
 
 
-def clean_data_for_beam(beam):
-    data = tfs.read(CLEANED_DPP_FILE.format(beam=beam))
+def clean_data_for_beam(input_file, output_path, output_file, qx_window, qy_window, plateau_length, bad_tunes):
+    data = tfs.read(input_file)
     last_frf = data['F_RF'][0]
     tune_x = []  # temporary list to hold the tune to further clean
     tune_y = []
@@ -135,7 +137,7 @@ def clean_data_for_beam(beam):
             tune_y.append(data['QY'][i])
 
         else:  # new plateau
-            out_tfs, j = add_points(tune_x, tune_y, i, j, fp, out_tfs, data)
+            out_tfs, j = add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, plateau_length)
 
             # Reset the counters
             tune_x = []
@@ -145,12 +147,12 @@ def clean_data_for_beam(beam):
         last_frf = data['F_RF'][i]
 
     # Last point
-    out_tfs, _ = add_points(tune_x, tune_y, i, j, fp, out_tfs, data)
+    out_tfs, _ = add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, plateau_length)
 
     # TFS can't write dates, convert it to str
     out_tfs = tfs.TfsDataFrame(out_tfs.astype({'TIME': str}))
     # Restore the headers
     out_tfs.headers = headers_backup
 
-    tfs.write(output, out_tfs)
+    tfs.write(output_path / output_file, out_tfs)
     print("\nCleaned!")

@@ -4,6 +4,7 @@ from matplotlib.ticker import FormatStrFormatter
 from pathlib import Path
 import tfs
 import numpy as np
+import pandas as pd
 from functools import partial
 import matplotlib as mpl
 
@@ -70,8 +71,6 @@ def plot_freq(fig,
     beam = data.headers['BEAM']
     dpp = data['DPP']
 
-    FONTSIZE = 30
-
     rf0 = data.headers['F_RF']  # Nominal RF Frequency
 
     # Convert the str time to datetime
@@ -79,11 +78,10 @@ def plot_freq(fig,
 
     zp = []  # to store the labels for legend
     # Plot the RF
-    #fig, ax = plt.subplots(1, 1, figsize=(25, 15))
     ax.plot(time, frequencies, label='RF Frequency')
     ax.set_title(title)
-    ax.set_xlabel('Time [s]', fontsize=FONTSIZE)
-    ax.set_ylabel('Frequency [Hz]', fontsize=FONTSIZE)
+    ax.set_xlabel('Time [s]')
+    ax.set_ylabel('Frequency [Hz]')
     zp.append(ax.get_legend_handles_labels())
 
     # rotate and align the tick labels so they look better
@@ -97,7 +95,7 @@ def plot_freq(fig,
         f = ax2.plot
     f(time, tune_x, color='red', label='$Q_x$', alpha=alpha[0])
     f(time, tune_y, color='orange', label='$Q_y$', alpha=alpha[1])
-    ax2.set_ylabel('Tune [$2 \pi$]', fontsize=FONTSIZE)
+    ax2.set_ylabel('Tune [$2 \pi$]')
     zp.append(ax2.get_legend_handles_labels())
 
     ##
@@ -109,7 +107,7 @@ def plot_freq(fig,
         # Add the DPP
         ax3 = ax.twinx()
         ax3.spines.right.set_position(("axes", 1.1))
-        ax3.set_ylabel(r'$\frac{\Delta p}{p}$', fontsize=FONTSIZE)
+        ax3.set_ylabel(r'$\frac{\Delta p}{p}$')
         ax3.plot(time, dpp, color='green', label='$\Delta p/p$', linestyle='--')
         zp.append(ax3.get_legend_handles_labels())
 
@@ -119,7 +117,7 @@ def plot_freq(fig,
         ax4.spines.left.set_position(("axes", -0.1))
         ax4.yaxis.set_ticks_position('left')
         ax4.yaxis.set_label_position('left')
-        ax4.set_ylabel('$\Delta$RF [Hz]', fontsize=FONTSIZE)
+        ax4.set_ylabel('$\Delta$RF [Hz]')
         delta_rf = frequencies - rf0
         ax4.plot(time, delta_rf, alpha=0)  # transparent, we only  want the axis
 
@@ -131,7 +129,7 @@ def plot_freq(fig,
     # ax.get_legend_handles_labels(),
     #                                                 ax2.get_legend_handles_labels(),
     #                                                 ax3.get_legend_handles_labels())]
-    leg = ax.legend(handles, labels, loc='upper left', fontsize=23)
+    leg = ax.legend(handles, labels, loc='upper left')
     for lh in leg.legendHandles:
         lh.set_alpha(1)
 
@@ -151,25 +149,17 @@ def plot_freq(fig,
         l_ = [-e for e in list(range(0, -min_, 100))] + list(range(0, max_, 100))
         ax4.set_yticks(l_)
 
-    ax.tick_params(axis='y', labelsize=25)
-    ax2.tick_params(axis='y', labelsize=25)
+    ax.tick_params(axis='y')
+    ax2.tick_params(axis='y')
     if dpp_flag:
-        ax3.tick_params(axis='y', labelsize=25)
+        ax3.tick_params(axis='y')
     if delta_rf_flag:
-        ax4.tick_params(axis='y', labelsize=25)
-    ax.tick_params(axis='x', labelsize=25)
+        ax4.tick_params(axis='y')
+    ax.tick_params(axis='x')
 
     # Format the dates on the X axis
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
 
-    # fig.tight_layout()
-
-    # Save the image as EPS
-    #filename = title.replace(' ', '_').lower()
-    #mpl.set_loglevel("error")
-    #Path("./images/tune_measurement/").mkdir(parents=True, exist_ok=True)
-    #plt.savefig(f'./images/tune_measurement/{filename}.eps', format='eps')
-    #plt.savefig(f'./images/tune_measurement/{filename}.png', format='png', dpi=300)
-    #mpl.set_loglevel("warning")
+    #fig.tight_layout()
 
     return xticks
