@@ -1,6 +1,17 @@
 from datetime import datetime
 import typing
 import ast
+import sys
+import json
+from json import JSONDecodeError
+import tfs
+import timber
+import logging
+from pathlib import Path
+
+from PyQt5.QtGui import QPalette, QStandardItem, QFontMetrics
+from PyQt5.QtCore import QDir, QDateTime, pyqtSignal, QThread, QAbstractTableModel, QModelIndex, Qt, QEvent
+from PyQt5 import uic
 from PyQt5.QtWidgets import (
     QMainWindow,
     QApplication,
@@ -11,17 +22,8 @@ from PyQt5.QtWidgets import (
     QTableView,
     QSizePolicy,
     QHeaderView,
+    QComboBox, QStyledItemDelegate, qApp,
 )
-from PyQt5 import uic
-from PyQt5.QtCore import QDir, QDateTime, pyqtSignal, QThread, QAbstractTableModel, QModelIndex, Qt
-from pathlib import Path
-
-import sys
-import json
-from json import JSONDecodeError
-import tfs
-import timber
-import logging
 
 from plotting.widget import MplWidget
 from plotting import plot_dpp, plot_freq
@@ -33,13 +35,14 @@ from chromaticity import (
     get_maximum_chromaticity,
     get_chromaticity_df_with_notation)
 import cleaning.constants
-from constants import CHROMA_FILE
+from constants import CHROMA_FILE, RESPONSE_MATRICES
+from corrections import correct
 
 logger = logging.getLogger('chroma_GUI')
-logger.setLevel(logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-new_measurement_class = uic.loadUiType("new_measurement.ui")[0]  # Load the UI
-main_window_class = uic.loadUiType("chroma_gui.ui")[0]
+new_measurement_class = uic.loadUiType(Path(__file__).parent / "new_measurement.ui")[0]  # Load the UI
+main_window_class = uic.loadUiType(Path(__file__).parent / "chroma_gui.ui")[0]
 
 
 class ChromaticityTableModel(QAbstractTableModel):
@@ -303,6 +306,122 @@ class ExternalProgram(QThread):
         self.finished.emit()
 
 
+class CheckableComboBox(QComboBox):
+    # Subclass Delegate to increase item height
+    class Delegate(QStyledItemDelegate):
+        def sizeHint(self, option, index):
+            size = super().sizeHint(option, index)
+            size.setHeight(20)
+            return size
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Make the combo editable to set a custom text, but readonly
+        self.setEditable(True)
+        self.lineEdit().setReadOnly(True)
+        # Make the lineedit the same color as QPushButton
+        palette = qApp.palette()
+        palette.setBrush(QPalette.Base, palette.button())
+        self.lineEdit().setPalette(palette)
+
+        # Use custom delegate
+        self.setItemDelegate(CheckableComboBox.Delegate())
+
+        # Update the text when an item is toggled
+        self.model().dataChanged.connect(self.updateText)
+
+        # Hide and show popup when clicking the line edit
+        self.lineEdit().installEventFilter(self)
+        self.closeOnLineEditClick = False
+
+        # Prevent popup from closing when clicking on an item
+        self.view().viewport().installEventFilter(self)
+
+    def resizeEvent(self, event):
+        # Recompute text to elide as needed
+        self.updateText()
+        super().resizeEvent(event)
+
+    def eventFilter(self, object, event):
+        if object == self.lineEdit():
+            if event.type() == QEvent.MouseButtonRelease:
+                if self.closeOnLineEditClick:
+                    self.hidePopup()
+                else:
+                    self.showPopup()
+                return True
+            return False
+
+        if object == self.view().viewport():
+            if event.type() == QEvent.MouseButtonRelease:
+                index = self.view().indexAt(event.pos())
+                item = self.model().item(index.row())
+
+                if item.checkState() == Qt.Checked:
+                    item.setCheckState(Qt.Unchecked)
+                else:
+                    item.setCheckState(Qt.Checked)
+                return True
+        return False
+
+    def showPopup(self):
+        super().showPopup()
+        # When the popup is displayed, a click on the lineedit should close it
+        self.closeOnLineEditClick = True
+
+    def hidePopup(self):
+        super().hidePopup()
+        # Used to prevent immediate reopening when clicking on the lineEdit
+        self.startTimer(100)
+        # Refresh the display text when closing
+        self.updateText()
+
+    def timerEvent(self, event):
+        # After timeout, kill timer, and reenable click on line edit
+        self.killTimer(event.timerId())
+        self.closeOnLineEditClick = False
+
+    def updateText(self):
+        texts = []
+        for i in range(self.model().rowCount()):
+            if self.model().item(i).checkState() == Qt.Checked:
+                texts.append(self.model().item(i).text())
+        text = ", ".join(texts)
+
+        # Compute elided text (with "...")
+        metrics = QFontMetrics(self.lineEdit().font())
+        elidedText = metrics.elidedText(text, Qt.ElideRight, self.lineEdit().width())
+        self.lineEdit().setText(elidedText)
+
+    def addItem(self, text, data=None):
+        item = QStandardItem()
+        item.setText(text)
+        if data is None:
+            item.setData(text)
+        else:
+            item.setData(data)
+        item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsUserCheckable)
+        item.setData(Qt.Unchecked, Qt.CheckStateRole)
+        self.model().appendRow(item)
+
+    def addItems(self, texts, datalist=None):
+        for i, text in enumerate(texts):
+            try:
+                data = datalist[i]
+            except (TypeError, IndexError):
+                data = None
+            self.addItem(text, data)
+
+    def currentData(self):
+        # Return the list of selected items data
+        res = []
+        for i in range(self.model().rowCount()):
+            if self.model().item(i).checkState() == Qt.Checked:
+                res.append(self.model().item(i).data())
+        return res
+
+
 class MainWindow(QMainWindow, main_window_class):
     def __init__(self, parent=None):
         QMainWindow.__init__(self, parent)
@@ -330,6 +449,25 @@ class MainWindow(QMainWindow, main_window_class):
         self.enableTimberTab(False)
         self.enableCleaningTab(False)
         self.enableChromaticityTab(False)
+
+        self.setCorrectionComboBox()
+
+    def setCorrectionComboBox(self):
+        """
+        This function replaces the ComboBox containing the observables by one with items that can be clicked
+        """
+        # Remove the existing widget
+        self.verticalCorrectionLayout.removeWidget(self.observablesCorrectionComboBox)
+        self.observablesCorrectionComboBox.close()
+
+        # Create a new custom ComboBox and add it to the layout
+        self.observablesCorrectionComboBox = CheckableComboBox(self)
+        self.verticalCorrectionLayout.addWidget(self.observablesCorrectionComboBox)
+        self.verticalCorrectionLayout.update()
+
+        # Display the available corrections
+        self.observables = json.load(open(RESPONSE_MATRICES))['AVAILABLE_OBSERVABLES']
+        self.observablesCorrectionComboBox.addItems(self.observables)
 
     def enableTimberTab(self, value):
         self.timberTab.setEnabled(value)
@@ -435,7 +573,7 @@ class MainWindow(QMainWindow, main_window_class):
         # Assign functions to different states of the thread
         self.thread.started.connect(self.worker.createPlateaus)
         self.worker.finished.connect(self.thread.quit)
-        self.worker.finished.connect(self.plateauFinished())
+        self.worker.finished.connect(self.plateauFinished)
         self.worker.finished.connect(self.worker.deleteLater)
         self.thread.finished.connect(self.thread.deleteLater)
         self.thread.start()
@@ -493,6 +631,7 @@ class MainWindow(QMainWindow, main_window_class):
 
     def cleaningFinished(self, measurement=None):
         logger.info("Cleaning done!")
+        self.enableChromaticityTab(True)
         if not measurement:
             measurement = self.measurement
         self.updateCleanedTunePlot(measurement)
@@ -666,7 +805,6 @@ class MainWindow(QMainWindow, main_window_class):
         # Take all the horizontal space
         self.beamChromaticityTableView.horizontalHeader().resizeSections(QHeaderView.Stretch)
 
-
     def updateChromaPlots(self, measurement):
         """
         Add a plot to show the Chromaticity for both axes and both beams
@@ -717,6 +855,31 @@ class MainWindow(QMainWindow, main_window_class):
         for order in orders:
             dq = getattr(self, f'ChromaOrder{order}CheckBox')
             dq.setChecked(True)
+
+    def openMeasurementCorrectionClicked(self):
+        folder = QFileDialog.getExistingDirectory(
+            self,
+            "Select the Optics directory of the measurement to correct",
+            QDir.currentPath(),
+        )
+        if folder:
+            self.measurementCorrectionLineEdit.setText(folder)
+
+    def correctionButtonClicked(self):
+        # TODO
+        logger.info("Starting Response Matrix creation")
+        optics_path = self.measurementCorrectionLineEdit.text()
+        observables = self.observablesCorrectionComboBox.currentData()
+        chroma_factor = self.factorChromaSpinBox.value()
+
+        if len(observables) == 0:
+            logger.error("No observables selected!")
+            return
+
+        response = correct.create_response_matrix_f1004_dq3(observables, chroma_factor, beam=1)
+        logger.info('Response matrix created')
+        logger.info(f'  Number of observables: {response.shape[0]}')
+        logger.info(f'  Number of correctors: {response.shape[1]}\n')
 
 
 class NewMeasurementDialog(QDialog, new_measurement_class):
@@ -783,4 +946,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     ChromaGui = MainWindow(None)
     ChromaGui.show()
-    app.exec_()
+    try:
+        app.exec_()
+    except Exception as e:
+        logger.error(f"The app crashed!\n{e}")

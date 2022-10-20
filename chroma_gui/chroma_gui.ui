@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="timberTab">
      <property name="font">
@@ -390,7 +390,7 @@
            <double>0.010000000000000</double>
           </property>
           <property name="value">
-           <double>0.290000000000000</double>
+           <double>0.310000000000000</double>
           </property>
          </widget>
         </item>
@@ -493,7 +493,7 @@
         <item row="4" column="1" colspan="2">
          <widget class="QLineEdit" name="badTunesLineEdit">
           <property name="text">
-           <string>[(0.26, 0.268),]</string>
+           <string>[(0.266527, 0.266850),]</string>
           </property>
           <property name="placeholderText">
            <string/>
@@ -732,8 +732,8 @@
      <widget class="QTableView" name="beamChromaticityTableView">
       <property name="geometry">
        <rect>
-        <x>460</x>
-        <y>20</y>
+        <x>450</x>
+        <y>30</y>
         <width>831</width>
         <height>91</height>
        </rect>
@@ -854,6 +854,122 @@
      <attribute name="title">
       <string>Correction</string>
      </attribute>
+     <widget class="QPushButton" name="correctionButton">
+      <property name="geometry">
+       <rect>
+        <x>630</x>
+        <y>100</y>
+        <width>171</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Correct</string>
+      </property>
+     </widget>
+     <widget class="QWidget" name="">
+      <property name="geometry">
+       <rect>
+        <x>21</x>
+        <y>31</y>
+        <width>471</width>
+        <height>130</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QLabel" name="label_9">
+             <property name="toolTip">
+              <string>Optics directory of the measurement to correct</string>
+             </property>
+             <property name="whatsThis">
+              <string/>
+             </property>
+             <property name="text">
+              <string>Measurement to correct</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="measurementCorrectionLineEdit">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="mesurementCorrectionToolButton">
+             <property name="text">
+              <string>...</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <item>
+            <widget class="QLabel" name="label_33">
+             <property name="text">
+              <string>Chromaticity Factor</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_34">
+             <property name="text">
+              <string>rcond</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_10">
+             <property name="text">
+              <string>Observables to correct</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalCorrectionLayout">
+           <item>
+            <widget class="QSpinBox" name="factorChromaSpinBox">
+             <property name="maximum">
+              <number>10000</number>
+             </property>
+             <property name="value">
+              <number>520</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="rcondCorrectionSpinBox">
+             <property name="singleStep">
+              <double>0.000010000000000</double>
+             </property>
+             <property name="value">
+              <double>0.010000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="observablesCorrectionComboBox"/>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </widget>
    <widget class="QWidget" name="layoutWidget">
@@ -1201,6 +1317,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>mesurementCorrectionToolButton</sender>
+   <signal>clicked()</signal>
+   <receiver>mainWindow</receiver>
+   <slot>openMeasurementCorrectionClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>868</x>
+     <y>74</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>851</x>
+     <y>512</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>correctionButton</sender>
+   <signal>clicked()</signal>
+   <receiver>mainWindow</receiver>
+   <slot>correctionButtonClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>917</x>
+     <y>163</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>851</x>
+     <y>512</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>newMeasurementClicked()</slot>
@@ -1213,5 +1361,8 @@
   <slot>rePlotCleaningClicked()</slot>
   <slot>computeChromaClicked()</slot>
   <slot>updateChromaTablesForBeam()</slot>
+  <slot>slot1()</slot>
+  <slot>openMeasurementCorrectionClicked()</slot>
+  <slot>correctionButtonClicked()</slot>
  </slots>
 </ui>
