@@ -5,6 +5,8 @@ import sys
 import json
 from json import JSONDecodeError
 import tfs
+from typing import Tuple, List
+
 import timber
 import logging
 from pathlib import Path
@@ -443,11 +445,11 @@ class Config:
 
     # Cleaning
     rf_beam: float = 1
-    qx_window: tuple[float, float] = (0.24, 0.31)
-    qy_window: tuple[float, float] = (0.29, 0.34)
-    quartiles: tuple[float, float] = (0.20, 0.80)
+    qx_window: Tuple[float, float] = (0.24, 0.31)
+    qy_window: Tuple[float, float] = (0.29, 0.34)
+    quartiles: Tuple[float, float] = (0.20, 0.80)
     plateau_length: int = 15
-    bad_tune_lines: list[tuple[float, float]] = field(default_factory=lambda: [(0.266527, 0.266850)])
+    bad_tune_lines: List[Tuple[float, float]] = field(default_factory=lambda: [(0.266527, 0.266850)])
 
     plot_dpp: bool = False
     plot_delta_rf: bool = False
@@ -810,14 +812,14 @@ class MainWindow(QMainWindow, main_window_class):
         # Beam 1
         filepath = measurement.path / cleaning.constants.CLEANED_DPP_FILE.format(beam=1)
         plot_freq(self.plotCleanTuneB1Widget.canvas.fig, self.plotCleanTuneB1Widget.canvas.ax, filepath,
-                  'Cleaned Tune Measurement for Beam 1', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag, plot_style="scatter")
+                  'Cleaned Tune Measurement for Beam 1', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag, plot_style="line")
         self.plotCleanTuneB1Widget.canvas.draw()
         self.plotCleanTuneB1Widget.show()
 
         # Beam 2
         filepath = measurement.path / cleaning.constants.CLEANED_DPP_FILE.format(beam=2)
         plot_freq(self.plotCleanTuneB2Widget.canvas.fig, self.plotCleanTuneB2Widget.canvas.ax, filepath,
-                  f'Cleaned Tune Measurement for Beam 2', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag, plot_style="scatter")
+                  f'Cleaned Tune Measurement for Beam 2', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag, plot_style="line")
         self.plotCleanTuneB2Widget.canvas.draw()
         self.plotCleanTuneB2Widget.show()
 
