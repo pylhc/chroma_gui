@@ -464,7 +464,11 @@ def exceptHook(exc_type, exc_value, exc_tb):
     Function called when an exception occurs
     """
     tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
-    print(tb)
+    logger.error(tb)
+
+    # Close the running thread that crashed
+    main_window = findMainWindow()
+    main_window.thread.terminate()
     return
 
 
@@ -1043,7 +1047,10 @@ def findMainWindow() -> typing.Union[QMainWindow, None]:
 
 
 if __name__ == "__main__":
+    # Setup an exception catcher so the app does not crash
     sys.excepthook = exceptHook
+
+    # Start the app
     app = QApplication(sys.argv)
     ChromaGui = MainWindow(None)
     ChromaGui.show()
