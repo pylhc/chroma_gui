@@ -13,8 +13,8 @@ import traceback
 
 # PyQt libraries
 from PyQt5.QtGui import QPalette, QStandardItem, QFontMetrics
-from PyQt5.QtCore import QDir, QDateTime, pyqtSignal, QThread, QAbstractTableModel, QModelIndex, Qt, QEvent
-from PyQt5 import uic
+from PyQt5.QtCore import QDir, QDateTime, pyqtSignal, QThread, QAbstractTableModel, QModelIndex, Qt, QEvent, QRect
+from PyQt5 import uic, QtCore
 from PyQt5.QtWidgets import (
     QMainWindow,
     QApplication,
@@ -29,7 +29,7 @@ from PyQt5.QtWidgets import (
 )
 
 # Chroma-GUI specific libraries
-from plotting.widget import MplWidget
+from plotting.widget import MplWidget, mathTex_to_QPixmap
 from plotting import plot_dpp, plot_freq
 from cleaning import plateau, clean
 from chromaticity import (
@@ -37,7 +37,9 @@ from chromaticity import (
     construct_chroma_tfs,
     plot_chromaticity,
     get_maximum_chromaticity,
-    get_chromaticity_df_with_notation)
+    get_chromaticity_df_with_notation,
+    get_chromaticity_formula
+)
 import cleaning.constants
 from constants import CHROMA_FILE, RESPONSE_MATRICES, CONFIG
 from corrections import correct
@@ -804,14 +806,14 @@ class MainWindow(QMainWindow, main_window_class):
         # Beam 1
         filepath = measurement.path / cleaning.constants.CLEANED_DPP_FILE.format(beam=1)
         plot_freq(self.plotCleanTuneB1Widget.canvas.fig, self.plotCleanTuneB1Widget.canvas.ax, filepath,
-                  'Cleaned Tune Measurement for Beam 1', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag, plot_style="line")
+                  'Cleaned Tune Measurement for Beam 1', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag, plot_style="scatter")
         self.plotCleanTuneB1Widget.canvas.draw()
         self.plotCleanTuneB1Widget.show()
 
         # Beam 2
         filepath = measurement.path / cleaning.constants.CLEANED_DPP_FILE.format(beam=2)
         plot_freq(self.plotCleanTuneB2Widget.canvas.fig, self.plotCleanTuneB2Widget.canvas.ax, filepath,
-                  f'Cleaned Tune Measurement for Beam 2', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag, plot_style="line")
+                  f'Cleaned Tune Measurement for Beam 2', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag, plot_style="scatter")
         self.plotCleanTuneB2Widget.canvas.draw()
         self.plotCleanTuneB2Widget.show()
 
@@ -877,6 +879,12 @@ class MainWindow(QMainWindow, main_window_class):
         chroma_tfs = tfs.read(measurement.path / CHROMA_FILE)
         chroma_tfs = get_maximum_chromaticity(chroma_tfs)
         chroma_tfs = get_chromaticity_df_with_notation(chroma_tfs)
+
+        # Update the Chromaticity Formula at the top of the table
+        order = max(self.getChromaticityOrders())
+        latex_formula = get_chromaticity_formula(order)
+        pixmap = mathTex_to_QPixmap(latex_formula, fs=12)
+        self.chromaticityFormulaLabel.setPixmap(pixmap)
 
         # Beam 1 and Beam 2 models
         self.chromaB1TableModel = ChromaticityTableModel(chroma_tfs[chroma_tfs['BEAM'] == 'B1'].drop('BEAM', axis=1))
@@ -1039,4 +1047,4 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     ChromaGui = MainWindow(None)
     ChromaGui.show()
-    app.exec_()
+    app.exec()

@@ -43,7 +43,7 @@ def get_latex_number(num):
     return f'{n[0]} \\times 10^{{{int(n[1])}}}'
 
 
-def print_chromaticity_formula(order):
+def get_chromaticity_formula(order):
     dpp = r'\left( \frac{\Delta p}{p} \right)'
     chroma = f'Q {dpp} = Q_0 '
     chroma += f'+ Q\' {dpp} '
@@ -51,6 +51,7 @@ def print_chromaticity_formula(order):
     for o in range(2, order+1):
         q_str = "Q" + "'"*o
         chroma += f'+ \\frac{{1}}{{{o}!}} {q_str} \cdot {dpp}^{o} '
+    return f"${chroma}$"
 
 
 
@@ -217,7 +218,9 @@ def get_chromaticity_df_with_notation(chroma_tfs):
     for order in range(max_order+1):
         prime = f"({order})" if order > 0 else ""
         power = (order - 1) * 3 if order > 0 else 0
-        if order <= 1:
+        if order == 0:
+            headers.append('Q')
+        elif order == 1:
             headers.append(f"Q^{prime}")
         else:
             headers.append(f"Q^{prime} [x10^{power}]")

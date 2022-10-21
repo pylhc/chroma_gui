@@ -4,4 +4,5 @@ from .chroma_fct import (
     plot_chromaticity,
     get_maximum_chromaticity,
     get_chromaticity_df_with_notation,
+    get_chromaticity_formula,
 )
