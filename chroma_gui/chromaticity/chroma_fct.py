@@ -31,18 +31,6 @@ def chromaticity_func(order, x, *args):
     return res
 
 
-def get_notation(number, exponent, decimals=2):
-    # For printing purposes, return a number with the form <number>e<exp>
-    n = np.around(number / (10 ** exponent), decimals)
-    return f'{n}e{exponent}'
-
-
-def get_latex_number(num):
-    # Given a number, returns the latex notation with exponent
-    n = num.split('e')
-    return f'{n[0]} \\times 10^{{{int(n[1])}}}'
-
-
 def get_chromaticity_formula(order):
     dpp = r'\left( \frac{\Delta p}{p} \right)'
     chroma = f'Q {dpp} = Q_0 '
@@ -54,43 +42,6 @@ def get_chromaticity_formula(order):
     return f"${chroma}$"
 
 
-
-# ==================================================
-#               Plotting Functions
-# ==================================================
-
-def plot_freq(data, axis, popt, func, fig=None, ax=None, label="Fit", color="red", meas=True, title=None, fit_x=None):
-    tune = data[f'Q{axis}']
-    std = data[f'Q{axis}ERR']
-    dpp = data['DPP']
-    beam = data['BEAM']
-
-    if title:
-        ax.set_title(title)
-
-    # Plot the fit
-    if not fit_x:
-        dpp_x = np.linspace(data['DPP'].min(), data['DPP'].max())
-    else:
-        dpp_x = np.linspace(fit_x[0], fit_x[1])
-
-    # the z order is a hack to get the measurement data above everything
-    ax.plot(dpp_x, func(dpp_x, *popt), label=label, color=color, zorder=-32, linewidth=4.0)
-
-    # Plot the tune is meas == true, set to False for second plot for Q4
-    if meas:
-        ax.errorbar(dpp, 
-                    tune, 
-                    yerr=std, 
-                    label=f'Measurement', 
-                    linestyle='None', 
-                    color='black', 
-                    elinewidth=5, 
-                    capsize=6)
-
-    return fig, ax
-
-
 def construct_chroma_tfs(fit_orders):
     max_fit_order = max(fit_orders)
     q_val = [f"Q{o}" for o in range(max_fit_order + 1)]
@@ -99,11 +50,12 @@ def construct_chroma_tfs(fit_orders):
     return chroma_tfs
 
 
-def get_and_plot_chromaticity(filename, chroma_tfs, dpp_range, fit_orders, axis, XLIM, YLIM, fit_all_x=True):
+def get_chromaticity(filename, chroma_tfs, dpp_range, fit_orders, axis):
     '''
-        Performs a fit on the measurement data
-        Shows the plot with the fit
-        Displays the values
+    Computes the chromaticity for a given plane and DPP file
+    The values are computed via a fit, for all orders between min(fit_orders) and max(fit_orders), inclusive
+
+    The TFS given as input is then returned with an added row containing the chromaticity values
     '''
     # Print the general formula
     min_fit_order = min(fit_orders)
@@ -150,6 +102,9 @@ def get_and_plot_chromaticity(filename, chroma_tfs, dpp_range, fit_orders, axis,
 
 
 def plot_chromaticity(fig, ax, dpp_filename, chroma_tfs, axis, fit_orders, beam):
+    """
+    Plots the given orders of the chromaticity function with the values in the `chroma_tfs` TfsDataFrame
+    """
     data = tfs.read(dpp_filename)
 
     tune = data[f'Q{axis}']
@@ -184,7 +139,7 @@ def plot_chromaticity(fig, ax, dpp_filename, chroma_tfs, axis, fit_orders, beam)
 
         ax.plot(dpp_x, func(dpp_x, *chroma_values), label=label, color=COLORS[order-3], zorder=-32, linewidth=4.0)
 
-    # Plot the tune is meas == true, set to False for second plot for Q4
+    # Plot the measured tune with errorbars
     ax.errorbar(dpp,
                 tune,
                 yerr=std,
