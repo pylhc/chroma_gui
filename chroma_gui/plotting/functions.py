@@ -8,6 +8,8 @@ import pandas as pd
 from functools import partial
 import matplotlib as mpl
 
+TUNE_Y_COLOR = "red"
+TUNE_X_COLOR = "orange"
 
 def plot_dpp(fig, ax, filename):
     data = tfs.read(filename)
@@ -92,9 +94,13 @@ def plot_freq(fig,
     if plot_style == 'scatter':
         f = partial(ax2.scatter, marker='.')
     elif plot_style == 'line':
+        err_x = data['QXERR']
+        err_y = data['QYERR']
         f = ax2.plot
-    f(time, tune_x, color='red', label='$Q_x$', alpha=alpha[0])
-    f(time, tune_y, color='orange', label='$Q_y$', alpha=alpha[1])
+        ax2.fill_between(time, tune_x - err_x, tune_x + err_x, color=TUNE_X_COLOR, alpha=alpha[0]/4)
+        ax2.fill_between(time, tune_y - err_y, tune_y + err_y, color=TUNE_Y_COLOR, alpha=alpha[1]/4)
+    f(time, tune_x, color=TUNE_X_COLOR, label='$Q_x$', alpha=alpha[0])
+    f(time, tune_y, color=TUNE_Y_COLOR, label='$Q_y$', alpha=alpha[1])
     ax2.set_ylabel('Tune [$2 \pi$]')
     zp.append(ax2.get_legend_handles_labels())
 
