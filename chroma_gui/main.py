@@ -8,7 +8,10 @@ import tfs
 import timber
 import logging
 from pathlib import Path
+from dataclasses import dataclass, field
+import traceback
 
+# PyQt libraries
 from PyQt5.QtGui import QPalette, QStandardItem, QFontMetrics
 from PyQt5.QtCore import QDir, QDateTime, pyqtSignal, QThread, QAbstractTableModel, QModelIndex, Qt, QEvent
 from PyQt5 import uic
@@ -25,6 +28,7 @@ from PyQt5.QtWidgets import (
     QComboBox, QStyledItemDelegate, qApp,
 )
 
+# Chroma-GUI specific libraries
 from plotting.widget import MplWidget
 from plotting import plot_dpp, plot_freq
 from cleaning import plateau, clean
@@ -35,7 +39,7 @@ from chromaticity import (
     get_maximum_chromaticity,
     get_chromaticity_df_with_notation)
 import cleaning.constants
-from constants import CHROMA_FILE, RESPONSE_MATRICES
+from constants import CHROMA_FILE, RESPONSE_MATRICES, CONFIG
 from corrections import correct
 
 logger = logging.getLogger('chroma_GUI')
@@ -143,6 +147,7 @@ class Measurement:
         main_window.alfaB1LineEdit.setText(str(self.alpha['B1']))
         main_window.alfaB2LineEdit.setText(str(self.alpha['B2']))
         main_window.nominalRfLineEdit.setText(str(self.nominal_rf))
+        main_window.descriptionPlainTextEdit.setPlainText(self.description)
 
         # Set the extraction dates via Qt objects
         start = QDateTime.fromString(self.start_time.strftime("%Y-%m-%dT%H:%M:%S"), 'yyyy-MM-ddThh:mm:ss')
@@ -422,11 +427,51 @@ class CheckableComboBox(QComboBox):
         return res
 
 
+@dataclass
+class Config:
+    """
+    Class for storing user preferences
+    """
+    # New Measurement Window
+    model_path: Path = Path('.')
+    measurements_path: Path = Path('.')
+
+    # Timber
+    extract_raw_timber: bool = False
+
+    # Cleaning
+    rf_beam: float = 1
+    qx_window: tuple[float, float] = (0.24, 0.31)
+    qy_window: tuple[float, float] = (0.29, 0.34)
+    quartiles: tuple[float, float] = (0.20, 0.80)
+    plateau_length: int = 15
+    bad_tune_lines: list[tuple[float, float]] = field(default_factory=lambda: [(0.266527, 0.266850)])
+
+    plot_dpp: bool = False
+    plot_delta_rf: bool = False
+
+    @classmethod
+    def from_dict(cls: typing.Type["Config"], obj: dict):
+        return cls(
+            **obj
+        )
+
+
+def exceptHook(exc_type, exc_value, exc_tb):
+    """
+    Function called when an exception occurs
+    """
+    tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
+    print(tb)
+    return
+
+
 class MainWindow(QMainWindow, main_window_class):
     def __init__(self, parent=None):
         QMainWindow.__init__(self, parent)
         self.setupUi(self)
         self.measurement = None
+        self.config = None
 
         # Define the widgets for the plots
         self.plotDppB1Widget = None
@@ -444,6 +489,9 @@ class MainWindow(QMainWindow, main_window_class):
         self.chromaB1TableModel = None
         self.chromaB2TableModel = None
 
+        # Load preferences for file structure
+        self.loadConfig()
+
         # Disable tabs for now, as no measurement has been created or opened yet
         # TODO add Correction tab!
         self.enableTimberTab(False)
@@ -451,6 +499,33 @@ class MainWindow(QMainWindow, main_window_class):
         self.enableChromaticityTab(False)
 
         self.setCorrectionComboBox()
+
+    def loadConfig(self):
+        if not CONFIG.exists():
+            return
+        config_dict = json.load(open(CONFIG))
+        self.config = Config.from_dict(config_dict)
+
+        # Fix the value types
+        self.config.measurements_path = Path(self.config.measurements_path)
+        self.config.model_path = Path(self.config.model_path)
+        for i, tune_window in enumerate(self.config.bad_tune_lines):
+            self.config.bad_tune_lines[i] = tuple(tune_window)
+
+        # Set the different line edits
+        self.qxWindowLow.setValue(self.config.qx_window[0])
+        self.qxWindowHigh.setValue(self.config.qx_window[1])
+        self.qyWindowLow.setValue(self.config.qy_window[0])
+        self.qyWindowHigh.setValue(self.config.qy_window[1])
+        self.q1Quartile.setValue(self.config.quartiles[0])
+        self.q3Quartile.setValue(self.config.quartiles[1])
+        self.rfBeamComboBox.setCurrentIndex(self.config.rf_beam - 1)  # Index starts at 0: Beam - 1 = index
+        self.plateauLength.setValue(self.config.plateau_length)
+        self.badTunesLineEdit.setText(str(self.config.bad_tune_lines))
+
+        self.rawBBQCheckBox.setChecked(self.config.extract_raw_timber)
+        self.showDppCheckBox.setChecked(self.config.plot_dpp)
+        self.showDeltaRfCheckBox.setChecked(self.config.plot_delta_rf)
 
     def setCorrectionComboBox(self):
         """
@@ -486,7 +561,7 @@ class MainWindow(QMainWindow, main_window_class):
         folder = QFileDialog.getExistingDirectory(
             self,
             "Select Measurement Directory",
-            QDir.currentPath(),
+            str(self.config.measurements_path),
         )
         if not folder:
             QMessageBox.warning(self,
@@ -501,29 +576,41 @@ class MainWindow(QMainWindow, main_window_class):
             QMessageBox.warning(self,
                                 "Failed to open measurement",
                                 f"{str(e)}")
-        except JSONDecodeError:
+            logger.error(e)
+        except JSONDecodeError as e:
             QMessageBox.warning(self,
                                 "Failed to open measurement",
                                 f"The file 'measurement.info' is not a valid JSON file")
-        except KeyError:
+            logger.error(e)
+        except KeyError as e:
             QMessageBox.warning(self,
                                 "Failed to open measurement",
                                 f"The file 'measurement.info' does not contain the required keys")
+            logger.error(e)
 
     def saveSettingsClicked(self):
         """
         Save the settings into the measurement file
         """
+        # Check if a measurement has been opened or created already, otherwise why would we save something?
+        if not self.measurement:
+            logger.warning("No measurement has been opened or created, the settings can't be saved.")
+            return
+
+        # Nominal RF
         nominal_rf = self.nominalRfLineEdit.text()
         if nominal_rf == 0 or nominal_rf == 'None':
             nominal_rf = None
         if nominal_rf is not None:
             nominal_rf = float(nominal_rf)
-
         self.measurement.nominal_rf = nominal_rf
+
+        # Description
+        self.measurement.description = self.descriptionPlainTextEdit.toPlainText()
 
         # Save the measurement
         self.measurement.save_as_json()
+        logger.info('Settings saved!')
 
     def extractTimberClicked(self):
         start = self.startTimeTimberEdit.dateTime().toPyDateTime()
@@ -852,15 +939,18 @@ class MainWindow(QMainWindow, main_window_class):
         self.plotChromaB1XWidget.show()
 
     def setChromaticityOrders(self, orders):
-        for order in orders:
+        for order in range(3, max(orders)+1):
             dq = getattr(self, f'ChromaOrder{order}CheckBox')
-            dq.setChecked(True)
+            if order in orders:
+                dq.setChecked(True)
+            else:
+                dq.setChecked(False)
 
     def openMeasurementCorrectionClicked(self):
         folder = QFileDialog.getExistingDirectory(
             self,
             "Select the Optics directory of the measurement to correct",
-            QDir.currentPath(),
+            str(self.config.measurements_path),
         )
         if folder:
             self.measurementCorrectionLineEdit.setText(folder)
@@ -888,10 +978,11 @@ class NewMeasurementDialog(QDialog, new_measurement_class):
         self.setupUi(self)
 
     def openLocationClicked(self):
+        main_window = findMainWindow()
         folder = QFileDialog.getExistingDirectory(
             self,
             "Select new Measurement Directory",
-            QDir.currentPath(),
+            str(main_window.config.measurements_path),
         )
         if folder:
             self.locationLineEdit.setText(folder)
@@ -907,10 +998,11 @@ class NewMeasurementDialog(QDialog, new_measurement_class):
             self.modelB2LineEdit.setText(folder)
 
     def openModel(self):
+        main_window = findMainWindow()
         folder = QFileDialog.getExistingDirectory(
             self,
             "Select Model Directory",
-            QDir.currentPath(),
+            str(main_window.config.model_path),
         )
         return folder
 
@@ -943,10 +1035,8 @@ def findMainWindow() -> typing.Union[QMainWindow, None]:
 
 
 if __name__ == "__main__":
+    sys.excepthook = exceptHook
     app = QApplication(sys.argv)
     ChromaGui = MainWindow(None)
     ChromaGui.show()
-    try:
-        app.exec_()
-    except Exception as e:
-        logger.error(f"The app crashed!\n{e}")
+    app.exec_()
