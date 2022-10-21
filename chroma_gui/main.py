@@ -1048,12 +1048,16 @@ def findMainWindow() -> typing.Union[QMainWindow, None]:
     return None
 
 
-if __name__ == "__main__":
+def main(argv):
     # Setup an exception catcher so the app does not crash
     sys.excepthook = exceptHook
 
     # Start the app
-    app = QApplication(sys.argv)
+    app = QApplication(argv)
     ChromaGui = MainWindow(None)
     ChromaGui.show()
     app.exec()
+
+
+if __name__ == "__main__":
+    main(sys.argv)
