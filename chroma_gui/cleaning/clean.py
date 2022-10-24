@@ -50,15 +50,15 @@ def remove_bad_time(data, t0, t1):
     return data
 
 
-def reject_outliers(data, plane, qx_window, qy_window, bad_tunes):
+def reject_outliers(data, plane, qx_window, qy_window, quartiles, bad_tunes):
     data = pd.Series(data)
     data = tune_window(data, plane, qx_window, qy_window)
 
     for q0, q1 in bad_tunes:
         data = remove_bad_tune_line(data, plane, q0, q1)
 
-    Q1 = data.quantile(0.2)
-    Q3 = data.quantile(0.80)
+    Q1 = data.quantile(quartiles[0])
+    Q3 = data.quantile(quartiles[1])
     IQR = Q3 - Q1
 
     fence_low = Q1 - 1.5 * IQR
@@ -70,8 +70,8 @@ def reject_outliers(data, plane, qx_window, qy_window, bad_tunes):
     return data_cleaned, std
 
 
-def get_cleaned_tune(tunes, plane, qx_window, qy_window, bad_tunes):
-    cleaned_tunes, std = reject_outliers(tunes, plane, qx_window, qy_window, bad_tunes)
+def get_cleaned_tune(tunes, plane, qx_window, qy_window, quartiles, bad_tunes):
+    cleaned_tunes, std = reject_outliers(tunes, plane, qx_window, qy_window, quartiles, bad_tunes)
 
     # if all the points are the same, the cleaned tunes would be empty
     if len(cleaned_tunes) == 0:
@@ -82,7 +82,7 @@ def get_cleaned_tune(tunes, plane, qx_window, qy_window, bad_tunes):
     return sum(cleaned_tunes) / len(cleaned_tunes), std
 
 
-def add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, plateau_length, bad_tunes):
+def add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, quartiles, plateau_length, bad_tunes):
     # Length of plateau
     length = i - fp - 1
     # If the plateau is shorter than (arbitrary) 15 measurements, drop it
@@ -90,8 +90,8 @@ def add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, pl
         logger.debug(f"Not logging plateau because of its short length: {i - fp - 1}")
         return out_tfs, j
 
-    tune_avg_x, std_x = get_cleaned_tune(tune_x, 'X', qx_window, qy_window, bad_tunes)
-    tune_avg_y, std_y = get_cleaned_tune(tune_y, 'Y', qx_window, qy_window, bad_tunes)
+    tune_avg_x, std_x = get_cleaned_tune(tune_x, 'X', qx_window, qy_window, quartiles, bad_tunes)
+    tune_avg_y, std_y = get_cleaned_tune(tune_y, 'Y', qx_window, qy_window, quartiles, bad_tunes)
 
     if tune_avg_x is None or tune_avg_y is None:
         logger.debug(f"Not logging plateau because of equal tune data: {tune_x[0]}")
@@ -114,7 +114,8 @@ def add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, pl
     return out_tfs, j
 
 
-def clean_data_for_beam(input_file, output_path, output_file, qx_window, qy_window, plateau_length, bad_tunes):
+def clean_data_for_beam(input_file, output_path, output_file, qx_window, qy_window, quartiles, plateau_length,
+                        bad_tunes):
     data = tfs.read(input_file)
     last_frf = data['F_RF'][0]
     tune_x = []  # temporary list to hold the tune to further clean
@@ -143,7 +144,8 @@ def clean_data_for_beam(input_file, output_path, output_file, qx_window, qy_wind
             tune_y.append(data['QY'][i])
 
         else:  # new plateau
-            out_tfs, j = add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, plateau_length, bad_tunes)
+            out_tfs, j = add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, quartiles,
+                                    plateau_length, bad_tunes)
 
             # Reset the counters
             tune_x = []
@@ -153,7 +155,8 @@ def clean_data_for_beam(input_file, output_path, output_file, qx_window, qy_wind
         last_frf = data['F_RF'][i]
 
     # Last point
-    out_tfs, _ = add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, plateau_length, bad_tunes)
+    out_tfs, _ = add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, quartiles,
+                            plateau_length, bad_tunes)
 
     # TFS can't write dates, convert it to str
     out_tfs = tfs.TfsDataFrame(out_tfs.astype({'TIME': str}))

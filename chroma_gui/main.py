@@ -285,15 +285,15 @@ class ExternalProgram(QThread):
 
     def cleanTune(self):
         (input_file_B1, input_file_B2, output_path, output_filename_B1, output_filename_B2, qx_window, qy_window,
-         plateau_length, bad_tunes) = self.args
+         quartiles, plateau_length, bad_tunes) = self.args
 
         # Beam 1
-        clean.clean_data_for_beam(input_file_B1, output_path, output_filename_B1, qx_window, qy_window, plateau_length,
-                                  bad_tunes)
+        clean.clean_data_for_beam(input_file_B1, output_path, output_filename_B1, qx_window, qy_window, quartiles,
+                                  plateau_length, bad_tunes)
 
         # Beam 2
-        clean.clean_data_for_beam(input_file_B2, output_path, output_filename_B2, qx_window, qy_window, plateau_length,
-                                  bad_tunes)
+        clean.clean_data_for_beam(input_file_B2, output_path, output_filename_B2, qx_window, qy_window, quartiles,
+                                  plateau_length, bad_tunes)
         self.finished.emit()
 
     def computeChroma(self):
@@ -615,7 +615,7 @@ class MainWindow(QMainWindow, main_window_class):
 
         # Nominal RF
         nominal_rf = self.nominalRfLineEdit.text()
-        if nominal_rf == 0 or nominal_rf == 'None':
+        if nominal_rf.strip() == "0" or nominal_rf.strip() == 'None':
             nominal_rf = None
         if nominal_rf is not None:
             nominal_rf = float(nominal_rf)
@@ -683,8 +683,11 @@ class MainWindow(QMainWindow, main_window_class):
 
         # Check of the nominal RF exists
         # If it is 0 or None, the plateau creation will take the first value in the dataFrame
-        if nominal_rf == 0 or nominal_rf == 'None':
+        if nominal_rf.strip() == "0" or nominal_rf.strip() == 'None':
             nominal_rf = None
+            msg = "The nominal frequency is not set. The first point of the data extracted will be taken. "
+            msg += "Be sure that this point is the expected one!"
+            logger.warning(msg)
         if nominal_rf is not None:
             nominal_rf = float(nominal_rf)
 
@@ -725,6 +728,7 @@ class MainWindow(QMainWindow, main_window_class):
                          cleaning.constants.CLEANED_DPP_FILE.format(beam=2),
                          (qx_low, qx_high),
                          (qy_low, qy_high),
+                         (q1_quartile, q3_quartile),
                          plateau_length,
                          bad_tunes)
 

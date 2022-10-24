@@ -80,7 +80,8 @@ def get_tunes(timber_data, beam, rf_beam, start_time, end_time, nominal_rf, alph
     rf_data = construct_rf_data_from_csv(timber_data, rf_beam)
 
     # If the nominal_rf is None, set it right now as it is the first point of the measurement
-    nominal_rf = rf_data['F_RF'].iloc[0]
+    if nominal_rf is None:
+        nominal_rf = rf_data['F_RF'].iloc[0]
 
     data = pd.DataFrame(columns=['TIME', 'F_RF', 'QX', 'QY', 'DPP'])
     with open(timber_data) as f:
