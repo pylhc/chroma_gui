@@ -3,7 +3,10 @@ from fileinput import filename
 import pytimber
 from datetime import datetime
 import os
-from timber.constants import (
+import logging
+import pandas as pd
+
+from chroma_gui.timber.constants import (
     FILENAME,
     BACKUP_FILENAME,
     TIMBER_VARS,
@@ -11,8 +14,6 @@ from timber.constants import (
     FILENAME_PKL,
     BACKUP_FILENAME_PKL
 )
-import logging
-import pandas as pd
 
 
 def extract_from_timber(variables, start_time, end_time):
@@ -81,3 +82,29 @@ def save_as_pickle(path, data):
 def extract_usual_variables(start_time, end_time):
     data = extract_from_timber(TIMBER_VARS, start_time, end_time)
     return data
+
+
+def read_variables_from_csv(filename, variables):
+    """
+    Returns the data of a variable contained in a CSV created by Timber web
+    """
+    variable = variables[0]
+
+    var_flag = False
+    values = []
+    with open(filename) as f:
+        for i, line in enumerate(f):
+            if line.startswith('#'):  # Comments
+                continue
+            if line.startswith('VARIABLE'):
+                var_flag = False
+                if line[len('VARIABLE: '):].strip() == variable:  # Variable is found
+                    var_flag = True
+                continue
+
+            if var_flag and not line.startswith('Timestamp') and line.strip() != '':
+                timestamp, value = line.split(',')
+                timestamp = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S.%f')
+                value = float(value)
+                values.append((timestamp, value))
+    return values

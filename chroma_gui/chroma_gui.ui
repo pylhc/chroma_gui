@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="timberTab">
      <property name="font">
@@ -52,8 +52,8 @@
      <widget class="QLabel" name="statusTimberExtractionLabel">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>150</y>
+        <x>330</x>
+        <y>10</y>
         <width>241</width>
         <height>141</height>
        </rect>
@@ -65,7 +65,7 @@
        <string/>
       </property>
       <property name="alignment">
-       <set>Qt::AlignHCenter|Qt::AlignTop</set>
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
       </property>
      </widget>
      <widget class="QWidget" name="layoutWidget">
@@ -165,6 +165,17 @@
         </widget>
        </item>
       </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_11">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>150</y>
+        <width>1481</width>
+        <height>781</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="timberDataLayout"/>
      </widget>
     </widget>
     <widget class="QWidget" name="cleaningTab">

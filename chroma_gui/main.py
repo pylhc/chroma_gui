@@ -7,7 +7,6 @@ from json import JSONDecodeError
 import tfs
 from typing import Tuple, List
 
-import timber
 import logging
 from pathlib import Path
 from dataclasses import dataclass, field
@@ -31,20 +30,25 @@ from PyQt5.QtWidgets import (
 )
 
 # Chroma-GUI specific libraries
-from plotting.widget import MplWidget, mathTex_to_QPixmap
-from plotting import plot_dpp, plot_freq
-from cleaning import plateau, clean
-from chromaticity import (
+import chroma_gui.timber as timber
+from chroma_gui.plotting.widget import MplWidget, mathTex_to_QPixmap
+from chroma_gui.plotting import (
+    plot_dpp,
+    plot_freq,
+    plot_timber,
+    plot_chromaticity,
+)
+from chroma_gui.cleaning import plateau, clean
+from chroma_gui.chromaticity import (
     get_chromaticity,
     construct_chroma_tfs,
-    plot_chromaticity,
     get_maximum_chromaticity,
     get_chromaticity_df_with_notation,
     get_chromaticity_formula
 )
-import cleaning.constants
-from constants import CHROMA_FILE, RESPONSE_MATRICES, CONFIG
-from corrections import correct
+import chroma_gui.cleaning.constants as cleaning_constants
+from chroma_gui.constants import CHROMA_FILE, RESPONSE_MATRICES, CONFIG
+from chroma_gui.corrections import correct
 
 logger = logging.getLogger('chroma_GUI')
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -168,6 +172,7 @@ class Measurement:
 
         # Enable the cleaning tab if we've got extracted data
         if extracted:
+            main_window.updateTimberPlot(self)
             main_window.enableCleaningTab(True)
             # Set the times
             start = QDateTime.fromString(self.start_time.strftime("%Y-%m-%dT%H:%M:%S"), 'yyyy-MM-ddThh:mm:ss')
@@ -219,8 +224,8 @@ class Measurement:
             return "No extraction in directory yet", False
 
     def get_cleaning_status(self):
-        path_dpp = Path(self.path / cleaning.constants.DPP_FILE.format(beam=1))
-        path_cleaned = Path(self.path / cleaning.constants.CLEANED_DPP_FILE.format(beam=1))
+        path_dpp = Path(self.path / cleaning_constants.DPP_FILE.format(beam=1))
+        path_cleaned = Path(self.path / cleaning_constants.CLEANED_DPP_FILE.format(beam=1))
         return path_dpp.exists(), path_cleaned.exists()
 
     def get_chroma_status(self):
@@ -490,6 +495,7 @@ class MainWindow(QMainWindow, main_window_class):
         self.worker = None
 
         # Define the widgets for the plots
+        self.plotTimberWidget = None
         self.plotDppB1Widget = None
         self.plotDppB2Widget = None
         self.plotRawTuneB1Widget = None
@@ -721,11 +727,11 @@ class MainWindow(QMainWindow, main_window_class):
         logger.info("Starting Tune Cleaning")
         self.startThread("cleanTune",
                          "cleaningFinished",
-                         self.measurement.path / cleaning.constants.DPP_FILE.format(beam=1),
-                         self.measurement.path / cleaning.constants.DPP_FILE.format(beam=2),
+                         self.measurement.path / cleaning_constants.DPP_FILE.format(beam=1),
+                         self.measurement.path / cleaning_constants.DPP_FILE.format(beam=2),
                          self.measurement.path,
-                         cleaning.constants.CLEANED_DPP_FILE.format(beam=1),
-                         cleaning.constants.CLEANED_DPP_FILE.format(beam=2),
+                         cleaning_constants.CLEANED_DPP_FILE.format(beam=1),
+                         cleaning_constants.CLEANED_DPP_FILE.format(beam=2),
                          (qx_low, qx_high),
                          (qy_low, qy_high),
                          (q1_quartile, q3_quartile),
@@ -771,13 +777,13 @@ class MainWindow(QMainWindow, main_window_class):
         self.cleaningPlotB2Layout.addWidget(self.plotDppB2Widget)
 
         # Beam 1
-        file_path = measurement.path / cleaning.constants.DPP_FILE.format(beam=1)
+        file_path = measurement.path / cleaning_constants.DPP_FILE.format(beam=1)
         plot_dpp(self.plotDppB1Widget.canvas.fig, self.plotDppB1Widget.canvas.ax, file_path)
         self.plotDppB1Widget.canvas.draw()
         self.plotDppB1Widget.show()
 
         # Beam 2
-        file_path = measurement.path / cleaning.constants.DPP_FILE.format(beam=2)
+        file_path = measurement.path / cleaning_constants.DPP_FILE.format(beam=2)
         plot_dpp(self.plotDppB2Widget.canvas.fig, self.plotDppB2Widget.canvas.ax, file_path)
         self.plotDppB2Widget.canvas.draw()
         self.plotDppB2Widget.show()
@@ -798,14 +804,14 @@ class MainWindow(QMainWindow, main_window_class):
         delta_rf_flag = self.showDeltaRfCheckBox.isChecked()
 
         # Beam 1
-        filepath = measurement.path / cleaning.constants.DPP_FILE.format(beam=1)
+        filepath = measurement.path / cleaning_constants.DPP_FILE.format(beam=1)
         plot_freq(self.plotRawTuneB1Widget.canvas.fig, self.plotRawTuneB1Widget.canvas.ax, filepath,
                   'Raw Tune Measurement for Beam 1', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag)
         self.plotRawTuneB1Widget.canvas.draw()
         self.plotRawTuneB1Widget.show()
 
         # Beam 2
-        filepath = measurement.path / cleaning.constants.DPP_FILE.format(beam=2)
+        filepath = measurement.path / cleaning_constants.DPP_FILE.format(beam=2)
         plot_freq(self.plotRawTuneB2Widget.canvas.fig, self.plotRawTuneB2Widget.canvas.ax, filepath,
                   f'Raw Tune Measurement for Beam 2', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag)
         self.plotRawTuneB2Widget.canvas.draw()
@@ -828,14 +834,14 @@ class MainWindow(QMainWindow, main_window_class):
         delta_rf_flag = self.showDeltaRfCheckBox.isChecked()
 
         # Beam 1
-        filepath = measurement.path / cleaning.constants.CLEANED_DPP_FILE.format(beam=1)
+        filepath = measurement.path / cleaning_constants.CLEANED_DPP_FILE.format(beam=1)
         plot_freq(self.plotCleanTuneB1Widget.canvas.fig, self.plotCleanTuneB1Widget.canvas.ax, filepath,
                   'Cleaned Tune Measurement for Beam 1', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag, plot_style="line")
         self.plotCleanTuneB1Widget.canvas.draw()
         self.plotCleanTuneB1Widget.show()
 
         # Beam 2
-        filepath = measurement.path / cleaning.constants.CLEANED_DPP_FILE.format(beam=2)
+        filepath = measurement.path / cleaning_constants.CLEANED_DPP_FILE.format(beam=2)
         plot_freq(self.plotCleanTuneB2Widget.canvas.fig, self.plotCleanTuneB2Widget.canvas.ax, filepath,
                   f'Cleaned Tune Measurement for Beam 2', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag, plot_style="line")
         self.plotCleanTuneB2Widget.canvas.draw()
@@ -869,8 +875,8 @@ class MainWindow(QMainWindow, main_window_class):
         dpp_range_low = self.dppRangeLowSpinBox.value()
         dpp_range_high = self.dppRangeHighSpinBox.value()
 
-        input_file_B1 = self.measurement.path / cleaning.constants.CLEANED_DPP_FILE.format(beam=1)
-        input_file_B2 = self.measurement.path / cleaning.constants.CLEANED_DPP_FILE.format(beam=2)
+        input_file_B1 = self.measurement.path / cleaning_constants.CLEANED_DPP_FILE.format(beam=1)
+        input_file_B2 = self.measurement.path / cleaning_constants.CLEANED_DPP_FILE.format(beam=2)
         output_path = self.measurement.path
         fit_orders = self.getChromaticityOrders()
         dpp_range = (dpp_range_low, dpp_range_high)
@@ -946,14 +952,14 @@ class MainWindow(QMainWindow, main_window_class):
         fit_orders = self.getChromaticityOrders()
 
         # Beam 1
-        dpp_file_b1 = measurement.path / cleaning.constants.CLEANED_DPP_FILE.format(beam=1)
+        dpp_file_b1 = measurement.path / cleaning_constants.CLEANED_DPP_FILE.format(beam=1)
         plot_chromaticity(self.plotChromaB1XWidget.canvas.fig, self.plotChromaB1XWidget.canvas.ax,
                           dpp_file_b1, chroma_tfs_file, 'X', fit_orders, "B1")
         plot_chromaticity(self.plotChromaB1YWidget.canvas.fig, self.plotChromaB1YWidget.canvas.ax,
                           dpp_file_b1, chroma_tfs_file, 'Y', fit_orders, "B1")
 
         # Beam 2
-        dpp_file_b2 = measurement.path / cleaning.constants.CLEANED_DPP_FILE.format(beam=2)
+        dpp_file_b2 = measurement.path / cleaning_constants.CLEANED_DPP_FILE.format(beam=2)
         plot_chromaticity(self.plotChromaB2XWidget.canvas.fig, self.plotChromaB2XWidget.canvas.ax,
                           dpp_file_b2, chroma_tfs_file, 'X', fit_orders, "B2")
         plot_chromaticity(self.plotChromaB2YWidget.canvas.fig, self.plotChromaB2YWidget.canvas.ax,
@@ -961,6 +967,26 @@ class MainWindow(QMainWindow, main_window_class):
 
         self.plotChromaB1XWidget.canvas.draw()
         self.plotChromaB1XWidget.show()
+
+    def updateTimberPlot(self, measurement):
+        # Remove the existing plot, if any
+        if self.plotTimberWidget is not None:
+            self.deletePlot(self.plotTimberWidget)
+
+        # Create the Matplotlib widgets
+        self.plotTimberWidget = MplWidget()
+
+        # Add the widgets to the layout
+        self.timberDataLayout.addWidget(self.plotTimberWidget)
+
+        selected_variables = ["ALB.SR4.B1:FGC_FREQ"]
+        plot_timber(self.plotTimberWidget.canvas.fig,
+                    self.plotTimberWidget.canvas.ax,
+                    measurement.path / timber.constants.FILENAME,
+                    selected_variables)
+
+        self.plotTimberWidget.canvas.draw()
+        self.plotTimberWidget.show()
 
     def setChromaticityOrders(self, orders):
         for order in range(3, max(orders)+1):

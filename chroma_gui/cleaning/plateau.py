@@ -1,4 +1,4 @@
-from cleaning.constants import (
+from chroma_gui.cleaning.constants import (
     RF_VARIABLE,
     TUNE_VARS,
     X_VAR_INDICATOR,

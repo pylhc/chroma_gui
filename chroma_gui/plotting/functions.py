@@ -1,15 +1,28 @@
 from datetime import datetime
 import matplotlib.dates as mdates
 from matplotlib.ticker import FormatStrFormatter
-from pathlib import Path
 import tfs
 import numpy as np
 import pandas as pd
 from functools import partial
-import matplotlib as mpl
+
+from chroma_gui.chromaticity.chroma_fct import chromaticity_func
+from chroma_gui.timber.extract import read_variables_from_csv
 
 TUNE_Y_COLOR = "red"
 TUNE_X_COLOR = "orange"
+
+# Colors defined by the palette "deep" of Seaborn, and shuffled a bit
+# This avoids using the package since only those colors are used from it
+COLORS = [(0.2980392156862745, 0.4470588235294118, 0.6901960784313725),
+          (0.3333333333333333, 0.6588235294117647, 0.40784313725490196),
+          (0.8666666666666667, 0.5176470588235295, 0.3215686274509804),
+          (0.7686274509803922, 0.3058823529411765, 0.3215686274509804),
+          (0.5058823529411764, 0.4470588235294118, 0.7019607843137254),
+          (0.5764705882352941, 0.47058823529411764, 0.3764705882352941),
+          (0.8549019607843137, 0.5450980392156862, 0.7647058823529411),
+          (0.5490196078431373, 0.5490196078431373, 0.5490196078431373)]
+
 
 def plot_dpp(fig, ax, filename):
     data = tfs.read(filename)
@@ -169,3 +182,58 @@ def plot_freq(fig,
     #fig.tight_layout()
 
     return xticks
+
+
+def plot_chromaticity(fig, ax, dpp_filename, chroma_tfs, axis, fit_orders, beam):
+    """
+    Plots the given orders of the chromaticity function with the values in the `chroma_tfs` TfsDataFrame
+    """
+    data = tfs.read(dpp_filename)
+
+    tune = data[f'Q{axis}']
+    std = data[f'Q{axis}ERR']
+    dpp = data['DPP']
+
+    # Get the chromaticity values to make the plot
+    chroma_tfs = chroma_tfs[chroma_tfs['AXIS'] == axis]
+    chroma_tfs = chroma_tfs[chroma_tfs['BEAM'] == beam]
+    chroma_tfs = chroma_tfs.drop(['AXIS', 'BEAM'], axis=1)
+
+    # Create the X axis
+    dpp_x = np.linspace(data['DPP'].min(), data['DPP'].max())
+
+    for i, order in enumerate(fit_orders):
+        label = f"$Q^{{({order})}}$ fit"
+
+        # Get the values for the correct order
+        chroma_to_order = chroma_tfs[chroma_tfs['UP_TO_ORDER'] == order].drop(['UP_TO_ORDER'], axis=1)
+
+        columns = [c for c in chroma_to_order.columns if int(c[1]) <= order and 'ERR' not in c]
+        chroma_values = chroma_to_order[columns].values[0]
+
+        # Plot the chromaticity function with the supplied values
+        ax.plot(dpp_x, chromaticity_func(dpp_x, *chroma_values),
+                label=label, color=COLORS[order-3], zorder=-32, linewidth=4.0)
+
+    # Plot the measured tune with errorbars
+    ax.errorbar(dpp,
+                tune,
+                yerr=std,
+                label=f'Measurement',
+                linestyle='None',
+                color='black',
+                elinewidth=2,
+                capsize=3)
+
+    ax.set_title(f"Chromaticity for Beam {beam[1]}")
+    ax.set_xlabel(r'$\frac{\Delta p}{p}$', fontsize=15)
+    ax.set_ylabel(f'$Q_{axis}$', fontsize=15)
+    ax.tick_params(axis="both", labelsize=12)
+    ax.legend(loc=2)
+
+
+def plot_timber(fig, ax, filename, variables):
+    timber_data = read_variables_from_csv(filename, variables)
+    timestamp, val = list(zip(*timber_data))
+    print(timestamp)
+    return

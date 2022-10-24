@@ -40,7 +40,6 @@ REQUIREMENTS: dict = {
     ],
 }
 
-
 setup(
     name='chroma-gui',
     version=ABOUT_CHROMA_GUI['__version__'],
@@ -52,6 +51,8 @@ setup(
     url='',
 
     packages=find_packages(),
+    package_data={'': ["*.ui", "resources/**"]},
+    include_package_data=True,
     python_requires='~=3.7',
     classifiers=[
         "Programming Language :: Python :: 3",
