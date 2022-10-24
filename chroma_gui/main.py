@@ -35,7 +35,7 @@ from plotting.widget import MplWidget, mathTex_to_QPixmap
 from plotting import plot_dpp, plot_freq
 from cleaning import plateau, clean
 from chromaticity import (
-    get_and_plot_chromaticity,
+    get_chromaticity,
     construct_chroma_tfs,
     plot_chromaticity,
     get_maximum_chromaticity,
@@ -303,12 +303,12 @@ class ExternalProgram(QThread):
         chroma_tfs = construct_chroma_tfs(fit_orders)
 
         # Beam 1
-        chroma_tfs = get_and_plot_chromaticity(input_file_B1, chroma_tfs, dpp_range, fit_orders, 'X', None, None)
-        chroma_tfs = get_and_plot_chromaticity(input_file_B1, chroma_tfs, dpp_range, fit_orders, 'Y', None, None)
+        chroma_tfs = get_chromaticity(input_file_B1, chroma_tfs, dpp_range, fit_orders, 'X')
+        chroma_tfs = get_chromaticity(input_file_B1, chroma_tfs, dpp_range, fit_orders, 'Y')
 
         # Beam 2
-        chroma_tfs = get_and_plot_chromaticity(input_file_B2, chroma_tfs, dpp_range, fit_orders, 'X', None, None)
-        chroma_tfs = get_and_plot_chromaticity(input_file_B2, chroma_tfs, dpp_range, fit_orders, 'Y', None, None)
+        chroma_tfs = get_chromaticity(input_file_B2, chroma_tfs, dpp_range, fit_orders, 'X')
+        chroma_tfs = get_chromaticity(input_file_B2, chroma_tfs, dpp_range, fit_orders, 'Y')
 
         tfs.write(output_path / CHROMA_FILE, chroma_tfs)
 
@@ -449,7 +449,7 @@ class Config:
     qy_window: Tuple[float, float] = (0.29, 0.34)
     quartiles: Tuple[float, float] = (0.20, 0.80)
     plateau_length: int = 15
-    bad_tune_lines: List[Tuple[float, float]] = field(default_factory=lambda: [(0.266527, 0.266850)])
+    bad_tune_lines: List[Tuple[float, float]] = field(default_factory=lambda: [(0.2665, 0.2670)])
 
     plot_dpp: bool = False
     plot_delta_rf: bool = False
@@ -468,9 +468,13 @@ def exceptHook(exc_type, exc_value, exc_tb):
     tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
     logger.error(tb)
 
-    # Close the running thread that crashed
+    # Close the running thread if it caused the crash
+    # Otherwise, it might just be the GUI
     main_window = findMainWindow()
-    main_window.thread.terminate()
+    try:
+        main_window.thread.terminate()
+    except:
+        pass
     return
 
 
@@ -480,6 +484,10 @@ class MainWindow(QMainWindow, main_window_class):
         self.setupUi(self)
         self.measurement = None
         self.config = None
+
+        # Thread
+        self.thread = None
+        self.worker = None
 
         # Define the widgets for the plots
         self.plotDppB1Widget = None
@@ -620,6 +628,40 @@ class MainWindow(QMainWindow, main_window_class):
         self.measurement.save_as_json()
         logger.info('Settings saved!')
 
+    def startThread(self, main_function, finish_function, *args):
+        """
+        Simple wrapper to start a thread
+        Arguments:
+            - main_function: method of the class `ExternalProgram` to be started as main function of the thread
+            - finish_function: method of the class  `MainWindow` to be called when the thread has finished
+            - *args: arguments to be passed to the instantiation of the `ExternalProgram` class, those are the
+            `main_function` arguments
+        """
+        # Check if we've got a thread already running
+        try:
+            if self.thread is not None and self.thread.isRunning():
+                logger.warning("A thread is already running, please wait for it to finish")
+                return
+        except RuntimeError:  # The thread has been deleted, it's all good
+            pass
+
+        # Create the thread and the class with our functions
+        self.thread = QThread()
+        self.worker = ExternalProgram(*args)
+
+        # Move worker to the thread
+        self.worker.moveToThread(self.thread)
+
+        # Connect signals and slots
+        self.thread.started.connect(getattr(self.worker, main_function))
+        self.worker.finished.connect(self.thread.quit)
+        self.worker.finished.connect(getattr(self, finish_function))
+        self.worker.finished.connect(self.worker.deleteLater)
+        self.thread.finished.connect(self.thread.deleteLater)
+
+        # Start the thread
+        self.thread.start()
+
     def extractTimberClicked(self):
         start = self.startTimeTimberEdit.dateTime().toPyDateTime()
         end = self.endTimeTimberEdit.dateTime().toPyDateTime()
@@ -629,20 +671,9 @@ class MainWindow(QMainWindow, main_window_class):
         self.measurement.end_time = end
         self.measurement.save_as_json()
 
-        # Step 2: Create a QThread object
-        self.thread = QThread()
-        # Step 3: Create a worker object
-        self.worker = ExternalProgram(start, end)
-        # Step 4: Move worker to the thread
-        self.worker.moveToThread(self.thread)
-        # Step 5: Connect signals and slots
-        self.thread.started.connect(self.worker.extractTimber)
-        self.worker.finished.connect(self.thread.quit)
-        self.worker.finished.connect(self.timberExtractionFinished)
-        self.worker.finished.connect(self.worker.deleteLater)
-        self.thread.finished.connect(self.thread.deleteLater)
-        # Step 6: Start the thread
-        self.thread.start()
+        # Start the extraction
+        logger.info("Starting Timber extraction")
+        self.startThread("extractTimber", "timberExtractionFinished", start, end)
 
     def createPlateausClicked(self):
         start = self.startPlateauDateTimeEdit.dateTime().toPyDateTime()
@@ -657,21 +688,10 @@ class MainWindow(QMainWindow, main_window_class):
         if nominal_rf is not None:
             nominal_rf = float(nominal_rf)
 
-        alpha = self.measurement.alpha
-
+        # Start the plateau creation
         logger.info("Starting Plateau Creation")
-        self.thread = QThread()
-        self.worker = ExternalProgram(self.measurement.path, timber.constants.FILENAME, rf_beam, start, end,
-                                      nominal_rf, alpha)
-        self.worker.moveToThread(self.thread)
-
-        # Assign functions to different states of the thread
-        self.thread.started.connect(self.worker.createPlateaus)
-        self.worker.finished.connect(self.thread.quit)
-        self.worker.finished.connect(self.plateauFinished)
-        self.worker.finished.connect(self.worker.deleteLater)
-        self.thread.finished.connect(self.thread.deleteLater)
-        self.thread.start()
+        self.startThread("createPlateaus", "plateauFinished", self.measurement.path, timber.constants.FILENAME,
+                         rf_beam, start, end, nominal_rf, self.measurement.alpha)
 
     def cleanDataClicked(self):
         # Get values from the GUI
@@ -691,28 +711,22 @@ class MainWindow(QMainWindow, main_window_class):
         # Bad tune lines: list of tuples, e.g. [(0.26, 0.28), ]
         try:
             bad_tunes = ast.literal_eval(self.badTunesLineEdit.text())
-        except:
+        except (ValueError, TypeError, SyntaxError, MemoryError, RecursionError):
             bad_tunes = []
-            logger.error("Could not load the bad tunes line. Default to none.")
+            logger.error("Could not load the bad tunes line. Defaulting to none.")
 
         logger.info("Starting Tune Cleaning")
-        self.thread = QThread()
-        self.worker = ExternalProgram(self.measurement.path / cleaning.constants.DPP_FILE.format(beam=1),
-                                      self.measurement.path / cleaning.constants.DPP_FILE.format(beam=2),
-                                      self.measurement.path,
-                                      cleaning.constants.CLEANED_DPP_FILE.format(beam=1),
-                                      cleaning.constants.CLEANED_DPP_FILE.format(beam=2),
-                                      (qx_low, qx_high), (qy_low, qy_high), plateau_length, bad_tunes,
-                                      )
-        self.worker.moveToThread(self.thread)
-
-        # Assign functions to different states of the thread
-        self.thread.started.connect(self.worker.cleanTune)
-        self.worker.finished.connect(self.thread.quit)
-        self.worker.finished.connect(self.cleaningFinished)
-        self.worker.finished.connect(self.worker.deleteLater)
-        self.thread.finished.connect(self.thread.deleteLater)
-        self.thread.start()
+        self.startThread("cleanTune",
+                         "cleaningFinished",
+                         self.measurement.path / cleaning.constants.DPP_FILE.format(beam=1),
+                         self.measurement.path / cleaning.constants.DPP_FILE.format(beam=2),
+                         self.measurement.path,
+                         cleaning.constants.CLEANED_DPP_FILE.format(beam=1),
+                         cleaning.constants.CLEANED_DPP_FILE.format(beam=2),
+                         (qx_low, qx_high),
+                         (qy_low, qy_high),
+                         plateau_length,
+                         bad_tunes)
 
     def plateauFinished(self, measurement=None):
         logger.info("Plateaus done!")
@@ -858,17 +872,9 @@ class MainWindow(QMainWindow, main_window_class):
         dpp_range = (dpp_range_low, dpp_range_high)
 
         logger.info("Starting Chromaticity Computing")
-        self.thread = QThread()
-        self.worker = ExternalProgram(input_file_B1, input_file_B2, output_path, fit_orders, dpp_range)
-        self.worker.moveToThread(self.thread)
-
-        # Assign functions to different states of the thread
-        self.thread.started.connect(self.worker.computeChroma)
-        self.worker.finished.connect(self.thread.quit)
-        self.worker.finished.connect(self.chromaFinished)
-        self.worker.finished.connect(self.worker.deleteLater)
-        self.thread.finished.connect(self.thread.deleteLater)
-        self.thread.start()
+        self.startThread("computeChroma", "chromaFinished",
+                         input_file_B1, input_file_B2, output_path, fit_orders, dpp_range)
+        return
 
     def chromaFinished(self, measurement=None):
         logger.info('Chromaticity finished computing')
