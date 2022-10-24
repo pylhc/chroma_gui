@@ -3,12 +3,18 @@ import numpy as np
 from math import factorial
 from functools import partial
 from scipy.optimize import curve_fit
-import seaborn as sns
 import tfs
 
-sns.set_palette("deep")
-
-COLORS = [f'C{i}' for i in [0, 2, 1, 3, 4] + list(range(5, 100))]
+# Colors defined by the palette "deep" of Seaborn, and shuffled a bit
+# This avoids using the package since only those colors are used from it
+COLORS = [(0.2980392156862745, 0.4470588235294118, 0.6901960784313725),
+          (0.3333333333333333, 0.6588235294117647, 0.40784313725490196),
+          (0.8666666666666667, 0.5176470588235295, 0.3215686274509804),
+          (0.7686274509803922, 0.3058823529411765, 0.3215686274509804),
+          (0.5058823529411764, 0.4470588235294118, 0.7019607843137254),
+          (0.5764705882352941, 0.47058823529411764, 0.3764705882352941),
+          (0.8549019607843137, 0.5450980392156862, 0.7647058823529411),
+          (0.5490196078431373, 0.5490196078431373, 0.5490196078431373)]
 
 
 def append(df, new_df):

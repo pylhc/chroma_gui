@@ -26,7 +26,6 @@ REQUIREMENTS: dict = {
         "pyqt5",
         "pandas",
         "numpy",
-        "seaborn",
         "scipy",
     ],
     'test': [
