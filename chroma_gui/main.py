@@ -914,7 +914,7 @@ class MainWindow(QMainWindow, main_window_class):
         # Select an item when clicking on a cell, not the row
         self.beamChromaticityTableView.setSelectionBehavior(QTableView.SelectItems)
         # Take all the horizontal space
-        self.beamChromaticityTableView.horizontalHeader().resizeSections(QHeaderView.Stretch)
+        self.beamChromaticityTableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
     def updateChromaPlots(self, measurement):
         """
