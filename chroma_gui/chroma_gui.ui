@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="timberTab">
      <property name="font">
@@ -174,8 +174,8 @@
      <widget class="QPushButton" name="createPlateausButton">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>110</y>
+        <x>170</x>
+        <y>140</y>
         <width>121</width>
         <height>25</height>
        </rect>
@@ -194,7 +194,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="beam1PlotsTab">
        <attribute name="title">
@@ -340,41 +340,41 @@
        <rect>
         <x>360</x>
         <y>10</y>
-        <width>401</width>
+        <width>411</width>
         <height>161</height>
        </rect>
       </property>
-      <widget class="QPushButton" name="cleanDataButton">
-       <property name="geometry">
-        <rect>
-         <x>300</x>
-         <y>70</y>
-         <width>80</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Clean Data</string>
-       </property>
-      </widget>
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>20</x>
+         <x>40</x>
          <y>0</y>
-         <width>271</width>
+         <width>321</width>
          <height>155</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_5">
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_14">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_7">
           <property name="text">
-           <string>Q1 and Q3 quartiles</string>
+           <string>Qx Tune Window</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
+        <item row="2" column="2">
+         <widget class="QDoubleSpinBox" name="q3Quartile">
+          <property name="decimals">
+           <number>3</number>
+          </property>
+          <property name="singleStep">
+           <double>0.050000000000000</double>
+          </property>
+          <property name="value">
+           <double>0.800000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
          <widget class="QLabel" name="label_15">
           <property name="text">
            <string>Plateau Length</string>
@@ -394,19 +394,6 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QDoubleSpinBox" name="qxWindowLow">
-          <property name="decimals">
-           <number>3</number>
-          </property>
-          <property name="singleStep">
-           <double>0.010000000000000</double>
-          </property>
-          <property name="value">
-           <double>0.240000000000000</double>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="1">
          <widget class="QDoubleSpinBox" name="qyWindowLow">
           <property name="decimals">
@@ -417,26 +404,6 @@
           </property>
           <property name="value">
            <double>0.290000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_7">
-          <property name="text">
-           <string>Qx Tune Window</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QDoubleSpinBox" name="q3Quartile">
-          <property name="decimals">
-           <number>3</number>
-          </property>
-          <property name="singleStep">
-           <double>0.050000000000000</double>
-          </property>
-          <property name="value">
-           <double>0.800000000000000</double>
           </property>
          </widget>
         </item>
@@ -460,6 +427,19 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="1">
+         <widget class="QDoubleSpinBox" name="qxWindowLow">
+          <property name="decimals">
+           <number>3</number>
+          </property>
+          <property name="singleStep">
+           <double>0.010000000000000</double>
+          </property>
+          <property name="value">
+           <double>0.240000000000000</double>
+          </property>
+         </widget>
+        </item>
         <item row="2" column="1">
          <widget class="QDoubleSpinBox" name="q1Quartile">
           <property name="decimals">
@@ -473,7 +453,14 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_14">
+          <property name="text">
+           <string>Q1 and Q3 quartiles</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
          <widget class="QSpinBox" name="plateauLength">
           <property name="minimum">
            <number>1</number>
@@ -483,20 +470,27 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="label_16">
-          <property name="text">
-           <string>Bad Tune Lines</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1" colspan="2">
+        <item row="3" column="1" colspan="2">
          <widget class="QLineEdit" name="badTunesLineEdit">
           <property name="text">
            <string>[(0.266527, 0.266850),]</string>
           </property>
           <property name="placeholderText">
            <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_16">
+          <property name="text">
+           <string>Bad Tune Lines</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="2">
+         <widget class="QPushButton" name="cleanDataButton">
+          <property name="text">
+           <string>Clean Data</string>
           </property>
          </widget>
         </item>
@@ -566,17 +560,14 @@
         <x>10</x>
         <y>10</y>
         <width>281</width>
-        <height>91</height>
+        <height>122</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_4">
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_4">
-         <property name="toolTip">
-          <string>The RF Frequency isn't always registered for both beams. Usually only BEAM 1 contains the data.</string>
-         </property>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_6">
          <property name="text">
-          <string>Beam used for RF</string>
+          <string>Refine End</string>
          </property>
         </widget>
        </item>
@@ -603,6 +594,23 @@
          </item>
         </widget>
        </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="toolTip">
+          <string>The RF Frequency isn't always registered for both beams. Usually only BEAM 1 contains the data.</string>
+         </property>
+         <property name="text">
+          <string>Beam used for RF</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QDateTimeEdit" name="endPlateauDateTimeEdit">
+         <property name="displayFormat">
+          <string>yyyy-MM-dd HH:mm:ss</string>
+         </property>
+        </widget>
+       </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_5">
          <property name="text">
@@ -617,17 +625,23 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_6">
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="nominalRfLineEdit">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
          <property name="text">
-          <string>Refine End</string>
+          <string/>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
-        <widget class="QDateTimeEdit" name="endPlateauDateTimeEdit">
-         <property name="displayFormat">
-          <string>yyyy-MM-dd HH:mm:ss</string>
+       <item row="3" column="0">
+        <widget class="QLabel" name="nominalRfLabel">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Nominal Frequency of the RF (Usually around 400_788_869).&lt;/p&gt;&lt;p&gt;If set to 0 or &lt;span style=&quot; font-style:italic;&quot;&gt;None&lt;/span&gt;, it will default to the first value of the measurement.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Nominal RF</string>
          </property>
         </widget>
        </item>
@@ -666,6 +680,15 @@
        </item>
       </layout>
      </widget>
+     <zorder>cleaningPlotsTab</zorder>
+     <zorder>createPlateausButton</zorder>
+     <zorder>cleaningWidget</zorder>
+     <zorder>line</zorder>
+     <zorder>line_2</zorder>
+     <zorder>label_17</zorder>
+     <zorder>line_3</zorder>
+     <zorder>layoutWidget</zorder>
+     <zorder>layoutWidget</zorder>
     </widget>
     <widget class="QWidget" name="chromaticityTab">
      <attribute name="title">
@@ -994,62 +1017,11 @@
      </widget>
     </widget>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>140</y>
-      <width>181</width>
-      <height>81</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item>
-      <widget class="QLabel" name="measurementLabel">
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Measurement Settings</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="nominalRfLineEdit">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="nominalRfLabel">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Nominal Frequency of the RF (Usually around 400_788_869).&lt;/p&gt;&lt;p&gt;If set to 0 or &lt;span style=&quot; font-style:italic;&quot;&gt;None&lt;/span&gt;, it will default to the first value of the measurement.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="text">
-          <string>Nominal RF</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </widget>
    <widget class="QPushButton" name="saveSettingsButton">
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>470</y>
+      <y>440</y>
       <width>111</width>
       <height>25</height>
      </rect>
@@ -1130,7 +1102,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>290</y>
+      <y>260</y>
       <width>181</width>
       <height>171</height>
      </rect>
@@ -1139,10 +1111,31 @@
    <widget class="QLabel" name="label_11">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>260</y>
-      <width>121</width>
+      <x>0</x>
+      <y>240</y>
+      <width>101</width>
       <height>17</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>11</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Description</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="measurementLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>170</y>
+      <width>179</width>
+      <height>79</height>
      </rect>
     </property>
     <property name="font">
@@ -1151,7 +1144,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Description</string>
+     <string>Measurement Settings</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
