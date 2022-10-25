@@ -88,17 +88,18 @@ def read_variables_from_csv(filename, variables):
     """
     Returns the data of a variable contained in a CSV created by Timber web
     """
-    variable = variables[0]
-
     var_flag = False
-    values = []
+    values = {}  # dict with variables as keys, then a list of tuple(Timestamp, value)
     with open(filename) as f:
         for i, line in enumerate(f):
             if line.startswith('#'):  # Comments
                 continue
             if line.startswith('VARIABLE'):
                 var_flag = False
-                if line[len('VARIABLE: '):].strip() == variable:  # Variable is found
+                var_name = line[len('VARIABLE: '):].strip()
+                if var_name in variables:  # Variable is found
+                    if var_name not in values:
+                        values[var_name] = []
                     var_flag = True
                 continue
 
@@ -106,5 +107,23 @@ def read_variables_from_csv(filename, variables):
                 timestamp, value = line.split(',')
                 timestamp = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S.%f')
                 value = float(value)
-                values.append((timestamp, value))
+                values[var_name].append((timestamp, value))
     return values
+
+
+def get_variables_names_from_csv(filename):
+    """
+    Returns all the available variables in the timber extract
+    """
+    variables = []
+
+    with open(filename) as f:
+        for i, line in enumerate(f):
+            if line.startswith('#'):  # Comments
+                continue
+            if line.startswith('VARIABLE'):
+                var_name = line[len('VARIABLE: '):].strip()
+                variables.append(var_name)
+                continue
+    return variables
+

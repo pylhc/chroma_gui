@@ -26,11 +26,18 @@ from PyQt5.QtWidgets import (
     QTableView,
     QSizePolicy,
     QHeaderView,
-    QComboBox, QStyledItemDelegate, qApp,
+    QComboBox,
+    QStyledItemDelegate,
+    qApp,
+    QListWidgetItem,
 )
 
 # Chroma-GUI specific libraries
 import chroma_gui.timber as timber
+from chroma_gui.timber import (
+    get_variables_names_from_csv,
+    read_variables_from_csv,
+)
 from chroma_gui.plotting.widget import MplWidget, mathTex_to_QPixmap
 from chroma_gui.plotting import (
     plot_dpp,
@@ -173,6 +180,7 @@ class Measurement:
         # Enable the cleaning tab if we've got extracted data
         if extracted:
             main_window.updateTimberPlot(self)
+            main_window.updateTimberTable(self)
             main_window.enableCleaningTab(True)
             # Set the times
             start = QDateTime.fromString(self.start_time.strftime("%Y-%m-%dT%H:%M:%S"), 'yyyy-MM-ddThh:mm:ss')
@@ -493,6 +501,9 @@ class MainWindow(QMainWindow, main_window_class):
         # Thread
         self.thread = None
         self.worker = None
+
+        # Timber variables to display
+        self.selectedTimberVariables = []
 
         # Define the widgets for the plots
         self.plotTimberWidget = None
@@ -968,6 +979,30 @@ class MainWindow(QMainWindow, main_window_class):
         self.plotChromaB1XWidget.canvas.draw()
         self.plotChromaB1XWidget.show()
 
+    def timberVariableSelectionChanged(self, item):
+        """
+        Function to be called when an element of the timber selection has been changed.
+        """
+        if item.checkState() == Qt.Unchecked:
+            if item.text() in self.selectedTimberVariables:
+                self.selectedTimberVariables.remove(item.text())
+            else:
+                logger.error(f"Could not remove the selected timber variable '{item.text()}'")
+        elif item.checkState() == Qt.Checked:
+            self.selectedTimberVariables.append(item.text())
+
+        # Update the plot accordingly
+        self.updateTimberPlot(self.measurement)
+
+    def updateTimberTable(self, measurement):
+        # Get the available variables from the extracted data
+        available_variables = get_variables_names_from_csv(measurement.path / timber.constants.FILENAME)
+        for variable in available_variables:
+            item = QListWidgetItem(variable)
+            item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            item.setCheckState(Qt.Unchecked)
+            self.timberVariablesListWidget.addItem(item)
+
     def updateTimberPlot(self, measurement):
         # Remove the existing plot, if any
         if self.plotTimberWidget is not None:
@@ -979,11 +1014,10 @@ class MainWindow(QMainWindow, main_window_class):
         # Add the widgets to the layout
         self.timberDataLayout.addWidget(self.plotTimberWidget)
 
-        selected_variables = ["ALB.SR4.B1:FGC_FREQ"]
         plot_timber(self.plotTimberWidget.canvas.fig,
                     self.plotTimberWidget.canvas.ax,
                     measurement.path / timber.constants.FILENAME,
-                    selected_variables)
+                    self.selectedTimberVariables)
 
         self.plotTimberWidget.canvas.draw()
         self.plotTimberWidget.show()
@@ -1085,6 +1119,7 @@ def findMainWindow() -> typing.Union[QMainWindow, None]:
 
 
 def main(argv):
+    logger.info(f"Running the chroma-gui with python: {sys.executable}")
     # Setup an exception catcher so the app does not crash
     sys.excepthook = exceptHook
 

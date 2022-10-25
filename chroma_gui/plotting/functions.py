@@ -234,6 +234,9 @@ def plot_chromaticity(fig, ax, dpp_filename, chroma_tfs, axis, fit_orders, beam)
 
 def plot_timber(fig, ax, filename, variables):
     timber_data = read_variables_from_csv(filename, variables)
-    timestamp, val = list(zip(*timber_data))
-    print(timestamp)
-    return
+
+    for i, variable in enumerate(timber_data.keys()):
+        ax1 = ax.twinx()
+        timestamps, values = list(zip(*timber_data[variable]))
+        ax1.plot(timestamps, values, label=variable, color=f"C{i}")
+        ax1.legend()
