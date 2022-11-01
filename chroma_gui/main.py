@@ -149,60 +149,11 @@ class Measurement:
             self.end_time = datetime.fromisoformat(measurement_info['end_time'])
 
         self.load_twiss()  # load the twiss files containing alfa
-        self.updateLineEdits()  # Update the interface to show the data
 
     def load_twiss(self):
         for beam in self.alpha.keys():
             twiss = tfs.read(Path(self.model_path[beam]) / 'twiss.dat')
             self.alpha[beam] = twiss.headers['ALFA']
-
-    def updateLineEdits(self):
-        # Update the labels in the Main Window
-        main_window = findMainWindow()
-        main_window.alfaB1LineEdit.setText(str(self.alpha['B1']))
-        main_window.alfaB2LineEdit.setText(str(self.alpha['B2']))
-        main_window.nominalRfLineEdit.setText(str(self.nominal_rf))
-        main_window.descriptionPlainTextEdit.setPlainText(self.description)
-
-        # Set the extraction dates via Qt objects
-        start = QDateTime.fromString(self.start_time.strftime("%Y-%m-%dT%H:%M:%S"), 'yyyy-MM-ddThh:mm:ss')
-        end = QDateTime.fromString(self.end_time.strftime("%Y-%m-%dT%H:%M:%S"), 'yyyy-MM-ddThh:mm:ss')
-        main_window.startTimeTimberEdit.setDateTime(start)
-        main_window.endTimeTimberEdit.setDateTime(end)
-
-        # Write if an extraction already exists with some details about the date
-        message, extracted = self.get_timber_status()
-        main_window.statusTimberExtractionLabel.setText(message)
-
-        # Enable the Timber tab for the first time
-        main_window.enableTimberTab(True)
-
-        # Enable the cleaning tab if we've got extracted data
-        if extracted:
-            main_window.updateTimberPlot(self)
-            main_window.updateTimberTable(self)
-            main_window.enableCleaningTab(True)
-            # Set the times
-            start = QDateTime.fromString(self.start_time.strftime("%Y-%m-%dT%H:%M:%S"), 'yyyy-MM-ddThh:mm:ss')
-            end = QDateTime.fromString(self.end_time.strftime("%Y-%m-%dT%H:%M:%S"), 'yyyy-MM-ddThh:mm:ss')
-            main_window.startPlateauDateTimeEdit.setDateTime(start)
-            main_window.endPlateauDateTimeEdit.setDateTime(end)
-
-        # Check if we got cleaned data already
-        dpp, cleaned = self.get_cleaning_status()
-        if dpp:  # If we have created plateaus, plot them
-            main_window.plateauFinished(self)
-        else:  # If we don't have plateaus, there is no need to display the cleaning yet
-            main_window.cleaningWidget.setEnabled(False)
-
-        if cleaned:  # the cleaned data exist, it can be plotted!
-            main_window.cleaningFinished(self)
-            main_window.enableChromaticityTab(True)
-
-        chroma_status, chroma_orders = self.get_chroma_status()
-        if chroma_status:
-            main_window.setChromaticityOrders(chroma_orders)
-            main_window.chromaFinished(self)
 
     def get_timber_status(self):
         """
@@ -450,8 +401,8 @@ class Config:
     Class for storing user preferences
     """
     # New Measurement Window
-    model_path: Path = Path('.')
-    measurements_path: Path = Path('.')
+    model_path: Path = Path('/user/slops/data/LHC_DATA/OP_DATA/Betabeat/')
+    measurements_path: Path = Path('/user/slops/data/LHC_DATA/OP_DATA/Betabeat/')
 
     # Timber
     extract_raw_timber: bool = False
@@ -560,6 +511,53 @@ class MainWindow(QMainWindow, main_window_class):
         self.showDppCheckBox.setChecked(self.config.plot_dpp)
         self.showDeltaRfCheckBox.setChecked(self.config.plot_delta_rf)
 
+    def updateLineEdits(self):
+        # Update the labels in the Main Window
+        self.alfaB1LineEdit.setText(str(self.measurement.alpha['B1']))
+        self.alfaB2LineEdit.setText(str(self.measurement.alpha['B2']))
+        self.nominalRfLineEdit.setText(str(self.measurement.nominal_rf))
+        self.descriptionPlainTextEdit.setPlainText(self.measurement.description)
+
+        # Set the extraction dates via Qt objects
+        start = QDateTime.fromString(self.measurement.start_time.strftime("%Y-%m-%dT%H:%M:%S"), 'yyyy-MM-ddThh:mm:ss')
+        end = QDateTime.fromString(self.measurement.end_time.strftime("%Y-%m-%dT%H:%M:%S"), 'yyyy-MM-ddThh:mm:ss')
+        self.startTimeTimberEdit.setDateTime(start)
+        self.endTimeTimberEdit.setDateTime(end)
+
+        # Write if an extraction already exists with some details about the date
+        message, extracted = self.measurement.get_timber_status()
+        self.statusTimberExtractionLabel.setText(message)
+
+        # Enable the Timber tab for the first time
+        self.enableTimberTab(True)
+
+        # Enable the cleaning tab if we've got extracted data
+        if extracted:
+            self.updateTimberPlot(self.measurement)
+            self.updateTimberTable(self.measurement)
+            self.enableCleaningTab(True)
+            # Set the times
+            start = QDateTime.fromString(self.measurement.start_time.strftime("%Y-%m-%dT%H:%M:%S"), 'yyyy-MM-ddThh:mm:ss')
+            end = QDateTime.fromString(self.measurement.end_time.strftime("%Y-%m-%dT%H:%M:%S"), 'yyyy-MM-ddThh:mm:ss')
+            self.startPlateauDateTimeEdit.setDateTime(start)
+            self.endPlateauDateTimeEdit.setDateTime(end)
+
+        # Check if we got cleaned data already
+        dpp, cleaned = self.measurement.get_cleaning_status()
+        if dpp:  # If we have created plateaus, plot them
+            self.plateauFinished(self.measurement)
+        else:  # If we don't have plateaus, there is no need to display the cleaning yet
+            self.cleaningWidget.setEnabled(False)
+
+        if cleaned:  # the cleaned data exist, it can be plotted!
+            self.cleaningFinished(self.measurement)
+            self.enableChromaticityTab(True)
+
+        chroma_status, chroma_orders = self.measurement.get_chroma_status()
+        if chroma_status:
+            self.setChromaticityOrders(chroma_orders)
+            self.chromaFinished(self.measurement)
+
     def setCorrectionComboBox(self):
         """
         This function replaces the ComboBox containing the observables by one with items that can be clicked
@@ -620,6 +618,9 @@ class MainWindow(QMainWindow, main_window_class):
                                 "Failed to open measurement",
                                 f"The file 'measurement.info' does not contain the required keys")
             logger.error(e)
+
+        if self.measurement is not None:
+            self.updateLineEdits()
 
     def saveSettingsClicked(self):
         """
@@ -768,7 +769,7 @@ class MainWindow(QMainWindow, main_window_class):
 
     def timberExtractionFinished(self):
         # Update some UI
-        self.measurement.updateLineEdits()
+        self.updateLineEdits()
 
     def updateDppPlot(self, measurement):
         """
