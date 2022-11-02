@@ -4,4 +4,5 @@ from .functions import (
     plot_freq,
     plot_chromaticity,
     plot_timber,
+    save_chromaticity_plot,
 )

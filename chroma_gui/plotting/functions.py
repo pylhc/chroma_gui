@@ -240,3 +240,8 @@ def plot_timber(fig, ax, filename, variables):
         timestamps, values = list(zip(*timber_data[variable]))
         ax1.plot(timestamps, values, label=variable, color=f"C{i}")
         ax1.legend()
+
+
+def save_chromaticity_plot(fig, filepath, formats):
+    for f in formats:
+        fig.savefig(f'{filepath}.{f}', format=f)

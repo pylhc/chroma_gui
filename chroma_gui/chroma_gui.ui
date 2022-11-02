@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="timberTab">
      <property name="font">
@@ -765,7 +765,7 @@
        <rect>
         <x>10</x>
         <y>90</y>
-        <width>131</width>
+        <width>141</width>
         <height>25</height>
        </rect>
       </property>
@@ -910,6 +910,19 @@
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="savePlotsButton">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>90</y>
+        <width>141</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Save Plots</string>
       </property>
      </widget>
     </widget>
@@ -1432,6 +1445,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>savePlotsButton</sender>
+   <signal>clicked()</signal>
+   <receiver>mainWindow</receiver>
+   <slot>savePlotsClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>442</x>
+     <y>153</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>851</x>
+     <y>512</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>newMeasurementClicked()</slot>
@@ -1448,5 +1477,6 @@
   <slot>openMeasurementCorrectionClicked()</slot>
   <slot>correctionButtonClicked()</slot>
   <slot>timberVariableSelectionChanged()</slot>
+  <slot>savePlotsClicked()</slot>
  </slots>
 </ui>

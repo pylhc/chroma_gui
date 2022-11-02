@@ -44,6 +44,7 @@ from chroma_gui.plotting import (
     plot_freq,
     plot_timber,
     plot_chromaticity,
+    save_chromaticity_plot,
 )
 from chroma_gui.cleaning import plateau, clean
 from chroma_gui.chromaticity import (
@@ -951,6 +952,12 @@ class MainWindow(QMainWindow, main_window_class):
         self.plotChromaB2XWidget = MplWidget()
         self.plotChromaB2YWidget = MplWidget()
 
+        size = (10, 10)
+        self.plotChromaB1XWidget.canvas.fig.set_size_inches(size)
+        self.plotChromaB1YWidget.canvas.fig.set_size_inches(size)
+        self.plotChromaB2XWidget.canvas.fig.set_size_inches(size)
+        self.plotChromaB2YWidget.canvas.fig.set_size_inches(size)
+
         # Add the widgets to the layout
         self.beam1ChromaLayout.addWidget(self.plotChromaB1XWidget)
         self.beam1ChromaLayout.addWidget(self.plotChromaB1YWidget)
@@ -979,6 +986,14 @@ class MainWindow(QMainWindow, main_window_class):
 
         self.plotChromaB1XWidget.canvas.draw()
         self.plotChromaB1XWidget.show()
+
+    def savePlotsClicked(self):
+        path = self.measurement.path / "plots"
+        save_chromaticity_plot(self.plotChromaB1XWidget.canvas.fig, path / "Beam1_Qx", formats=['png', 'pdf'])
+        save_chromaticity_plot(self.plotChromaB1YWidget.canvas.fig, path / "Beam1_Qy", formats=['png', 'pdf'])
+        save_chromaticity_plot(self.plotChromaB2XWidget.canvas.fig, path / "Beam2_Qx", formats=['png', 'pdf'])
+        save_chromaticity_plot(self.plotChromaB2YWidget.canvas.fig, path / "Beam2_Qy", formats=['png', 'pdf'])
+        logger.info(f"Saved Chromaticity plots to {path}")
 
     def timberVariableSelectionChanged(self, item):
         """
