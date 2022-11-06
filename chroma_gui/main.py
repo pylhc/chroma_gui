@@ -481,6 +481,8 @@ class MainWindow(QMainWindow, main_window_class):
         # Load preferences for file structure
         self.loadConfig()
 
+        print(self.config)
+
         # Disable tabs for now, as no measurement has been created or opened yet
         # TODO add Correction tab!
         self.enableTimberTab(False)
@@ -490,9 +492,10 @@ class MainWindow(QMainWindow, main_window_class):
         self.setCorrectionComboBox()
 
     def loadConfig(self):
-        if not CONFIG.exists():
-            return
-        config_dict = json.load(open(CONFIG))
+        if CONFIG.exists():
+          config_dict = json.load(open(CONFIG))
+        else:
+          config_dict = {}
         self.config = Config.from_dict(config_dict)
 
         # Fix the value types
