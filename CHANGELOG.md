@@ -1,5 +1,10 @@
 # Non-Linear Chromaticity GUI
 
+## 2022-11-06 - v0.0.5
+
+Fixed:
+  * Config would not be loaded properly when the file did not exist
+
 ## 2022-11-06 - v0.0.4
 
 Added:
