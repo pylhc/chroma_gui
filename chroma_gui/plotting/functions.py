@@ -244,4 +244,4 @@ def plot_timber(fig, ax, filename, variables):
 
 def save_chromaticity_plot(fig, filepath, formats):
     for f in formats:
-        fig.savefig(f'{filepath}.{f}', format=f)
+        fig.savefig(f'{filepath}.{f}', format=f, pad_inches=0, bbox_inches='tight', transparent=True)
