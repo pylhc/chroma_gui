@@ -27,6 +27,8 @@ REQUIREMENTS: dict = {
         "pandas",
         "numpy",
         "scipy",
+        "tabulate",
+        "pyperclip",
     ],
     'test': [
         'pytest',

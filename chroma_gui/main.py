@@ -6,6 +6,7 @@ import json
 from json import JSONDecodeError
 import tfs
 from typing import Tuple, List
+import pyperclip
 
 import logging
 from pathlib import Path
@@ -118,6 +119,9 @@ class ChromaticityTableModel(QAbstractTableModel):
                 return str(self._dataframe.index[section])
 
         return None
+
+    def getDataFrame(self):
+        return self._dataframe
 
 
 class Measurement:
@@ -989,11 +993,19 @@ class MainWindow(QMainWindow, main_window_class):
 
     def savePlotsClicked(self):
         path = self.measurement.path / "plots"
+        path.mkdir(exist_ok=True)
+
         save_chromaticity_plot(self.plotChromaB1XWidget.canvas.fig, path / "Beam1_Qx", formats=['png', 'pdf'])
         save_chromaticity_plot(self.plotChromaB1YWidget.canvas.fig, path / "Beam1_Qy", formats=['png', 'pdf'])
         save_chromaticity_plot(self.plotChromaB2XWidget.canvas.fig, path / "Beam2_Qx", formats=['png', 'pdf'])
         save_chromaticity_plot(self.plotChromaB2YWidget.canvas.fig, path / "Beam2_Qy", formats=['png', 'pdf'])
         logger.info(f"Saved Chromaticity plots to {path}")
+
+    def copyTableClicked(self):
+        current_beam = self.beamChromaticityTabWidget.currentIndex() + 1  # index starts at 0
+        markdown_df = getattr(self, f"chromaB{current_beam}TableModel").getDataFrame().to_markdown(index=False)
+        pyperclip.copy(markdown_df)
+        logger.info(f"Chromaticity Table for beam {current_beam} copied to clipboard.")
 
     def timberVariableSelectionChanged(self, item):
         """
@@ -1121,7 +1133,7 @@ class NewMeasurementDialog(QDialog, new_measurement_class):
 
         main_window = findMainWindow()
         main_window.measurement = measurement
-
+        main_window.updateLineEdits()
         self.close()
 
 
