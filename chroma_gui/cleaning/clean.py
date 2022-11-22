@@ -2,6 +2,8 @@ import tfs
 import numpy as np
 import pandas as pd
 import logging
+from scipy import signal
+from dateutil.parser import isoparse
 
 logger = logging.getLogger('chroma_GUI - Cleaning')
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -65,7 +67,6 @@ def reject_outliers(data, plane, qx_window, qy_window, quartiles, bad_tunes):
     fence_high = Q3 + 1.5 * IQR
     data_cleaned = data.loc[(data > fence_low) & (data < fence_high)]
 
-
     std = np.std(data_cleaned, axis=0)
     return data_cleaned, std
 
@@ -82,7 +83,100 @@ def get_cleaned_tune(tunes, plane, qx_window, qy_window, quartiles, bad_tunes):
     return sum(cleaned_tunes) / len(cleaned_tunes), std
 
 
-def add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, quartiles, plateau_length, bad_tunes):
+def merge_overlap(array):
+    """ Merge the overlapping arrays contained in the given array """
+    res = np.array([])
+    for b in array:
+        n_res = len(res)
+        n = min(n_res, len(b))
+        m = 0
+        for i in range(1, n + 1):
+            if b[n - i] == res[n_res - 1 - m]:
+                m += 1
+            else:
+                m = 0
+        res = np.concatenate((res, b[m:]), axis=None)
+
+    return res
+
+
+def get_spectrogram(raw_data, start_plateau, end_plateau, variables, seconds_step):
+    """ Divide the plateau in chunks of x seconds and apply a spectrogram on it """
+    # Create a mask to only get the data in the plateau
+    d = raw_data.loc[variables + 'H']
+    mask = d['TIMESTAMP'].astype('float') >= start_plateau.timestamp()
+    mask = mask & (d['TIMESTAMP'].astype('float') <= end_plateau.timestamp())
+
+    # Create chunks x seconds long
+    chunks = int((end_plateau - start_plateau).seconds / seconds_step)
+    if chunks == 0:
+        t = (end_plateau - start_plateau).seconds
+        logger.warning(f"The plateau is only {t} seconds long. It will be analyzed in one chunk")
+        chunks = 1
+
+    f, t, Sxx = {}, {}, {}
+    merged_data = {}
+    # Do the spectrogram analysis for each plane
+    for plane in ('H', 'V'):
+        # Merge the overlapping data returned by Timber
+        merged_data[plane] = merge_overlap(raw_data.loc[variables + plane]['VALUE'][mask])
+        elements_per_chunk = int(len(merged_data[plane]) / chunks)
+
+        # print(f'  Plateau will be analyzed in {chunks} chunks, each of {seconds_step} seconds ({seconds_step*11_000} turns)')
+        f[plane], t[plane], Sxx[plane] = signal.spectrogram(merged_data[plane],
+                                                            nperseg=elements_per_chunk,
+                                                            noverlap=elements_per_chunk // 8,
+                                                            fs=1)
+    return f, t, Sxx
+
+
+def get_max_peak(x_data, y_data, plane, window):
+    # Plot the maximum peaks for each plane
+    # Find the peaks via scipy
+    peaks, _ = signal.find_peaks(y_data,  # power density data
+                                 distance=100,  # minimum distance between peaks
+                                 )
+
+    #WINDOW = {'V': [.295, 0.33],  # FIXME
+    #          'H': [.24, 0.29]
+    #          }
+    # Get a window to only get the interesting peaks
+    tune_window = (x_data[peaks] >= window[plane][0]) & (x_data[peaks] <= window[plane][1])
+
+    # Get the peak amplitude associated to a tune (e.g. 2.6)
+    # Sort it in reverse order
+    peak_amp, tunes = zip(*sorted(zip(y_data[peaks][tune_window],
+                                      x_data[peaks][tune_window]),
+                                  reverse=True))
+    return tunes[0]
+
+
+def get_avg_tune_from_spectrogram(f, Sxx, kernel_size, qx_window, qy_window):
+    tunes = {'H': [], 'V': []}
+    avg_tunes = {'H': [], 'V': []}
+    for plane in 'H', 'V':
+        # print(f'Plane {plane}:')
+        # Iterate on the segments
+        for i in range(len(Sxx[plane][0])):
+            # Filter the data
+            data = signal.medfilt(Sxx[plane][:, i],
+                                  kernel_size=kernel_size)
+            # Get the tune
+            window = {'H': qx_window,
+                      'V': qy_window
+            }
+            tune = get_max_peak(f[plane], data, plane, window)
+            tunes[plane].append(tune)
+            # print(f'  Segment {i}: {tune}')
+
+        avg_tunes[plane] = [np.mean(tunes[plane]),
+                            np.std(tunes[plane])]
+        # print(f'Average tune in {plane}: {np.mean(tunes[plane])} +/- {np.std(tunes[plane])}')
+    return avg_tunes
+
+
+def add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, quartiles, plateau_length, bad_tunes,
+               from_raw_BBQ, raw_bbq_data=None, seconds_step=None, kernel_size=None, beam=None):
     # Length of plateau
     length = i - fp - 1
     # If the plateau is shorter than (arbitrary) 15 measurements, drop it
@@ -90,8 +184,17 @@ def add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, qu
         logger.debug(f"Not logging plateau because of its short length: {i - fp - 1}")
         return out_tfs, j
 
-    tune_avg_x, std_x = get_cleaned_tune(tune_x, 'X', qx_window, qy_window, quartiles, bad_tunes)
-    tune_avg_y, std_y = get_cleaned_tune(tune_y, 'Y', qx_window, qy_window, quartiles, bad_tunes)
+    if not from_raw_BBQ:  # Use the already processed tune from TIMBER
+        tune_avg_x, std_x = get_cleaned_tune(tune_x, 'X', qx_window, qy_window, quartiles, bad_tunes)
+        tune_avg_y, std_y = get_cleaned_tune(tune_y, 'Y', qx_window, qy_window, quartiles, bad_tunes)
+    else:  # Do our own magic on the raw BBQ data using a spectrogram
+        start_plateau = isoparse(data['TIME'][fp])
+        end_plateau = isoparse(data['TIME'][i - 1])
+        variables = f'LHC.BQBBQ.CONTINUOUS_HS.B{beam}:ACQ_DATA_'
+        f, t, Sxx = get_spectrogram(raw_bbq_data, start_plateau, end_plateau, variables, seconds_step)
+        tunes_from_raw = get_avg_tune_from_spectrogram(f, Sxx, kernel_size, qx_window, qy_window)
+        tune_avg_x, std_x = tunes_from_raw['H']
+        tune_avg_y, std_y = tunes_from_raw['V']
 
     if tune_avg_x is None or tune_avg_y is None:
         logger.debug(f"Not logging plateau because of equal tune data: {tune_x[0]}")
@@ -115,9 +218,15 @@ def add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, qu
 
 
 def clean_data_for_beam(input_file, output_path, output_file, qx_window, qy_window, quartiles, plateau_length,
-                        bad_tunes):
+                        bad_tunes, from_raw_BBQ=False, raw_bbq_file=None, seconds_step=None, kernel_size=None, beam=None):
     data = tfs.read(input_file)
     last_frf = data['F_RF'][0]
+
+    if not from_raw_BBQ:
+        raw_data = None
+    else:
+        raw_data = pd.read_pickle(raw_bbq_file)
+
     tune_x = []  # temporary list to hold the tune to further clean
     tune_y = []
 
@@ -145,7 +254,7 @@ def clean_data_for_beam(input_file, output_path, output_file, qx_window, qy_wind
 
         else:  # new plateau
             out_tfs, j = add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, quartiles,
-                                    plateau_length, bad_tunes)
+                                    plateau_length, bad_tunes, from_raw_BBQ, raw_data, seconds_step, kernel_size, beam)
 
             # Reset the counters
             tune_x = []
@@ -156,11 +265,14 @@ def clean_data_for_beam(input_file, output_path, output_file, qx_window, qy_wind
 
     # Last point
     out_tfs, _ = add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, quartiles,
-                            plateau_length, bad_tunes)
+                            plateau_length, bad_tunes, from_raw_BBQ, raw_data, seconds_step, kernel_size, beam)
 
     # TFS can't write dates, convert it to str
     out_tfs = tfs.TfsDataFrame(out_tfs.astype({'TIME': str}))
     # Restore the headers
     out_tfs.headers = headers_backup
+
+    if beam is not None:
+        out_tfs.headers['BEAM'] = f'B{beam}'
 
     tfs.write(output_path / output_file, out_tfs)

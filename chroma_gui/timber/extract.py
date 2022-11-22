@@ -66,10 +66,11 @@ def save_as_pickle(path, data):
     """
     now = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     backup_filename = path / BACKUP_FILENAME_PKL.format(now=now)
-    filename = path / FILENAME_PKL.format(now=now)
+    filename = path / FILENAME_PKL
 
     df = pd.DataFrame.from_dict(data=data, columns=['TIMESTAMP', 'VALUE'], orient='index')
     df.to_pickle(backup_filename)
+    logging.info(f"Timber pickle object saved as {FILENAME_PKL}")
 
     # Make a symlink to TIMBER_RAW_DATA.pkl.gz
     try:
@@ -81,6 +82,11 @@ def save_as_pickle(path, data):
 
 def extract_usual_variables(start_time, end_time):
     data = extract_from_timber(TIMBER_VARS, start_time, end_time)
+    return data
+
+
+def extract_raw_variables(start_time, end_time):
+    data = extract_from_timber(TIMBER_VARS + TIMBER_RAW_VARS, start_time, end_time)
     return data
 
 

@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="timberTab">
      <property name="font">
@@ -361,17 +361,17 @@
        <rect>
         <x>360</x>
         <y>10</y>
-        <width>411</width>
+        <width>611</width>
         <height>161</height>
        </rect>
       </property>
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>40</x>
+         <x>0</x>
          <y>0</y>
-         <width>321</width>
-         <height>155</height>
+         <width>311</width>
+         <height>163</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_5">
@@ -441,6 +441,13 @@
           </property>
          </widget>
         </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_16">
+          <property name="text">
+           <string>Bad Tune Lines</string>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_8">
           <property name="text">
@@ -474,23 +481,6 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_14">
-          <property name="text">
-           <string>Q1 and Q3 quartiles</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QSpinBox" name="plateauLength">
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="value">
-           <number>15</number>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="1" colspan="2">
          <widget class="QLineEdit" name="badTunesLineEdit">
           <property name="text">
@@ -501,17 +491,117 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_16">
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_14">
           <property name="text">
-           <string>Bad Tune Lines</string>
+           <string>Q1 and Q3 quartiles</string>
           </property>
          </widget>
         </item>
-        <item row="4" column="2">
-         <widget class="QPushButton" name="cleanDataButton">
+        <item row="4" column="1" colspan="2">
+         <widget class="QSpinBox" name="plateauLength">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="value">
+           <number>15</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QPushButton" name="cleanDataButton">
+       <property name="geometry">
+        <rect>
+         <x>340</x>
+         <y>130</y>
+         <width>261</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Clean Data</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="cleaningStatusLabel">
+       <property name="geometry">
+        <rect>
+         <x>340</x>
+         <y>100</y>
+         <width>261</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>340</x>
+         <y>0</y>
+         <width>260</width>
+         <height>91</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="1" column="1" colspan="2">
+         <widget class="QDoubleSpinBox" name="secondsStep">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="decimals">
+           <number>0</number>
+          </property>
+          <property name="singleStep">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>3.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_13">
           <property name="text">
-           <string>Clean Data</string>
+           <string>Kernel Size</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>Seconds Step</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1" colspan="2">
+         <widget class="QDoubleSpinBox" name="kernelSize">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="decimals">
+           <number>0</number>
+          </property>
+          <property name="singleStep">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>15.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="3">
+         <widget class="QCheckBox" name="useRawBBQCheckBox">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string>Use raw BBQ</string>
           </property>
          </widget>
         </item>
@@ -534,7 +624,7 @@
      <widget class="Line" name="line_2">
       <property name="geometry">
        <rect>
-        <x>780</x>
+        <x>970</x>
         <y>0</y>
         <width>20</width>
         <height>171</height>
@@ -547,7 +637,7 @@
      <widget class="QLabel" name="label_17">
       <property name="geometry">
        <rect>
-        <x>810</x>
+        <x>1000</x>
         <y>10</y>
         <width>51</width>
         <height>17</height>
@@ -565,7 +655,7 @@
      <widget class="Line" name="line_3">
       <property name="geometry">
        <rect>
-        <x>930</x>
+        <x>1120</x>
         <y>0</y>
         <width>20</width>
         <height>171</height>
@@ -671,7 +761,7 @@
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>820</x>
+        <x>1010</x>
         <y>40</y>
         <width>84</width>
         <height>85</height>
@@ -701,6 +791,32 @@
        </item>
       </layout>
      </widget>
+     <widget class="Line" name="line_4">
+      <property name="geometry">
+       <rect>
+        <x>1480</x>
+        <y>560</y>
+        <width>20</width>
+        <height>171</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="Line" name="line_5">
+      <property name="geometry">
+       <rect>
+        <x>1480</x>
+        <y>560</y>
+        <width>20</width>
+        <height>171</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
      <zorder>cleaningPlotsTab</zorder>
      <zorder>createPlateausButton</zorder>
      <zorder>cleaningWidget</zorder>
@@ -710,6 +826,8 @@
      <zorder>line_3</zorder>
      <zorder>layoutWidget</zorder>
      <zorder>layoutWidget</zorder>
+     <zorder>line_4</zorder>
+     <zorder>line_5</zorder>
     </widget>
     <widget class="QWidget" name="chromaticityTab">
      <attribute name="title">
@@ -1484,6 +1602,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>useRawBBQCheckBox</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>mainWindow</receiver>
+   <slot>useRawBBQCheckBoxClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1031</x>
+     <y>73</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>851</x>
+     <y>512</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>newMeasurementClicked()</slot>
@@ -1502,5 +1636,7 @@
   <slot>timberVariableSelectionChanged()</slot>
   <slot>savePlotsClicked()</slot>
   <slot>copyTableClicked()</slot>
+  <slot>cleanRawBBQDataClicked()</slot>
+  <slot>useRawBBQCheckBoxClicked()</slot>
  </slots>
 </ui>

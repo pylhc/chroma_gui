@@ -72,9 +72,9 @@ def get_dpp(dpp_data, timestamp):
 
 
 # Then get the tunes
-def get_tunes(timber_data, beam, rf_beam, start_time, end_time, nominal_rf, alpha):
+def get_tunes_plateaus(timber_data, beam, rf_beam, start_time, end_time, nominal_rf, alpha):
     """
-    Builds a dataFrame with the tune, RF and DPP 'chunked' into plateaux
+    Builds a dataFrame with the tune, RF and DPP 'chunked' into plateaus
     """
     # Get the RF as a dataframe
     rf_data = construct_rf_data_from_csv(timber_data, rf_beam)
@@ -144,8 +144,8 @@ def create_plateau(path, timber_data, rf_beam, start_time, end_time, nominal_rf,
     """
     Wrapper function to get plateaus from B1 and B2 and save them
     """
-    plateau_b1 = get_tunes(path / timber_data, 1, rf_beam, start_time, end_time, nominal_rf, alpha['B1'])
-    plateau_b2 = get_tunes(path / timber_data, 2, rf_beam, start_time, end_time, nominal_rf, alpha['B2'])
+    plateau_b1 = get_tunes_plateaus(path / timber_data, 1, rf_beam, start_time, end_time, nominal_rf, alpha['B1'])
+    plateau_b2 = get_tunes_plateaus(path / timber_data, 2, rf_beam, start_time, end_time, nominal_rf, alpha['B2'])
 
     tfs.write(path / DPP_FILE.format(beam=1), plateau_b1)
     tfs.write(path / DPP_FILE.format(beam=2), plateau_b2)

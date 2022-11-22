@@ -241,6 +241,7 @@ class ExternalProgram(QThread):
 
         # If the user tells us to extract the RAW data, save it
         if main_window.rawBBQCheckBox.isChecked():
+            data = timber.extract.extract_raw_variables(start, end)
             timber.extract.save_as_pickle(measurement_path, data)
 
         logger.info("PyTimber extraction finished")
@@ -263,6 +264,24 @@ class ExternalProgram(QThread):
         # Beam 2
         clean.clean_data_for_beam(input_file_B2, output_path, output_filename_B2, qx_window, qy_window, quartiles,
                                   plateau_length, bad_tunes)
+        self.finished.emit()
+
+    def cleanTuneRawBBQ(self):
+        (input_file, input_file_raw, output_path, output_filename_B1, output_filename_B2, qx_window, qy_window,
+         plateau_length,
+         seconds_step, kernel_size) = self.args
+
+        quartiles = None
+        bad_tunes = []
+        # Beam 1
+        clean.clean_data_for_beam(input_file, output_path, output_filename_B1, qx_window, qy_window, quartiles,
+                                  plateau_length, bad_tunes, from_raw_BBQ=True, raw_bbq_file=input_file_raw,
+                                  seconds_step=seconds_step, kernel_size=kernel_size, beam=1)
+
+        # Beam 2
+        clean.clean_data_for_beam(input_file, output_path, output_filename_B2, qx_window, qy_window, quartiles,
+                                  plateau_length, bad_tunes, from_raw_BBQ=True, raw_bbq_file=input_file_raw,
+                                  seconds_step=seconds_step, kernel_size=kernel_size, beam=2)
         self.finished.emit()
 
     def computeChroma(self):
@@ -444,6 +463,13 @@ def exceptHook(exc_type, exc_value, exc_tb):
         main_window.thread.terminate()
     except:
         pass
+
+    # Inform the user in the GUI that the function didn't run properly
+    stk = traceback.extract_tb(exc_tb, 1)
+    function_name = stk[0][2]  # function that caused the issue
+    if function_name == "cleanTuneRawBBQ":
+        main_window.cleaningStatusLabel.setText("Cleaning failed!")
+
     return
 
 
@@ -481,8 +507,6 @@ class MainWindow(QMainWindow, main_window_class):
         # Load preferences for file structure
         self.loadConfig()
 
-        print(self.config)
-
         # Disable tabs for now, as no measurement has been created or opened yet
         # TODO add Correction tab!
         self.enableTimberTab(False)
@@ -493,9 +517,9 @@ class MainWindow(QMainWindow, main_window_class):
 
     def loadConfig(self):
         if CONFIG.exists():
-          config_dict = json.load(open(CONFIG))
+            config_dict = json.load(open(CONFIG))
         else:
-          config_dict = {}
+            config_dict = {}
         self.config = Config.from_dict(config_dict)
 
         # Fix the value types
@@ -545,7 +569,8 @@ class MainWindow(QMainWindow, main_window_class):
             self.updateTimberTable(self.measurement)
             self.enableCleaningTab(True)
             # Set the times
-            start = QDateTime.fromString(self.measurement.start_time.strftime("%Y-%m-%dT%H:%M:%S"), 'yyyy-MM-ddThh:mm:ss')
+            start = QDateTime.fromString(self.measurement.start_time.strftime("%Y-%m-%dT%H:%M:%S"),
+                                         'yyyy-MM-ddThh:mm:ss')
             end = QDateTime.fromString(self.measurement.end_time.strftime("%Y-%m-%dT%H:%M:%S"), 'yyyy-MM-ddThh:mm:ss')
             self.startPlateauDateTimeEdit.setDateTime(start)
             self.endPlateauDateTimeEdit.setDateTime(end)
@@ -737,6 +762,10 @@ class MainWindow(QMainWindow, main_window_class):
         # Minimum Plateau Length
         plateau_length = self.plateauLength.value()
 
+        # Raw BBQ specific options
+        seconds_step = self.secondsStep.value()
+        kernel_size = self.kernelSize.value()
+
         # Bad tune lines: list of tuples, e.g. [(0.26, 0.28), ]
         try:
             bad_tunes = ast.literal_eval(self.badTunesLineEdit.text())
@@ -744,19 +773,37 @@ class MainWindow(QMainWindow, main_window_class):
             bad_tunes = []
             logger.error("Could not load the bad tunes line. Defaulting to none.")
 
+        # Set the cleaning label
+        self.cleaningStatusLabel.setText("Cleaning in progress…")
+
         logger.info("Starting Tune Cleaning")
-        self.startThread("cleanTune",
-                         "cleaningFinished",
-                         self.measurement.path / cleaning_constants.DPP_FILE.format(beam=1),
-                         self.measurement.path / cleaning_constants.DPP_FILE.format(beam=2),
-                         self.measurement.path,
-                         cleaning_constants.CLEANED_DPP_FILE.format(beam=1),
-                         cleaning_constants.CLEANED_DPP_FILE.format(beam=2),
-                         (qx_low, qx_high),
-                         (qy_low, qy_high),
-                         (q1_quartile, q3_quartile),
-                         plateau_length,
-                         bad_tunes)
+        if not self.useRawBBQCheckBox.isChecked():
+            self.startThread("cleanTune",
+                             "cleaningFinished",
+                             self.measurement.path / cleaning_constants.DPP_FILE.format(beam=1),
+                             self.measurement.path / cleaning_constants.DPP_FILE.format(beam=2),
+                             self.measurement.path,
+                             cleaning_constants.CLEANED_DPP_FILE.format(beam=1),
+                             cleaning_constants.CLEANED_DPP_FILE.format(beam=2),
+                             (qx_low, qx_high),
+                             (qy_low, qy_high),
+                             (q1_quartile, q3_quartile),
+                             plateau_length,
+                             bad_tunes)
+        else:
+            self.startThread("cleanTuneRawBBQ",
+                             "cleaningFinished",
+                             self.measurement.path / cleaning_constants.DPP_FILE.format(beam=1),
+                             self.measurement.path / timber.constants.FILENAME_PKL,
+                             self.measurement.path,
+                             cleaning_constants.CLEANED_DPP_FILE.format(beam=1),
+                             cleaning_constants.CLEANED_DPP_FILE.format(beam=2),
+                             (qx_low, qx_high),
+                             (qy_low, qy_high),
+                             plateau_length,
+                             int(seconds_step),
+                             int(kernel_size),
+                             )
 
     def plateauFinished(self, measurement=None):
         logger.info("Plateaus done!")
@@ -770,6 +817,7 @@ class MainWindow(QMainWindow, main_window_class):
 
     def cleaningFinished(self, measurement=None):
         logger.info("Cleaning done!")
+        self.cleaningStatusLabel.setText("Cleaning done")
         self.enableChromaticityTab(True)
         if not measurement:
             measurement = self.measurement
@@ -856,14 +904,16 @@ class MainWindow(QMainWindow, main_window_class):
         # Beam 1
         filepath = measurement.path / cleaning_constants.CLEANED_DPP_FILE.format(beam=1)
         plot_freq(self.plotCleanTuneB1Widget.canvas.fig, self.plotCleanTuneB1Widget.canvas.ax, filepath,
-                  'Cleaned Tune Measurement for Beam 1', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag, plot_style="line")
+                  'Cleaned Tune Measurement for Beam 1', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag,
+                  plot_style="line")
         self.plotCleanTuneB1Widget.canvas.draw()
         self.plotCleanTuneB1Widget.show()
 
         # Beam 2
         filepath = measurement.path / cleaning_constants.CLEANED_DPP_FILE.format(beam=2)
         plot_freq(self.plotCleanTuneB2Widget.canvas.fig, self.plotCleanTuneB2Widget.canvas.ax, filepath,
-                  f'Cleaned Tune Measurement for Beam 2', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag, plot_style="line")
+                  f'Cleaned Tune Measurement for Beam 2', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag,
+                  plot_style="line")
         self.plotCleanTuneB2Widget.canvas.draw()
         self.plotCleanTuneB2Widget.show()
 
@@ -1010,6 +1060,15 @@ class MainWindow(QMainWindow, main_window_class):
         pyperclip.copy(markdown_df)
         logger.info(f"Chromaticity Table for beam {current_beam} copied to clipboard.")
 
+    def useRawBBQCheckBoxClicked(self, value):
+        raw_enabled = value == 2
+
+        self.secondsStep.setEnabled(True == raw_enabled)
+        self.kernelSize.setEnabled(True == raw_enabled)
+        self.badTunesLineEdit.setEnabled(False == raw_enabled)
+        self.q1Quartile.setEnabled(False == raw_enabled)
+        self.q3Quartile.setEnabled(False == raw_enabled)
+
     def timberVariableSelectionChanged(self, item):
         """
         Function to be called when an element of the timber selection has been changed.
@@ -1054,7 +1113,7 @@ class MainWindow(QMainWindow, main_window_class):
         self.plotTimberWidget.show()
 
     def setChromaticityOrders(self, orders):
-        for order in range(3, max(orders)+1):
+        for order in range(3, max(orders) + 1):
             dq = getattr(self, f'ChromaOrder{order}CheckBox')
             if order in orders:
                 dq.setChecked(True)

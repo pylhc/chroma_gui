@@ -26,7 +26,7 @@ TIMBER_VARS = ['LHC.BQBBQ.CONTINUOUS_HS.B1:EIGEN_FREQ_1',  # Good BBQ data usual
 
 # Vars not to be saved in the CSV
 TIMBER_RAW_VARS = ['LHC.BQBBQ.CONTINUOUS_HS.B1:ACQ_DATA_H',
-            'LHC.BQBBQ.CONTINUOUS_HS.B1:ACQ_DATA_V',
-            'LHC.BQBBQ.CONTINUOUS_HS.B2:ACQ_DATA_H',
-            'LHC.BQBBQ.CONTINUOUS_HS.B2:ACQ_DATA_V',
-            ]
+                   'LHC.BQBBQ.CONTINUOUS_HS.B1:ACQ_DATA_V',
+                   'LHC.BQBBQ.CONTINUOUS_HS.B2:ACQ_DATA_H',
+                   'LHC.BQBBQ.CONTINUOUS_HS.B2:ACQ_DATA_V',
+                  ]
