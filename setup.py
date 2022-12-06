@@ -29,6 +29,7 @@ REQUIREMENTS: dict = {
         "scipy",
         "tabulate",
         "pyperclip",
+        "PyNAFF",
     ],
     'test': [
         'pytest',

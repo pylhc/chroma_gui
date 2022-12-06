@@ -259,28 +259,27 @@ class ExternalProgram(QThread):
 
         # Beam 1
         clean.clean_data_for_beam(input_file_B1, output_path, output_filename_B1, qx_window, qy_window, quartiles,
-                                  plateau_length, bad_tunes)
+                                  plateau_length, bad_tunes, method="bbq")
 
         # Beam 2
         clean.clean_data_for_beam(input_file_B2, output_path, output_filename_B2, qx_window, qy_window, quartiles,
-                                  plateau_length, bad_tunes)
+                                  plateau_length, bad_tunes, method="bbq")
         self.finished.emit()
 
     def cleanTuneRawBBQ(self):
         (input_file, input_file_raw, output_path, output_filename_B1, output_filename_B2, qx_window, qy_window,
-         plateau_length,
-         seconds_step, kernel_size) = self.args
+         plateau_length, seconds_step, kernel_size, method) = self.args
 
         quartiles = None
         bad_tunes = []
         # Beam 1
         clean.clean_data_for_beam(input_file, output_path, output_filename_B1, qx_window, qy_window, quartiles,
-                                  plateau_length, bad_tunes, from_raw_BBQ=True, raw_bbq_file=input_file_raw,
+                                  plateau_length, bad_tunes, method=method, raw_bbq_file=input_file_raw,
                                   seconds_step=seconds_step, kernel_size=kernel_size, beam=1)
 
         # Beam 2
         clean.clean_data_for_beam(input_file, output_path, output_filename_B2, qx_window, qy_window, quartiles,
-                                  plateau_length, bad_tunes, from_raw_BBQ=True, raw_bbq_file=input_file_raw,
+                                  plateau_length, bad_tunes, method=method, raw_bbq_file=input_file_raw,
                                   seconds_step=seconds_step, kernel_size=kernel_size, beam=2)
         self.finished.emit()
 
@@ -777,7 +776,7 @@ class MainWindow(QMainWindow, main_window_class):
         self.cleaningStatusLabel.setText("Cleaning in progress…")
 
         logger.info("Starting Tune Cleaning")
-        if not self.useRawBBQCheckBox.isChecked():
+        if not self.useRawBBQCheckBox.isChecked():  # classic BBQ
             self.startThread("cleanTune",
                              "cleaningFinished",
                              self.measurement.path / cleaning_constants.DPP_FILE.format(beam=1),
@@ -790,7 +789,8 @@ class MainWindow(QMainWindow, main_window_class):
                              (q1_quartile, q3_quartile),
                              plateau_length,
                              bad_tunes)
-        else:
+        else:  # raw BBQ
+            method = "raw_bbq_naff" if self.useNAFFCheckBox.isChecked() else "raw_bbq_spectrogram"
             self.startThread("cleanTuneRawBBQ",
                              "cleaningFinished",
                              self.measurement.path / cleaning_constants.DPP_FILE.format(beam=1),
@@ -803,6 +803,7 @@ class MainWindow(QMainWindow, main_window_class):
                              plateau_length,
                              int(seconds_step),
                              int(kernel_size),
+                             method,
                              )
 
     def plateauFinished(self, measurement=None):
@@ -1063,11 +1064,22 @@ class MainWindow(QMainWindow, main_window_class):
     def useRawBBQCheckBoxClicked(self, value):
         raw_enabled = value == 2
 
+        # Turn ON or OFF some features depending on if the user wants to use the raw BBQ or not
+        self.useNAFFCheckBox.setEnabled(True == raw_enabled)
         self.secondsStep.setEnabled(True == raw_enabled)
         self.kernelSize.setEnabled(True == raw_enabled)
         self.badTunesLineEdit.setEnabled(False == raw_enabled)
         self.q1Quartile.setEnabled(False == raw_enabled)
         self.q3Quartile.setEnabled(False == raw_enabled)
+
+        if raw_enabled:
+            self.useNAFFCheckBoxClicked(int(self.useNAFFCheckBox.isChecked()) * 2)  # Send a 0 or 2 depending on the state
+
+    def useNAFFCheckBoxClicked(self, value):
+        naff_enabled = value == 2
+
+        # Turn ON or OFF some raw bbq functions
+        self.kernelSize.setEnabled(False == naff_enabled)
 
     def timberVariableSelectionChanged(self, item):
         """

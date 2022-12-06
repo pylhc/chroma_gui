@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import logging
 from scipy import signal
+import PyNAFF as pnf
 from dateutil.parser import isoparse
 
 logger = logging.getLogger('chroma_GUI - Cleaning')
@@ -130,16 +131,60 @@ def get_spectrogram(raw_data, start_plateau, end_plateau, variables, seconds_ste
     return f, t, Sxx
 
 
+def get_avg_tune_from_naff(raw_data, start_plateau, end_plateau, variables, seconds_step, qx_window, qy_window):
+    """ Divide the plateau in chunks of x seconds and use NAFF on it"""
+    # Create a mask to only get the data in the plateau
+    d = raw_data.loc[variables + 'H']
+    mask = d['TIMESTAMP'].astype('float') >= start_plateau.timestamp()
+    mask = mask & (d['TIMESTAMP'].astype('float') <= end_plateau.timestamp())
+    window = {'H': qx_window, 'V': qy_window}
+
+    # Create chunks x seconds long
+    chunks = int((end_plateau - start_plateau).seconds / seconds_step)
+    if chunks == 0:
+        t = (end_plateau - start_plateau).seconds
+        logger.warning(f"The plateau is only {t} seconds long. It will be analyzed in one chunk")
+        chunks = 1
+
+    merged_data = {}
+    tunes = {'H': [], 'V': []}
+    # Get the tune via NAFF for each plane
+    for plane in ('H', 'V'):
+        # Merge the overlapping data returned by Timber
+        merged_data[plane] = merge_overlap(raw_data.loc[variables + plane]['VALUE'][mask])
+        elements_per_chunk = int(len(merged_data[plane]) / chunks)
+
+        # Process each chunk
+        for i in range(chunks):
+            data = merged_data[plane][elements_per_chunk * i: elements_per_chunk * (i+1)]
+
+            spectrum = pnf.naff(data,
+                                turns=len(data)-1,  # somehow it fails with all the data
+                                nterms=2,
+                                skipTurns=0,
+                                getFullSpectrum=False,
+                                window=1)
+
+            tune = None
+            for j in range(len(spectrum)):
+                if window[plane][0] <= spectrum[j][1] <= window[plane][1]:
+                    tune = spectrum[j][1]
+                    tunes[plane].append(tune)
+                    break
+            if tune is None:
+                return {'H': (None, None), 'V': (None, None)}
+
+    tune_x = np.average(tunes['H']), np.std(tunes['H'])
+    tune_y = np.average(tunes['V']), np.std(tunes['V'])
+    return {'H': tune_x, 'V': tune_y}
+
+
 def get_max_peak(x_data, y_data, plane, window):
     # Plot the maximum peaks for each plane
     # Find the peaks via scipy
     peaks, _ = signal.find_peaks(y_data,  # power density data
                                  distance=100,  # minimum distance between peaks
                                  )
-
-    #WINDOW = {'V': [.295, 0.33],  # FIXME
-    #          'H': [.24, 0.29]
-    #          }
     # Get a window to only get the interesting peaks
     tune_window = (x_data[peaks] >= window[plane][0]) & (x_data[peaks] <= window[plane][1])
 
@@ -176,7 +221,7 @@ def get_avg_tune_from_spectrogram(f, Sxx, kernel_size, qx_window, qy_window):
 
 
 def add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, quartiles, plateau_length, bad_tunes,
-               from_raw_BBQ, raw_bbq_data=None, seconds_step=None, kernel_size=None, beam=None):
+               method="bbq", raw_bbq_data=None, seconds_step=None, kernel_size=None, beam=None):
     # Length of plateau
     length = i - fp - 1
     # If the plateau is shorter than (arbitrary) 15 measurements, drop it
@@ -184,10 +229,11 @@ def add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, qu
         logger.debug(f"Not logging plateau because of its short length: {i - fp - 1}")
         return out_tfs, j
 
-    if not from_raw_BBQ:  # Use the already processed tune from TIMBER
+    # Use the selected method to compute the tune
+    if method == "bbq":  # Use the already processed tune from TIMBER
         tune_avg_x, std_x = get_cleaned_tune(tune_x, 'X', qx_window, qy_window, quartiles, bad_tunes)
         tune_avg_y, std_y = get_cleaned_tune(tune_y, 'Y', qx_window, qy_window, quartiles, bad_tunes)
-    else:  # Do our own magic on the raw BBQ data using a spectrogram
+    elif method == "raw_bbq_spectrogram":  # Do our own magic on the raw BBQ data using a spectrogram
         start_plateau = isoparse(data['TIME'][fp])
         end_plateau = isoparse(data['TIME'][i - 1])
         variables = f'LHC.BQBBQ.CONTINUOUS_HS.B{beam}:ACQ_DATA_'
@@ -195,7 +241,16 @@ def add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, qu
         tunes_from_raw = get_avg_tune_from_spectrogram(f, Sxx, kernel_size, qx_window, qy_window)
         tune_avg_x, std_x = tunes_from_raw['H']
         tune_avg_y, std_y = tunes_from_raw['V']
+    elif method == "raw_bbq_naff":
+        start_plateau = isoparse(data['TIME'][fp])
+        end_plateau = isoparse(data['TIME'][i - 1])
+        variables = f'LHC.BQBBQ.CONTINUOUS_HS.B{beam}:ACQ_DATA_'
+        tunes_from_raw = get_avg_tune_from_naff(raw_bbq_data, start_plateau, end_plateau, variables, seconds_step,
+                                                qx_window, qy_window)
+        tune_avg_x, std_x = tunes_from_raw['H']
+        tune_avg_y, std_y = tunes_from_raw['V']
 
+    # Reject short plateaus that have no std
     if tune_avg_x is None or tune_avg_y is None:
         logger.debug(f"Not logging plateau because of equal tune data: {tune_x[0]}")
         logger.debug(f"  Time: {data['TIME'][fp]} / {data['TIME'][i-1]}")
@@ -218,11 +273,11 @@ def add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, qu
 
 
 def clean_data_for_beam(input_file, output_path, output_file, qx_window, qy_window, quartiles, plateau_length,
-                        bad_tunes, from_raw_BBQ=False, raw_bbq_file=None, seconds_step=None, kernel_size=None, beam=None):
+                        bad_tunes, method, raw_bbq_file=None, seconds_step=None, kernel_size=None, beam=None):
     data = tfs.read(input_file)
     last_frf = data['F_RF'][0]
 
-    if not from_raw_BBQ:
+    if method == "bbq":  # can be "bbq", "raw_bbq_naff", "raw_bbq_spectrogram"
         raw_data = None
     else:
         raw_data = pd.read_pickle(raw_bbq_file)
@@ -254,7 +309,7 @@ def clean_data_for_beam(input_file, output_path, output_file, qx_window, qy_wind
 
         else:  # new plateau
             out_tfs, j = add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, quartiles,
-                                    plateau_length, bad_tunes, from_raw_BBQ, raw_data, seconds_step, kernel_size, beam)
+                                    plateau_length, bad_tunes, method, raw_data, seconds_step, kernel_size, beam)
 
             # Reset the counters
             tune_x = []
@@ -265,7 +320,7 @@ def clean_data_for_beam(input_file, output_path, output_file, qx_window, qy_wind
 
     # Last point
     out_tfs, _ = add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, quartiles,
-                            plateau_length, bad_tunes, from_raw_BBQ, raw_data, seconds_step, kernel_size, beam)
+                            plateau_length, bad_tunes, method, raw_data, seconds_step, kernel_size, beam)
 
     # TFS can't write dates, convert it to str
     out_tfs = tfs.TfsDataFrame(out_tfs.astype({'TIME': str}))
