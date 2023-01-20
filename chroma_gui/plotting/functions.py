@@ -5,6 +5,7 @@ import tfs
 import numpy as np
 import pandas as pd
 from functools import partial
+from sklearn.metrics import r2_score
 
 from chroma_gui.chromaticity.chroma_fct import chromaticity_func
 from chroma_gui.timber.extract import read_variables_from_csv
@@ -35,7 +36,7 @@ def plot_dpp(fig, ax, filename):
     time = [datetime.strptime(t, '%Y-%m-%d %H:%M:%S.%f') for t in time]
 
     ax.plot(time, frequencies, label='RF Frequency')
-    ax.set_title(f'DPP Change due to Frequency Change for Beam {beam}')
+    #ax.set_title(f'DPP Change due to Frequency Change for Beam {beam}')
     ax.set_xlabel('Time [s]')
     ax.set_ylabel('Frequency [Hz]')
 
@@ -94,7 +95,7 @@ def plot_freq(fig,
     zp = []  # to store the labels for legend
     # Plot the RF
     ax.plot(time, frequencies, label='RF Frequency')
-    ax.set_title(title)
+    #ax.set_title(title)
     ax.set_xlabel('Time [s]')
     ax.set_ylabel('Frequency [Hz]')
     zp.append(ax.get_legend_handles_labels())
@@ -140,17 +141,6 @@ def plot_freq(fig,
         delta_rf = frequencies - rf0
         ax4.plot(time, delta_rf, alpha=0)  # transparent, we only  want the axis
 
-    # Fix the legend
-    handles, labels = [], []
-    for i in range(len(zp)):
-        handles += zp[i][0]
-        labels += zp[i][1]
-    # ax.get_legend_handles_labels(),
-    #                                                 ax2.get_legend_handles_labels(),
-    #                                                 ax3.get_legend_handles_labels())]
-    leg = ax.legend(handles, labels, loc='upper left')
-    for lh in leg.legendHandles:
-        lh.set_alpha(1)
 
     # Set a higher tick frequency for the time
     xticks_freq = 10
@@ -179,7 +169,18 @@ def plot_freq(fig,
     # Format the dates on the X axis
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
 
-    #fig.tight_layout()
+    # Fix the legend
+    handles, labels = [], []
+    for i in range(len(zp)):
+        handles += zp[i][0]
+        labels += zp[i][1]
+    # ax.get_legend_handles_labels(),
+    #                                                 ax2.get_legend_handles_labels(),
+    #                                                 ax3.get_legend_handles_labels())]
+    leg = ax.legend(handles, labels, loc='upper left')
+    leg = ax2.legend(handles, labels, loc='upper left')
+    for lh in leg.legendHandles:
+        lh.set_alpha(1)
 
     return xticks
 
@@ -202,6 +203,7 @@ def plot_chromaticity(fig, ax, dpp_filename, chroma_tfs, axis, fit_orders, beam)
     # Create the X axis
     dpp_x = np.linspace(data['DPP'].min(), data['DPP'].max())
 
+    chi_square = 0  # Chi-square score for the fit
     for i, order in enumerate(fit_orders):
         label = f"$Q^{{({order})}}$ fit"
 
@@ -210,6 +212,13 @@ def plot_chromaticity(fig, ax, dpp_filename, chroma_tfs, axis, fit_orders, beam)
 
         columns = [c for c in chroma_to_order.columns if int(c[1]) <= order and 'ERR' not in c]
         chroma_values = chroma_to_order[columns].values[0]
+
+        # Get the fit of the chromaticity and its reduced Chi-square score
+        # Here we use "dpp", the same number of points as for the measurement
+        model_data = chromaticity_func(dpp, *chroma_values)
+        sq_residual = (tune - model_data) ** 2
+        chi_square = np.sum(sq_residual / std**2)
+        chi_square = chi_square / (len(tune) - len(chroma_values))  # Subtract the degrees of freedom
 
         # Plot the chromaticity function with the supplied values
         ax.plot(dpp_x, chromaticity_func(dpp_x, *chroma_values),
@@ -225,12 +234,14 @@ def plot_chromaticity(fig, ax, dpp_filename, chroma_tfs, axis, fit_orders, beam)
                 elinewidth=2,
                 capsize=3)
 
-    ax.set_title(f"Chromaticity for Beam {beam[1]}")
-    ax.set_xlabel(r'$\frac{\Delta p}{p}$', fontsize=15)
-    ax.set_ylabel(f'$Q_{axis}$', fontsize=15)
-    ax.tick_params(axis="both", labelsize=12)
+    #ax.set_title(f"Chromaticity for Beam {beam[1]}")
+    ax.set_xlabel(r'$\frac{\Delta p}{p}$')
+    ax.set_ylabel(f'$Q_{axis}$')
+    ax.tick_params(axis="both")
     ax.legend(loc=2)
 
+    # This will be the last computed R-square score, the highest order
+    return chi_square
 
 def plot_timber(fig, ax, filename, variables):
     timber_data = read_variables_from_csv(filename, variables)
