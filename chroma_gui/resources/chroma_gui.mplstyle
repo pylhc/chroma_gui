@@ -1,0 +1,24 @@
+# Global fontsize
+font.size       : 14
+
+# Line width
+lines.linewidth: 2.5
+
+# Title size
+axes.titlesize  : large
+
+# Axes size
+axes.labelsize  : medium
+
+# Ticks size
+xtick.labelsize : medium
+ytick.labelsize : medium
+
+# Position of the axes
+figure.subplot.left  : 0.12
+figure.subplot.bottom: 0.15
+figure.subplot.right : 0.99
+figure.subplot.top   : 0.77
+
+# Use tight layout
+figure.autolayout: true

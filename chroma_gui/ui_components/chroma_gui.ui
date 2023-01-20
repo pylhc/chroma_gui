@@ -15,6 +15,9 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tabWidget">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>200</x>
@@ -24,7 +27,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="timberTab">
      <property name="font">
@@ -300,7 +303,7 @@
          </rect>
         </property>
         <property name="currentIndex">
-         <number>2</number>
+         <number>0</number>
         </property>
         <property name="tabBarAutoHide">
          <bool>false</bool>
@@ -405,7 +408,7 @@
         <item row="0" column="2">
          <widget class="QDoubleSpinBox" name="qxWindowHigh">
           <property name="decimals">
-           <number>3</number>
+           <number>5</number>
           </property>
           <property name="singleStep">
            <double>0.010000000000000</double>
@@ -418,7 +421,7 @@
         <item row="1" column="1">
          <widget class="QDoubleSpinBox" name="qyWindowLow">
           <property name="decimals">
-           <number>3</number>
+           <number>5</number>
           </property>
           <property name="singleStep">
            <double>0.010000000000000</double>
@@ -431,7 +434,7 @@
         <item row="1" column="2">
          <widget class="QDoubleSpinBox" name="qyWindowHigh">
           <property name="decimals">
-           <number>3</number>
+           <number>5</number>
           </property>
           <property name="singleStep">
            <double>0.010000000000000</double>
@@ -458,7 +461,7 @@
         <item row="0" column="1">
          <widget class="QDoubleSpinBox" name="qxWindowLow">
           <property name="decimals">
-           <number>3</number>
+           <number>5</number>
           </property>
           <property name="singleStep">
            <double>0.010000000000000</double>
@@ -539,7 +542,7 @@
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>340</x>
@@ -853,7 +856,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_10">
        <attribute name="title">
@@ -863,9 +866,9 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>0</y>
+          <y>50</y>
           <width>1471</width>
-          <height>771</height>
+          <height>681</height>
          </rect>
         </property>
         <layout class="QHBoxLayout" name="beam1ChromaLayout"/>
@@ -879,9 +882,9 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>0</y>
+          <y>50</y>
           <width>1471</width>
-          <height>771</height>
+          <height>681</height>
          </rect>
         </property>
         <layout class="QHBoxLayout" name="beam2ChromaLayout"/>
@@ -1027,12 +1030,12 @@
        <set>Qt::AlignCenter</set>
       </property>
      </widget>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>90</y>
-        <width>301</width>
+        <width>302</width>
         <height>27</height>
        </rect>
       </property>
@@ -1060,10 +1063,68 @@
        </item>
       </layout>
      </widget>
+     <widget class="QLabel" name="r2_y">
+      <property name="geometry">
+       <rect>
+        <x>1310</x>
+        <y>130</y>
+        <width>41</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>χ²_ν Y:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="r2_x">
+      <property name="geometry">
+       <rect>
+        <x>1310</x>
+        <y>110</y>
+        <width>41</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>χ²_ν X:</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::MarkdownText</enum>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="r2_x_value">
+      <property name="geometry">
+       <rect>
+        <x>1350</x>
+        <y>110</y>
+        <width>81</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="r2_y_value">
+      <property name="geometry">
+       <rect>
+        <x>1350</x>
+        <y>130</y>
+        <width>81</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="correctionTab">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <attribute name="title">
       <string>Correction</string>
@@ -1345,8 +1406,15 @@
     </property>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuMatplotlib">
+    <property name="title">
+     <string>Matplotlib</string>
+    </property>
+    <addaction name="actionEdit_rcParams"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuAbout"/>
+   <addaction name="menuMatplotlib"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionNew">
@@ -1367,6 +1435,11 @@
   <action name="actionQuit">
    <property name="text">
     <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionEdit_rcParams">
+   <property name="text">
+    <string>Edit rcParams</string>
    </property>
   </action>
  </widget>
@@ -1421,38 +1494,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>extractTimberButton</sender>
-   <signal>clicked()</signal>
-   <receiver>mainWindow</receiver>
-   <slot>extractTimberClicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>342</x>
-     <y>173</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>851</x>
-     <y>512</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>createPlateausButton</sender>
-   <signal>clicked()</signal>
-   <receiver>mainWindow</receiver>
-   <slot>createPlateausClicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>322</x>
-     <y>173</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>851</x>
-     <y>512</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>saveSettingsButton</sender>
    <signal>clicked()</signal>
    <receiver>mainWindow</receiver>
@@ -1460,7 +1501,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>95</x>
-     <y>284</y>
+     <y>462</y>
     </hint>
     <hint type="destinationlabel">
      <x>851</x>
@@ -1469,14 +1510,14 @@
    </hints>
   </connection>
   <connection>
-   <sender>cleanDataButton</sender>
+   <sender>savePlotsButton</sender>
    <signal>clicked()</signal>
    <receiver>mainWindow</receiver>
-   <slot>cleanDataClicked()</slot>
+   <slot>savePlotsClicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>901</x>
-     <y>143</y>
+     <x>426</x>
+     <y>166</y>
     </hint>
     <hint type="destinationlabel">
      <x>851</x>
@@ -1491,56 +1532,8 @@
    <slot>rePlotCleaningClicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1063</x>
-     <y>162</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>851</x>
-     <y>512</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>computeChromaButton</sender>
-   <signal>clicked()</signal>
-   <receiver>mainWindow</receiver>
-   <slot>computeChromaClicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>537</x>
-     <y>153</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>851</x>
-     <y>512</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>beamChromaticityTabWidget</sender>
-   <signal>currentChanged(int)</signal>
-   <receiver>mainWindow</receiver>
-   <slot>updateChromaTablesForBeam()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>952</x>
-     <y>586</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>851</x>
-     <y>512</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>mesurementCorrectionToolButton</sender>
-   <signal>clicked()</signal>
-   <receiver>mainWindow</receiver>
-   <slot>openMeasurementCorrectionClicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>868</x>
-     <y>74</y>
+     <x>1353</x>
+     <y>174</y>
     </hint>
     <hint type="destinationlabel">
      <x>851</x>
@@ -1565,6 +1558,38 @@
    </hints>
   </connection>
   <connection>
+   <sender>cleanDataButton</sender>
+   <signal>clicked()</signal>
+   <receiver>mainWindow</receiver>
+   <slot>cleanDataClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>903</x>
+     <y>194</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>851</x>
+     <y>512</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>extractTimberButton</sender>
+   <signal>clicked()</signal>
+   <receiver>mainWindow</receiver>
+   <slot>extractTimberClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>342</x>
+     <y>173</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>851</x>
+     <y>512</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
    <sender>timberVariablesListWidget</sender>
    <signal>itemChanged(QListWidgetItem*)</signal>
    <receiver>mainWindow</receiver>
@@ -1581,14 +1606,46 @@
    </hints>
   </connection>
   <connection>
-   <sender>savePlotsButton</sender>
-   <signal>clicked()</signal>
+   <sender>useNAFFCheckBox</sender>
+   <signal>stateChanged(int)</signal>
    <receiver>mainWindow</receiver>
-   <slot>savePlotsClicked()</slot>
+   <slot>useNAFFCheckBoxClicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>442</x>
-     <y>153</y>
+     <x>1123</x>
+     <y>80</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>851</x>
+     <y>512</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>createPlateausButton</sender>
+   <signal>clicked()</signal>
+   <receiver>mainWindow</receiver>
+   <slot>createPlateausClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>372</x>
+     <y>215</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>851</x>
+     <y>512</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>useRawBBQCheckBox</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>mainWindow</receiver>
+   <slot>useRawBBQCheckBoxClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1008</x>
+     <y>84</y>
     </hint>
     <hint type="destinationlabel">
      <x>851</x>
@@ -1613,14 +1670,14 @@
    </hints>
   </connection>
   <connection>
-   <sender>useRawBBQCheckBox</sender>
-   <signal>stateChanged(int)</signal>
+   <sender>computeChromaButton</sender>
+   <signal>clicked()</signal>
    <receiver>mainWindow</receiver>
-   <slot>useRawBBQCheckBoxClicked()</slot>
+   <slot>computeChromaClicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1031</x>
-     <y>73</y>
+     <x>340</x>
+     <y>166</y>
     </hint>
     <hint type="destinationlabel">
      <x>851</x>
@@ -1629,14 +1686,46 @@
    </hints>
   </connection>
   <connection>
-   <sender>useNAFFCheckBox</sender>
-   <signal>stateChanged(int)</signal>
+   <sender>mesurementCorrectionToolButton</sender>
+   <signal>clicked()</signal>
    <receiver>mainWindow</receiver>
-   <slot>useNAFFCheckBoxClicked()</slot>
+   <slot>openMeasurementCorrectionClicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1123</x>
-     <y>80</y>
+     <x>690</x>
+     <y>108</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>851</x>
+     <y>512</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>beamChromaticityTabWidget</sender>
+   <signal>currentChanged(int)</signal>
+   <receiver>mainWindow</receiver>
+   <slot>updateChromaTablesForBeam()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>952</x>
+     <y>586</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>851</x>
+     <y>512</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionEdit_rcParams</sender>
+   <signal>triggered()</signal>
+   <receiver>mainWindow</receiver>
+   <slot>rcParamsClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
     </hint>
     <hint type="destinationlabel">
      <x>851</x>
@@ -1665,5 +1754,6 @@
   <slot>cleanRawBBQDataClicked()</slot>
   <slot>useRawBBQCheckBoxClicked()</slot>
   <slot>useNAFFCheckBoxClicked()</slot>
+  <slot>rcParamsClicked()</slot>
  </slots>
 </ui>

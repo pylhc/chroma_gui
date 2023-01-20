@@ -7,10 +7,11 @@ from json import JSONDecodeError
 import tfs
 from typing import Tuple, List
 import pyperclip
+import matplotlib.pyplot as plt
 
 import logging
 from pathlib import Path
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 import traceback
 
 # PyQt libraries
@@ -31,6 +32,7 @@ from PyQt5.QtWidgets import (
     QStyledItemDelegate,
     qApp,
     QListWidgetItem,
+    QDialogButtonBox,
 )
 
 # Chroma-GUI specific libraries
@@ -62,9 +64,11 @@ from chroma_gui.corrections import correct
 logger = logging.getLogger('chroma_GUI')
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-new_measurement_class = uic.loadUiType(Path(__file__).parent / "new_measurement.ui")[0]  # Load the UI
-main_window_class = uic.loadUiType(Path(__file__).parent / "chroma_gui.ui")[0]
+new_measurement_class = uic.loadUiType(Path(__file__).parent / "ui_components" / "new_measurement.ui")[0]  # Load the UI
+main_window_class = uic.loadUiType(Path(__file__).parent / "ui_components" / "chroma_gui.ui")[0]
+rcparams_window_class = uic.loadUiType(Path(__file__).parent / "ui_components" / "mpl_rcparams.ui")[0]
 
+RESOURCES = Path(__file__).parent / "resources"
 
 class ChromaticityTableModel(QAbstractTableModel):
     def __init__(self, dataframe: tfs.TfsDataFrame, parent=None):
@@ -441,11 +445,29 @@ class Config:
     plot_dpp: bool = False
     plot_delta_rf: bool = False
 
+    # Matplotlib rcParams
+    rcParams: str = None
+
     @classmethod
     def from_dict(cls: typing.Type["Config"], obj: dict):
         return cls(
             **obj
         )
+    def save_field(self, field, data):
+        """
+        Open the config file and change the given field
+        """
+        logger.info(f"Saving config field {field}")
+
+        # Read the config
+        config_fp = open(CONFIG, 'r+')
+        file = json.load(config_fp)
+        file[field] = data
+        config_fp.close()
+
+        # Write it
+        config_fp = open(CONFIG, "w")
+        json.dump(file, config_fp, indent=4)
 
 
 def exceptHook(exc_type, exc_value, exc_tb):
@@ -505,6 +527,7 @@ class MainWindow(QMainWindow, main_window_class):
 
         # Load preferences for file structure
         self.loadConfig()
+        self.applyMplStyle()
 
         # Disable tabs for now, as no measurement has been created or opened yet
         # TODO add Correction tab!
@@ -513,6 +536,20 @@ class MainWindow(QMainWindow, main_window_class):
         self.enableChromaticityTab(False)
 
         self.setCorrectionComboBox()
+
+        # R2 scores for each chromaticity fit
+        self.r2scores = {"B1": {"X": 0, "Y": 0},
+                         "B2": {"X": 0, "Y": 0}}
+
+
+    def applyMplStyle(self):
+        if self.config.rcParams is None:
+            plt.style.use(RESOURCES / "chroma_gui.mplstyle")
+        else:
+            for line in self.config.rcParams.split('\n'):
+                if not line.startswith("#") and line.strip() != "":
+                    key, value = [e.strip() for e in line.split(':')]
+                    plt.style.use({key: value})
 
     def loadConfig(self):
         if CONFIG.exists():
@@ -963,10 +1000,18 @@ class MainWindow(QMainWindow, main_window_class):
             measurement = self.measurement
         self.updateChromaTables(measurement)
         self.updateChromaPlots(measurement)
+        self.updateR2scores()
+
+    def updateR2scores(self):
+        # Set the r2 scores
+        current_beam = self.beamChromaticityTabWidget.currentIndex() + 1  # index starts at 0
+        self.r2_x_value.setText("{:.5f}".format(round(self.r2scores[f"B{current_beam}"]["X"], 5)))
+        self.r2_y_value.setText("{:.5f}".format(round(self.r2scores[f"B{current_beam}"]["Y"], 5)))
 
     def updateChromaTablesForBeam(self, current_beam):
         current_beam += 1  # index starts at 0
         self.beamChromaticityTableView.setModel(getattr(self, f"chromaB{current_beam}TableModel"))
+        self.updateR2scores()
 
     def updateChromaTables(self, measurement):
         chroma_tfs = tfs.read(measurement.path / CHROMA_FILE)
@@ -1030,20 +1075,24 @@ class MainWindow(QMainWindow, main_window_class):
 
         # Beam 1
         dpp_file_b1 = measurement.path / cleaning_constants.CLEANED_DPP_FILE.format(beam=1)
-        plot_chromaticity(self.plotChromaB1XWidget.canvas.fig, self.plotChromaB1XWidget.canvas.ax,
-                          dpp_file_b1, chroma_tfs_file, 'X', fit_orders, "B1")
-        plot_chromaticity(self.plotChromaB1YWidget.canvas.fig, self.plotChromaB1YWidget.canvas.ax,
-                          dpp_file_b1, chroma_tfs_file, 'Y', fit_orders, "B1")
+        self.r2scores['B1']['X'] = plot_chromaticity(self.plotChromaB1XWidget.canvas.fig,
+                                                     self.plotChromaB1XWidget.canvas.ax,
+                                                     dpp_file_b1, chroma_tfs_file, 'X', fit_orders, "B1")
+        self.r2scores['B1']['Y'] = plot_chromaticity(self.plotChromaB1YWidget.canvas.fig,
+                                                     self.plotChromaB1YWidget.canvas.ax,
+                                                     dpp_file_b1, chroma_tfs_file, 'Y', fit_orders, "B1")
 
         # Beam 2
         dpp_file_b2 = measurement.path / cleaning_constants.CLEANED_DPP_FILE.format(beam=2)
-        plot_chromaticity(self.plotChromaB2XWidget.canvas.fig, self.plotChromaB2XWidget.canvas.ax,
-                          dpp_file_b2, chroma_tfs_file, 'X', fit_orders, "B2")
-        plot_chromaticity(self.plotChromaB2YWidget.canvas.fig, self.plotChromaB2YWidget.canvas.ax,
-                          dpp_file_b2, chroma_tfs_file, 'Y', fit_orders, "B2")
+        self.r2scores['B2']['X'] = plot_chromaticity(self.plotChromaB2XWidget.canvas.fig,
+                                                     self.plotChromaB2XWidget.canvas.ax,
+                                                     dpp_file_b2, chroma_tfs_file, 'X', fit_orders, "B2")
+        self.r2scores['B2']['Y'] = plot_chromaticity(self.plotChromaB2YWidget.canvas.fig,
+                                                     self.plotChromaB2YWidget.canvas.ax,
+                                                     dpp_file_b2, chroma_tfs_file, 'Y', fit_orders, "B2")
 
-        self.plotChromaB1XWidget.canvas.draw()
-        self.plotChromaB1XWidget.show()
+        # Set the r2 scores
+        self.updateR2scores()
 
     def savePlotsClicked(self):
         path = self.measurement.path / "plots"
@@ -1157,6 +1206,55 @@ class MainWindow(QMainWindow, main_window_class):
         logger.info(f'  Number of observables: {response.shape[0]}')
         logger.info(f'  Number of correctors: {response.shape[1]}\n')
 
+    # === Matplotlib rcParams
+    def rcParamsClicked(self):
+        rcparams_dialog = MplRcParamsDialog(self)
+        rcparams_dialog.show()
+
+class MplRcParamsDialog(QDialog, rcparams_window_class):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.setupUi(self)
+        self.openRcParams()
+
+    def openRcParams(self):
+        """
+        Opens the user rcParams or the default one for the GUI
+        """
+        if findMainWindow().config.rcParams is not None:
+            text = findMainWindow().config.rcParams
+        else:
+            original_rcparams = RESOURCES / "chroma_gui.mplstyle"
+            text = ""
+            with open(original_rcparams) as f:
+                text = f.read()
+
+        self.rcParamsTextEdit.setText(text)
+
+    def accept(self, buttonClicked):
+        """
+        Saves the rcParams to the resource folder.
+        Can be triggered by clicking "Save" and "Apply".
+        "Save" closes the window after having saved the file.
+        "Apply" can be used to keep it open while tinkering with graphs
+        """
+        rcParams = self.rcParamsTextEdit.toPlainText()
+        if rcParams.strip() == "":
+            logger.warning("The supplied rcParams are empty! The file will not be overwritten.")
+            return
+
+        # Set the field and then save it
+        findMainWindow().config.rcParams = rcParams
+        findMainWindow().config.save_field("rcParams", rcParams)
+
+        # Apply the new style
+        findMainWindow().applyMplStyle()
+
+        clicked_role = self.buttonBox.buttonRole(buttonClicked)
+        if clicked_role == self.buttonBox.AcceptRole:  # Close the dialog
+            self.close()
+
+        logger.info("Matplotlib rcParams written")
 
 class NewMeasurementDialog(QDialog, new_measurement_class):
     def __init__(self, parent=None):
