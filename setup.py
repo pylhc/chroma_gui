@@ -30,6 +30,7 @@ REQUIREMENTS: dict = {
         "tabulate",
         "pyperclip",
         "PyNAFF",
+        "qtawesome",
     ],
     'test': [
         'pytest',

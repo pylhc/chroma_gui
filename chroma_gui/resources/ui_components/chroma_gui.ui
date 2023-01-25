@@ -104,7 +104,7 @@
           <string>Start time of measurement, in local time</string>
          </property>
          <property name="text">
-          <string>Start of Measurement</string>
+          <string>Start of Measurement [ICO]</string>
          </property>
         </widget>
        </item>
@@ -134,7 +134,7 @@
           <string>End time of measurement, in local time</string>
          </property>
          <property name="text">
-          <string>End of Measurement</string>
+          <string>End of Measurement [ICO]</string>
          </property>
         </widget>
        </item>
@@ -234,7 +234,7 @@
          </rect>
         </property>
         <property name="currentIndex">
-         <number>2</number>
+         <number>0</number>
         </property>
         <property name="tabBarAutoHide">
          <bool>true</bool>
@@ -400,8 +400,11 @@
         </item>
         <item row="4" column="0">
          <widget class="QLabel" name="label_15">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum length a plateau has to have to be considered.&lt;/p&gt;&lt;p&gt;This is to filter RF &amp;quot;jitter&amp;quot; where intermediate values before trims are registered for a brief moment.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
-           <string>Plateau Length</string>
+           <string>Min .Plateau Length [ICO]</string>
           </property>
          </widget>
         </item>
@@ -724,7 +727,7 @@
           <string>The RF Frequency isn't always registered for both beams. Usually only BEAM 1 contains the data.</string>
          </property>
          <property name="text">
-          <string>Beam used for RF</string>
+          <string>Beam used for RF [ICO]</string>
          </property>
         </widget>
        </item>
@@ -765,7 +768,7 @@
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Nominal Frequency of the RF (Usually around 400_788_869).&lt;/p&gt;&lt;p&gt;If set to 0 or &lt;span style=&quot; font-style:italic;&quot;&gt;None&lt;/span&gt;, it will default to the first value of the measurement.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>Nominal RF</string>
+          <string>Nominal RF [ICO]</string>
          </property>
         </widget>
        </item>
@@ -856,7 +859,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_10">
        <attribute name="title">
@@ -915,7 +918,7 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>306</width>
+        <width>382</width>
         <height>61</height>
        </rect>
       </property>
@@ -955,8 +958,11 @@
          </item>
          <item row="0" column="0">
           <widget class="QLabel" name="label_18">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only plot the desired chromaticity orders.&lt;/p&gt;&lt;p&gt;The fit is done with &lt;span style=&quot; font-weight:600;&quot;&gt;all orders&lt;/span&gt; up to the highest one.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
-            <string>Chromaticity Orders </string>
+            <string>Chromaticity Orders to Plot [ICO]</string>
            </property>
           </widget>
          </item>
@@ -973,8 +979,11 @@
         <layout class="QGridLayout" name="gridLayout_11">
          <item row="0" column="0">
           <widget class="QLabel" name="label_21">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Restrict the fit to a set DPP range.&lt;/p&gt;&lt;p&gt;This can be used to assess the quality of the fit with a lower range.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
-            <string>DPP Range</string>
+            <string>DPP Range [ICO]</string>
            </property>
           </widget>
          </item>

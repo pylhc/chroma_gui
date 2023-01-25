@@ -15,15 +15,25 @@ from dataclasses import dataclass, field, fields
 import traceback
 
 # PyQt libraries
+import qtawesome as qta
 from PyQt5.QtGui import QPalette, QStandardItem, QFontMetrics
-from PyQt5.QtCore import QDir, QDateTime, pyqtSignal, QThread, QAbstractTableModel, QModelIndex, Qt, QEvent, QRect
-from PyQt5 import uic, QtCore
+from PyQt5.QtCore import (
+    QDateTime,
+    pyqtSignal,
+    QThread,
+    QAbstractTableModel,
+    QModelIndex,
+    Qt,
+    QEvent,
+    QSize,
+)
+from PyQt5 import uic
 from PyQt5.QtWidgets import (
+    QLabel,
     QMainWindow,
     QApplication,
     QDialog,
     QFileDialog,
-    QWidget,
     QMessageBox,
     QTableView,
     QSizePolicy,
@@ -32,7 +42,8 @@ from PyQt5.QtWidgets import (
     QStyledItemDelegate,
     qApp,
     QListWidgetItem,
-    QDialogButtonBox,
+    QHBoxLayout,
+    QLayout,
 )
 
 # Chroma-GUI specific libraries
@@ -64,11 +75,13 @@ from chroma_gui.corrections import correct
 logger = logging.getLogger('chroma_GUI')
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-new_measurement_class = uic.loadUiType(Path(__file__).parent / "ui_components" / "new_measurement.ui")[0]  # Load the UI
-main_window_class = uic.loadUiType(Path(__file__).parent / "ui_components" / "chroma_gui.ui")[0]
-rcparams_window_class = uic.loadUiType(Path(__file__).parent / "ui_components" / "mpl_rcparams.ui")[0]
-
 RESOURCES = Path(__file__).parent / "resources"
+
+# Load the different UI windows
+new_measurement_class = uic.loadUiType(RESOURCES / "ui_components" / "new_measurement.ui")[0]
+main_window_class = uic.loadUiType(RESOURCES / "ui_components" / "chroma_gui.ui")[0]
+rcparams_window_class = uic.loadUiType(RESOURCES / "ui_components" / "mpl_rcparams.ui")[0]
+
 
 class ChromaticityTableModel(QAbstractTableModel):
     def __init__(self, dataframe: tfs.TfsDataFrame, parent=None):
@@ -453,6 +466,7 @@ class Config:
         return cls(
             **obj
         )
+
     def save_field(self, field, data):
         """
         Open the config file and change the given field
@@ -537,10 +551,44 @@ class MainWindow(QMainWindow, main_window_class):
 
         self.setCorrectionComboBox()
 
+        # Set the info icons on the labels
+        self.setInfoIcons()
+
         # R2 scores for each chromaticity fit
         self.r2scores = {"B1": {"X": 0, "Y": 0},
                          "B2": {"X": 0, "Y": 0}}
 
+    def setInfoIcons(self):
+        '''
+        Iterate through all the labels in the class, and replace '[ICO]' by a proper info icon
+        '''
+        for name, obj in vars(self).items():
+            if type(obj) == QLabel:
+                text = obj.text()
+                if '[ICO]' in text:
+                    text = text.replace(' [ICO]', '')
+
+                    # Create a H layout that will old the text / icon
+                    layout = QHBoxLayout()
+                    layout.setContentsMargins(0, 0, 0, 0)
+
+                    info_icon_id = "fa5s.question-circle"
+                    icon = QLabel()
+                    icon.setPixmap(qta.icon(info_icon_id).pixmap(QSize(16, 16)))
+
+                    layout.addWidget(QLabel(text))
+                    layout.addSpacing(1)
+                    layout.addWidget(icon)
+
+                    # Set the original tool tip to the icon
+                    tooltip = obj.toolTip()
+                    obj.setToolTip("")
+                    icon.setToolTip(tooltip)
+
+                    obj.setText("")  # remove the old text
+                    obj.setLayout(layout)  # and replace by the new layout
+                    layout.setSizeConstraint(QLayout.SetMinimumSize)
+                    obj.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
 
     def applyMplStyle(self):
         if self.config.rcParams is None:
