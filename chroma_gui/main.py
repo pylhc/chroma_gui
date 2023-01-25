@@ -559,15 +559,14 @@ class MainWindow(QMainWindow, main_window_class):
                          "B2": {"X": 0, "Y": 0}}
 
     def setInfoIcons(self):
-        '''
-        Iterate through all the labels in the class, and replace '[ICO]' by a proper info icon
-        '''
+        """
+        Iterate through all the labels in the class that have a tooltip, and place a proper info icon next to it
+        """
         for name, obj in vars(self).items():
             if type(obj) == QLabel:
                 text = obj.text()
-                if '[ICO]' in text:
-                    text = text.replace(' [ICO]', '')
-
+                tooltip = obj.toolTip()
+                if tooltip.strip() != "":
                     # Create a H layout that will old the text / icon
                     layout = QHBoxLayout()
                     layout.setContentsMargins(0, 0, 0, 0)
@@ -581,7 +580,6 @@ class MainWindow(QMainWindow, main_window_class):
                     layout.addWidget(icon)
 
                     # Set the original tool tip to the icon
-                    tooltip = obj.toolTip()
                     obj.setToolTip("")
                     icon.setToolTip(tooltip)
 

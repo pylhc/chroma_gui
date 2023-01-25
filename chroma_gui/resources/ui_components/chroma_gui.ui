@@ -104,7 +104,7 @@
           <string>Start time of measurement, in local time</string>
          </property>
          <property name="text">
-          <string>Start of Measurement [ICO]</string>
+          <string>Start of Measurement </string>
          </property>
         </widget>
        </item>
@@ -134,7 +134,7 @@
           <string>End time of measurement, in local time</string>
          </property>
          <property name="text">
-          <string>End of Measurement [ICO]</string>
+          <string>End of Measurement</string>
          </property>
         </widget>
        </item>
@@ -404,7 +404,7 @@
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum length a plateau has to have to be considered.&lt;/p&gt;&lt;p&gt;This is to filter RF &amp;quot;jitter&amp;quot; where intermediate values before trims are registered for a brief moment.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
-           <string>Min .Plateau Length [ICO]</string>
+           <string>Min .Plateau Length</string>
           </property>
          </widget>
         </item>
@@ -727,7 +727,7 @@
           <string>The RF Frequency isn't always registered for both beams. Usually only BEAM 1 contains the data.</string>
          </property>
          <property name="text">
-          <string>Beam used for RF [ICO]</string>
+          <string>Beam used for RF </string>
          </property>
         </widget>
        </item>
@@ -768,7 +768,7 @@
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Nominal Frequency of the RF (Usually around 400_788_869).&lt;/p&gt;&lt;p&gt;If set to 0 or &lt;span style=&quot; font-style:italic;&quot;&gt;None&lt;/span&gt;, it will default to the first value of the measurement.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>Nominal RF [ICO]</string>
+          <string>Nominal RF</string>
          </property>
         </widget>
        </item>
@@ -962,7 +962,7 @@
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Only plot the desired chromaticity orders.&lt;/p&gt;&lt;p&gt;The fit is done with &lt;span style=&quot; font-weight:600;&quot;&gt;all orders&lt;/span&gt; up to the highest one.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
-            <string>Chromaticity Orders to Plot [ICO]</string>
+            <string>Chromaticity Orders to Plot</string>
            </property>
           </widget>
          </item>
@@ -983,7 +983,7 @@
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Restrict the fit to a set DPP range.&lt;/p&gt;&lt;p&gt;This can be used to assess the quality of the fit with a lower range.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
-            <string>DPP Range [ICO]</string>
+            <string>DPP Range</string>
            </property>
           </widget>
          </item>
@@ -1269,74 +1269,6 @@
      <string>Save Settings</string>
     </property>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>181</width>
-      <height>101</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <widget class="QLabel" name="modelLabel">
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Model information. Click for more details.</string>
-       </property>
-       <property name="text">
-        <string>Model</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="alfaB1LineEdit">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="alfaB1Label">
-         <property name="text">
-          <string>ALFA B1</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="alfaB2Label">
-         <property name="text">
-          <string>ALFA B2</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="alfaB2LineEdit">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </widget>
    <widget class="QPlainTextEdit" name="descriptionPlainTextEdit">
     <property name="geometry">
      <rect>
@@ -1372,9 +1304,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>170</y>
-      <width>179</width>
-      <height>79</height>
+      <y>198</y>
+      <width>191</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="font">
@@ -1386,8 +1318,87 @@
      <string>Measurement Settings</string>
     </property>
     <property name="alignment">
-     <set>Qt::AlignCenter</set>
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
     </property>
+   </widget>
+   <widget class="QLabel" name="modelLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>24</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Model information.</string>
+    </property>
+    <property name="text">
+     <string>Model</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>60</y>
+      <width>179</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="alfaB2LineEdit">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="alfaB2Label">
+       <property name="text">
+        <string>ALFA B2</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="alfaB1LineEdit">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="frame">
+        <bool>true</bool>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="alfaB1Label">
+       <property name="text">
+        <string>ALFA B1</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
