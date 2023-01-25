@@ -222,7 +222,7 @@ def plot_chromaticity(fig, ax, dpp_filename, chroma_tfs, axis, fit_orders, beam)
 
         # Plot the chromaticity function with the supplied values
         ax.plot(dpp_x, chromaticity_func(dpp_x, *chroma_values),
-                label=label, color=COLORS[order-3], zorder=-32, linewidth=4.0)
+                label=label, color=COLORS[order-3], zorder=-32)
 
     # Plot the measured tune with errorbars
     ax.errorbar(dpp,
@@ -235,10 +235,10 @@ def plot_chromaticity(fig, ax, dpp_filename, chroma_tfs, axis, fit_orders, beam)
                 capsize=3)
 
     #ax.set_title(f"Chromaticity for Beam {beam[1]}")
-    ax.set_xlabel(r'$\frac{\Delta p}{p}$')
+    ax.set_xlabel(r"$\delta$")
     ax.set_ylabel(f'$Q_{axis}$')
     ax.tick_params(axis="both")
-    ax.legend(loc=2)
+    ax.legend()
 
     # This will be the last computed R-square score, the highest order
     return chi_square
