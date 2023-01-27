@@ -1,5 +1,18 @@
 # Non-Linear Chromaticity GUI
 
+# 2023-01-27 - v0.0.6
+
+Many changes for this release, mainly about the raw BBQ processing.
+
+Added:
+  * Raw BBQ processing based on several methods 
+    * spectrogram and median filter
+    * OMC3 harpy
+    * pyNAFF
+  * Window to change matplotlib's rcParams
+  * Reduced chi square in the chromaticity tab
+  * Info icons are added automatically to QLabels with a tooltip
+
 ## 2022-11-06 - v0.0.5
 
 Fixed:
