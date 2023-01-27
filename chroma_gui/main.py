@@ -259,7 +259,8 @@ class ExternalProgram(QThread):
         # If the user tells us to extract the RAW data, save it
         if main_window.rawBBQCheckBox.isChecked():
             data = timber.extract.extract_raw_variables(start, end)
-            timber.extract.save_as_pickle(measurement_path, data)
+            #timber.extract.save_as_pickle(measurement_path, data)
+            timber.extract.save_as_hdf(measurement_path, data)
 
         logger.info("PyTimber extraction finished")
         self.finished.emit()

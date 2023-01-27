@@ -5,6 +5,9 @@ BACKUP_FILENAME = "./TIMBER_DATA_{now}.csv"
 FILENAME_PKL = "./TIMBER_RAW_BBQ.pkl.gz"
 BACKUP_FILENAME_PKL = "./TIMBER_RAW_BBQ_{now}.pkl.gz"
 
+FILENAME_HDF = "./TIMBER_RAW_BBQ.hdf"
+BACKUP_FILENAME_HDF = "./TIMBER_RAW_BBQ_{now}.hdf"
+
 # Variables to query for
 TIMBER_VARS = ['LHC.BQBBQ.CONTINUOUS_HS.B1:EIGEN_FREQ_1',  # Good BBQ data usually, sometimes noisy
              'LHC.BQBBQ.CONTINUOUS_HS.B1:EIGEN_FREQ_2',

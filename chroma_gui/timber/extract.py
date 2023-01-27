@@ -12,7 +12,9 @@ from chroma_gui.timber.constants import (
     TIMBER_VARS,
     TIMBER_RAW_VARS,
     FILENAME_PKL,
-    BACKUP_FILENAME_PKL
+    BACKUP_FILENAME_PKL,
+    FILENAME_HDF,
+    BACKUP_FILENAME_HDF,
 )
 
 
@@ -73,6 +75,26 @@ def save_as_pickle(path, data):
     logging.info(f"Timber pickle object saved as {FILENAME_PKL}")
 
     # Make a symlink to TIMBER_RAW_DATA.pkl.gz
+    try:
+        os.remove(filename)
+    except:
+        pass
+    os.symlink(backup_filename, filename)
+
+
+def save_as_hdf(path, data):
+    """
+    Save the timber data as a dataframe as a HDF file to stay compatible between pandas versions.
+    """
+    now = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    backup_filename = path / BACKUP_FILENAME_HDF.format(now=now)
+    filename = path / FILENAME_HDF
+
+    df = pd.DataFrame.from_dict(data=data, columns=['TIMESTAMP', 'VALUE'], orient='index')
+    df.to_hdf(backup_filename, "df")
+    logging.info(f"Timber HDF object saved as {FILENAME_HDF}")
+
+    # Make a symlink to TIMBER_RAW_DATA.hdf
     try:
         os.remove(filename)
     except:
