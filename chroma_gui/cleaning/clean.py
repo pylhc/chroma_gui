@@ -5,6 +5,9 @@ import logging
 from scipy import signal
 import PyNAFF as pnf
 from dateutil.parser import isoparse
+import sdds
+from omc3 import hole_in_one
+from pathlib import Path
 
 logger = logging.getLogger('chroma_GUI - Cleaning')
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -86,19 +89,62 @@ def get_cleaned_tune(tunes, plane, qx_window, qy_window, quartiles, bad_tunes):
 
 def merge_overlap(array):
     """ Merge the overlapping arrays contained in the given array """
-    res = np.array([])
-    for b in array:
-        n_res = len(res)
-        n = min(n_res, len(b))
-        m = 0
-        for i in range(1, n + 1):
-            if b[n - i] == res[n_res - 1 - m]:
-                m += 1
-            else:
-                m = 0
-        res = np.concatenate((res, b[m:]), axis=None)
+    # Initialize and empty array of the maximum possible size
+    res = np.zeros(len(array) * len(array[0]), dtype=np.float64)
 
-    return res
+    res_counter = 0  # position of the last inserted data in res
+    for next_array in array:
+        n_res = res_counter
+        n = min(n_res, len(next_array))  # should be 2048 anyway
+
+        j = 0  # to iterate over res
+        for i in range(1, n+1):  # to iterate over next_array
+            if next_array[n-i] == res[n_res - 1 - j]:
+                j += 1
+            else:
+                j = 0
+
+        data_to_add = next_array[j:]
+        res[res_counter:res_counter+len(data_to_add)] = data_to_add
+
+        res_counter += len(data_to_add)
+
+    return res[:res_counter]
+
+
+def save_data_to_lhc_sdds(timestamp, data_x, data_y, bpm_name, path):
+    # IDs
+    N_BUNCHES: str = "nbOfCapBunches"
+    BUNCH_ID: str = "BunchId"
+    HOR_BUNCH_ID: str = "horBunchId"
+    N_TURNS: str = "nbOfCapTurns"
+    ACQ_STAMP: str = "acqStamp"
+    BPM_NAMES: str = "bpmNames"
+
+    POSITIONS = {
+        "X": "horPositionsConcentratedAndSorted",
+        "Y": "verPositionsConcentratedAndSorted",
+    }
+
+    definitions = [
+        sdds.classes.Parameter(ACQ_STAMP, "llong"),
+        sdds.classes.Parameter(N_BUNCHES, "long"),
+        sdds.classes.Parameter(N_TURNS, "long"),
+        sdds.classes.Array(BUNCH_ID, "long"),
+        sdds.classes.Array(BPM_NAMES, "string"),
+        sdds.classes.Array(POSITIONS["X"], "float"),
+        sdds.classes.Array(POSITIONS["Y"], "float"),
+    ]
+    values = [
+        timestamp,
+        1,
+        len(data_x),
+        [0] * len(data_x),
+        [bpm_name],
+        np.ravel(data_x),
+        np.ravel(data_y),
+    ]
+    sdds.write(sdds.SddsFile("SDDS1", None, definitions, values), path)
 
 
 def get_spectrogram(raw_data, start_plateau, end_plateau, variables, seconds_step):
@@ -179,6 +225,86 @@ def get_avg_tune_from_naff(raw_data, start_plateau, end_plateau, variables, seco
     return {'H': tune_x, 'V': tune_y}
 
 
+def get_avg_tune_from_harpy(raw_data, start_plateau, end_plateau, variables, qx_window, qy_window, beam, output_path):
+    """
+        Gets the tune from OMC3's harpy.
+        The raw BBQ data is merged and then saved as .sdds for each plateau.
+        Each plateau is then analysed by harpy, yielding Q_x,y and their error
+    """
+    # Create a mask to only get the data in the plateau
+    d = raw_data.loc[variables + 'H']
+    mask = d['TIMESTAMP'].astype('float') >= start_plateau.timestamp()
+    mask = mask & (d['TIMESTAMP'].astype('float') <= end_plateau.timestamp())
+    window = {'H': qx_window, 'V': qy_window}
+
+    # Create chunks x seconds long
+    seconds_step = 3
+    chunks = int((end_plateau - start_plateau).seconds / seconds_step)
+    if chunks == 0:
+        t = (end_plateau - start_plateau).seconds
+        logger.warning(f"The plateau is only {t} seconds long. It will be analyzed in one chunk")
+        chunks = 1
+
+
+    merged_data = {}
+    tunes = {'H': [], 'V': []}
+    # Get the tune via harpy for each plane
+    for plane in ('H', 'V'):
+        # Merge the overlapping data returned by Timber
+        logger.debug(f"Merging data for beam {beam}, plane {plane}")
+        merged_data[plane] = merge_overlap(raw_data.loc[variables + plane]['VALUE'][mask])
+
+    if len(merged_data['H']) != len(merged_data['V']):
+        print(len(merged_data['H']))
+        print(len(merged_data['V']))
+        print()
+
+    for i in range(chunks):
+        elements_per_chunk = int(len(merged_data['H']) / chunks)
+        data_x = merged_data['H'][elements_per_chunk * i: elements_per_chunk * (i + 1)]
+        data_y = merged_data['V'][elements_per_chunk * i: elements_per_chunk * (i + 1)]
+
+        # Save the data as SDDS for each plateau
+        filename = f"raw_bbq_B{beam}_{start_plateau}_{end_plateau}_{i:03}.sdds".replace(' ', '_')
+        output_sdds = output_path / "sdds"
+        output_sdds.mkdir(exist_ok=True)
+
+        if len(data_x) != len(data_y):
+            logger.error("Length of the horizontal and vertical data don't match. The SDDS file can not be created.")
+            continue
+
+        save_data_to_lhc_sdds(start_plateau.timestamp(),
+                              data_x,
+                              data_y,
+                              "BPM_BBQ",
+                              output_sdds / filename)
+
+        # Call Harpy on the chunk!
+        model_path = Path("/afs/cern.ch/work/m/mlegarre/public/beta_beat_output/2023-01-26/LHCB1/Models/test_raw_bbq")
+        hole_in_one.hole_in_one_entrypoint(
+            harpy=True,
+            files=[output_sdds / filename],
+            accel="lhc",
+            model=model_path / 'twiss.dat',
+            to_write=['lin', 'spectra', 'full_spectra', 'bpm_summary'],
+            unit='m',
+            tunes=[.28, .31, 0.],
+            nattunes=[.28, .31, 0.],
+            clean=False,
+            # opposite_direction=opposite_direction,
+            sing_val=12,
+            outputdir=output_sdds,
+            turn_bits=12,
+            free_kick=True,
+        )
+        print("Harpy done")
+        tunes['H'].append(tfs.read(output_sdds / f"{filename}.linx").headers['Q1'])
+        tunes['V'].append(tfs.read(output_sdds / f"{filename}.liny").headers['Q2'])
+
+    tune_x = np.average(tunes['H']), np.std(tunes['H'])
+    tune_y = np.average(tunes['V']), np.std(tunes['V'])
+    return {'H': tune_x, 'V': tune_y}
+
 def get_max_peak(x_data, y_data, plane, window):
     # Plot the maximum peaks for each plane
     # Find the peaks via scipy
@@ -221,7 +347,7 @@ def get_avg_tune_from_spectrogram(f, Sxx, kernel_size, qx_window, qy_window):
 
 
 def add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, quartiles, plateau_length, bad_tunes,
-               method="bbq", raw_bbq_data=None, seconds_step=None, kernel_size=None, beam=None):
+               method="bbq", raw_bbq_data=None, seconds_step=None, kernel_size=None, beam=None, output_path=None):
     # Length of plateau
     length = i - fp - 1
     # If the plateau is shorter than (arbitrary) 15 measurements, drop it
@@ -249,6 +375,14 @@ def add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, qu
                                                 qx_window, qy_window)
         tune_avg_x, std_x = tunes_from_raw['H']
         tune_avg_y, std_y = tunes_from_raw['V']
+    elif method == "raw_bbq_harpy":
+        start_plateau = isoparse(data['TIME'][fp])
+        end_plateau = isoparse(data['TIME'][i - 1])
+        variables = f'LHC.BQBBQ.CONTINUOUS_HS.B{beam}:ACQ_DATA_'
+        tunes_from_raw = get_avg_tune_from_harpy(raw_bbq_data, start_plateau, end_plateau, variables, qx_window, qy_window, beam, output_path)
+        tune_avg_x, std_x = tunes_from_raw['H']
+        tune_avg_y, std_y = tunes_from_raw['V']
+
 
     # Reject short plateaus that have no std
     if tune_avg_x is None or tune_avg_y is None:
@@ -309,7 +443,7 @@ def clean_data_for_beam(input_file, output_path, output_file, qx_window, qy_wind
 
         else:  # new plateau
             out_tfs, j = add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, quartiles,
-                                    plateau_length, bad_tunes, method, raw_data, seconds_step, kernel_size, beam)
+                                    plateau_length, bad_tunes, method, raw_data, seconds_step, kernel_size, beam, output_path)
 
             # Reset the counters
             tune_x = []
@@ -320,7 +454,7 @@ def clean_data_for_beam(input_file, output_path, output_file, qx_window, qy_wind
 
     # Last point
     out_tfs, _ = add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, quartiles,
-                            plateau_length, bad_tunes, method, raw_data, seconds_step, kernel_size, beam)
+                            plateau_length, bad_tunes, method, raw_data, seconds_step, kernel_size, beam, output_path)
 
     # TFS can't write dates, convert it to str
     out_tfs = tfs.TfsDataFrame(out_tfs.astype({'TIME': str}))

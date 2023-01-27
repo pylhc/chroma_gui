@@ -31,6 +31,8 @@ REQUIREMENTS: dict = {
         "pyperclip",
         "PyNAFF",
         "qtawesome",
+        "sdds",
+        "omc3",
     ],
     'test': [
         'pytest',

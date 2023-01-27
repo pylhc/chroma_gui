@@ -27,7 +27,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="timberTab">
      <property name="font">
@@ -218,7 +218,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="beam1PlotsTab">
        <attribute name="title">
@@ -303,7 +303,7 @@
          </rect>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>2</number>
         </property>
         <property name="tabBarAutoHide">
          <bool>false</bool>
@@ -404,7 +404,7 @@
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Minimum length a plateau has to have to be considered.&lt;/p&gt;&lt;p&gt;This is to filter RF &amp;quot;jitter&amp;quot; where intermediate values before trims are registered for a brief moment.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
-           <string>Min .Plateau Length</string>
+           <string>Min. Plateau Length</string>
           </property>
          </widget>
         </item>
@@ -533,7 +533,7 @@
        <property name="geometry">
         <rect>
          <x>340</x>
-         <y>100</y>
+         <y>110</y>
          <width>331</width>
          <height>16</height>
         </rect>
@@ -551,11 +551,58 @@
          <x>340</x>
          <y>0</y>
          <width>331</width>
-         <height>91</height>
+         <height>101</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="2" column="1" colspan="2">
+        <item row="1" column="0">
+         <widget class="QCheckBox" name="useRawBBQCheckBox">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string>Use raw BBQ</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2" colspan="2">
+         <widget class="QCheckBox" name="useNAFFCheckBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Use NAFF</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>Seconds Step</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_13">
+          <property name="text">
+           <string>Kernel Size</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QCheckBox" name="useHarpyCheckBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string>Use harpy</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1" colspan="3">
          <widget class="QDoubleSpinBox" name="secondsStep">
           <property name="enabled">
            <bool>false</bool>
@@ -571,21 +618,7 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_13">
-          <property name="text">
-           <string>Kernel Size</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_12">
-          <property name="text">
-           <string>Seconds Step</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1" colspan="2">
+        <item row="3" column="1" colspan="3">
          <widget class="QDoubleSpinBox" name="kernelSize">
           <property name="enabled">
            <bool>false</bool>
@@ -598,26 +631,6 @@
           </property>
           <property name="value">
            <double>15.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QCheckBox" name="useRawBBQCheckBox">
-          <property name="layoutDirection">
-           <enum>Qt::LeftToRight</enum>
-          </property>
-          <property name="text">
-           <string>Use raw BBQ</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1" colspan="2">
-         <widget class="QCheckBox" name="useNAFFCheckBox">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Use NAFF instead of spectrogram</string>
           </property>
          </widget>
         </item>
@@ -1753,6 +1766,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>useHarpyCheckBox</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>mainWindow</receiver>
+   <slot>useHarpyCheckBoxClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1043</x>
+     <y>76</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>851</x>
+     <y>512</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>newMeasurementClicked()</slot>
@@ -1775,5 +1804,6 @@
   <slot>useRawBBQCheckBoxClicked()</slot>
   <slot>useNAFFCheckBoxClicked()</slot>
   <slot>rcParamsClicked()</slot>
+  <slot>useHarpyCheckBoxClicked()</slot>
  </slots>
 </ui>

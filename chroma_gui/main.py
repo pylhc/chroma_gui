@@ -873,7 +873,13 @@ class MainWindow(QMainWindow, main_window_class):
                              plateau_length,
                              bad_tunes)
         else:  # raw BBQ
-            method = "raw_bbq_naff" if self.useNAFFCheckBox.isChecked() else "raw_bbq_spectrogram"
+            # Select the method to be called for processing the raw BBQ
+            method = "raw_bbq_spectrogram"
+            if self.useNAFFCheckBox.isChecked():
+                method = "raw_bbq_naff"
+            elif self.useHarpyCheckBox.isChecked():
+                method = "raw_bbq_harpy"
+
             self.startThread("cleanTuneRawBBQ",
                              "cleaningFinished",
                              self.measurement.path / cleaning_constants.DPP_FILE.format(beam=1),
@@ -1161,20 +1167,34 @@ class MainWindow(QMainWindow, main_window_class):
 
         # Turn ON or OFF some features depending on if the user wants to use the raw BBQ or not
         self.useNAFFCheckBox.setEnabled(True == raw_enabled)
+        self.useHarpyCheckBox.setEnabled(True == raw_enabled)
         self.secondsStep.setEnabled(True == raw_enabled)
         self.kernelSize.setEnabled(True == raw_enabled)
         self.badTunesLineEdit.setEnabled(False == raw_enabled)
         self.q1Quartile.setEnabled(False == raw_enabled)
         self.q3Quartile.setEnabled(False == raw_enabled)
 
+        # Enable or disable functionalities depending on the selected method
         if raw_enabled:
             self.useNAFFCheckBoxClicked(int(self.useNAFFCheckBox.isChecked()) * 2)  # Send a 0 or 2 depending on the state
+            self.useHarpyCheckBoxClicked(int(self.useHarpyCheckBox.isChecked()) * 2)  # Send a 0 or 2 depending on the state
 
     def useNAFFCheckBoxClicked(self, value):
-        naff_enabled = value == 2
-
+        """
+        Function called by the GUI when clicking the "Use NAFF" checkbox.
+        This disables some functionalities only used for the raw bbq spectrogram
+        """
         # Turn ON or OFF some raw bbq functions
+        naff_enabled = value == 2
         self.kernelSize.setEnabled(False == naff_enabled)
+
+    def useHarpyCheckBoxClicked(self, value):
+        """
+        Same as for useNAFFCheckBoxClicked(), but for Harpy
+        """
+        # Turn ON or OFF some raw bbq functions
+        harpy_enabled = value == 2
+        self.kernelSize.setEnabled(False == harpy_enabled)
 
     def timberVariableSelectionChanged(self, item):
         """
