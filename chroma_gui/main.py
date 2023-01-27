@@ -884,7 +884,7 @@ class MainWindow(QMainWindow, main_window_class):
             self.startThread("cleanTuneRawBBQ",
                              "cleaningFinished",
                              self.measurement.path / cleaning_constants.DPP_FILE.format(beam=1),
-                             self.measurement.path / timber.constants.FILENAME_PKL,
+                             self.measurement.path / timber.constants.FILENAME_HDF,
                              self.measurement.path,
                              cleaning_constants.CLEANED_DPP_FILE.format(beam=1),
                              cleaning_constants.CLEANED_DPP_FILE.format(beam=2),

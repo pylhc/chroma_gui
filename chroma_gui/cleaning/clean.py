@@ -415,7 +415,7 @@ def clean_data_for_beam(input_file, output_path, output_file, qx_window, qy_wind
         raw_data = None
     else:
         #raw_data = pd.read_pickle(raw_bbq_file)
-        raw_data = pd.read_hdf(raw_bbq_file)["df"]
+        raw_data = pd.read_hdf(raw_bbq_file)
 
     tune_x = []  # temporary list to hold the tune to further clean
     tune_y = []
