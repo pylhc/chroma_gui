@@ -1,5 +1,11 @@
 # Non-Linear Chromaticity GUI
 
+# 2023-01-27 - v0.0.7
+
+* Changed:
+  * Using HDF instead of pickle to stay compatible with different pandas
+    versions
+
 # 2023-01-27 - v0.0.6
 
 Many changes for this release, mainly about the raw BBQ processing.
