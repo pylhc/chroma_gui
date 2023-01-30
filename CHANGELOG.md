@@ -1,5 +1,14 @@
 # Non-Linear Chromaticity GUI
 
+# 2023-01-30 - v0.0.8
+
+* Removed:
+  * Harpy support, too slow to be usable and not meant for that usage
+
+* Added:
+  * Bad lines usage for raw BBQ processing
+  * Progress bar for cleaning
+
 # 2023-01-27 - v0.0.7
 
 * Changed:
