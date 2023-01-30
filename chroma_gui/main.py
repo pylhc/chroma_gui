@@ -26,6 +26,7 @@ from PyQt5.QtCore import (
     Qt,
     QEvent,
     QSize,
+    pyqtSlot,
 )
 from PyQt5 import uic
 from PyQt5.QtWidgets import (
@@ -234,11 +235,16 @@ class Measurement:
 
 class ExternalProgram(QThread):
     finished = pyqtSignal()
-    progress = pyqtSignal(int)
+    progress = pyqtSignal(float)
 
     def __init__(self, *args):
         super(QThread, self).__init__()
         self.args = args
+
+        # Base progress is added to the progress bar as the cleaning is done on two independent beams
+        self.base_progress = 0
+        # Connect the progress signal
+        self.progress.connect(self.progress_callback)
 
     def extractTimber(self):
         # Get the arguments from the creation of the object
@@ -275,30 +281,50 @@ class ExternalProgram(QThread):
         (input_file_B1, input_file_B2, output_path, output_filename_B1, output_filename_B2, qx_window, qy_window,
          quartiles, plateau_length, bad_tunes) = self.args
 
+        # Reset the progress bar
+        self.base_progress = 0
+        self.progress_callback(0)
+
         # Beam 1
         clean.clean_data_for_beam(input_file_B1, output_path, output_filename_B1, qx_window, qy_window, quartiles,
-                                  plateau_length, bad_tunes, method="bbq")
+                                  plateau_length, bad_tunes, method="bbq", signal=self.progress)
 
         # Beam 2
+        self.base_progress = 100  # max value is 200
         clean.clean_data_for_beam(input_file_B2, output_path, output_filename_B2, qx_window, qy_window, quartiles,
-                                  plateau_length, bad_tunes, method="bbq")
+                                  plateau_length, bad_tunes, method="bbq", signal=self.progress)
+
+        self.progress_callback(100)
         self.finished.emit()
+
+    @pyqtSlot(float)
+    def progress_callback(self, progress):
+        main_window = findMainWindow()
+        main_window.cleaningProgressBar.setValue(self.base_progress + int(progress))
+
 
     def cleanTuneRawBBQ(self):
         (input_file, input_file_raw, output_path, output_filename_B1, output_filename_B2, qx_window, qy_window,
-         plateau_length, seconds_step, kernel_size, method) = self.args
+         plateau_length, seconds_step, kernel_size, method, bad_tunes) = self.args
 
         quartiles = None
-        bad_tunes = []
+
+        # Reset the progress bar
+        self.base_progress = 0
+        self.progress_callback(0)
+
         # Beam 1
         clean.clean_data_for_beam(input_file, output_path, output_filename_B1, qx_window, qy_window, quartiles,
                                   plateau_length, bad_tunes, method=method, raw_bbq_file=input_file_raw,
-                                  seconds_step=seconds_step, kernel_size=kernel_size, beam=1)
+                                  seconds_step=seconds_step, kernel_size=kernel_size, beam=1, signal=self.progress)
 
         # Beam 2
+        self.base_progress = 100
         clean.clean_data_for_beam(input_file, output_path, output_filename_B2, qx_window, qy_window, quartiles,
                                   plateau_length, bad_tunes, method=method, raw_bbq_file=input_file_raw,
-                                  seconds_step=seconds_step, kernel_size=kernel_size, beam=2)
+                                  seconds_step=seconds_step, kernel_size=kernel_size, beam=2, signal=self.progress)
+
+        self.progress_callback(100)
         self.finished.emit()
 
     def computeChroma(self):
@@ -878,9 +904,6 @@ class MainWindow(QMainWindow, main_window_class):
             method = "raw_bbq_spectrogram"
             if self.useNAFFCheckBox.isChecked():
                 method = "raw_bbq_naff"
-            elif self.useHarpyCheckBox.isChecked():
-                method = "raw_bbq_harpy"
-
             self.startThread("cleanTuneRawBBQ",
                              "cleaningFinished",
                              self.measurement.path / cleaning_constants.DPP_FILE.format(beam=1),
@@ -894,6 +917,7 @@ class MainWindow(QMainWindow, main_window_class):
                              int(seconds_step),
                              int(kernel_size),
                              method,
+                             bad_tunes,
                              )
 
     def plateauFinished(self, measurement=None):
@@ -1168,17 +1192,14 @@ class MainWindow(QMainWindow, main_window_class):
 
         # Turn ON or OFF some features depending on if the user wants to use the raw BBQ or not
         self.useNAFFCheckBox.setEnabled(True == raw_enabled)
-        self.useHarpyCheckBox.setEnabled(True == raw_enabled)
         self.secondsStep.setEnabled(True == raw_enabled)
         self.kernelSize.setEnabled(True == raw_enabled)
-        self.badTunesLineEdit.setEnabled(False == raw_enabled)
         self.q1Quartile.setEnabled(False == raw_enabled)
         self.q3Quartile.setEnabled(False == raw_enabled)
 
         # Enable or disable functionalities depending on the selected method
         if raw_enabled:
             self.useNAFFCheckBoxClicked(int(self.useNAFFCheckBox.isChecked()) * 2)  # Send a 0 or 2 depending on the state
-            self.useHarpyCheckBoxClicked(int(self.useHarpyCheckBox.isChecked()) * 2)  # Send a 0 or 2 depending on the state
 
     def useNAFFCheckBoxClicked(self, value):
         """
@@ -1188,14 +1209,6 @@ class MainWindow(QMainWindow, main_window_class):
         # Turn ON or OFF some raw bbq functions
         naff_enabled = value == 2
         self.kernelSize.setEnabled(False == naff_enabled)
-
-    def useHarpyCheckBoxClicked(self, value):
-        """
-        Same as for useNAFFCheckBoxClicked(), but for Harpy
-        """
-        # Turn ON or OFF some raw bbq functions
-        harpy_enabled = value == 2
-        self.kernelSize.setEnabled(False == harpy_enabled)
 
     def timberVariableSelectionChanged(self, item):
         """

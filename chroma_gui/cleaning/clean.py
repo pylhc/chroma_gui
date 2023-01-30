@@ -4,9 +4,9 @@ import pandas as pd
 import logging
 from scipy import signal
 import PyNAFF as pnf
+import NAFFlib
+
 from dateutil.parser import isoparse
-import sdds
-from omc3 import hole_in_one
 from pathlib import Path
 
 logger = logging.getLogger('chroma_GUI - Cleaning')
@@ -112,41 +112,6 @@ def merge_overlap(array):
     return res[:res_counter]
 
 
-def save_data_to_lhc_sdds(timestamp, data_x, data_y, bpm_name, path):
-    # IDs
-    N_BUNCHES: str = "nbOfCapBunches"
-    BUNCH_ID: str = "BunchId"
-    HOR_BUNCH_ID: str = "horBunchId"
-    N_TURNS: str = "nbOfCapTurns"
-    ACQ_STAMP: str = "acqStamp"
-    BPM_NAMES: str = "bpmNames"
-
-    POSITIONS = {
-        "X": "horPositionsConcentratedAndSorted",
-        "Y": "verPositionsConcentratedAndSorted",
-    }
-
-    definitions = [
-        sdds.classes.Parameter(ACQ_STAMP, "llong"),
-        sdds.classes.Parameter(N_BUNCHES, "long"),
-        sdds.classes.Parameter(N_TURNS, "long"),
-        sdds.classes.Array(BUNCH_ID, "long"),
-        sdds.classes.Array(BPM_NAMES, "string"),
-        sdds.classes.Array(POSITIONS["X"], "float"),
-        sdds.classes.Array(POSITIONS["Y"], "float"),
-    ]
-    values = [
-        timestamp,
-        1,
-        len(data_x),
-        [0] * len(data_x),
-        [bpm_name],
-        np.ravel(data_x),
-        np.ravel(data_y),
-    ]
-    sdds.write(sdds.SddsFile("SDDS1", None, definitions, values), path)
-
-
 def get_spectrogram(raw_data, start_plateau, end_plateau, variables, seconds_step):
     """ Divide the plateau in chunks of x seconds and apply a spectrogram on it """
     # Create a mask to only get the data in the plateau
@@ -177,7 +142,8 @@ def get_spectrogram(raw_data, start_plateau, end_plateau, variables, seconds_ste
     return f, t, Sxx
 
 
-def get_avg_tune_from_naff(raw_data, start_plateau, end_plateau, variables, seconds_step, qx_window, qy_window):
+def get_avg_tune_from_naff(raw_data, start_plateau, end_plateau, variables, seconds_step, qx_window, qy_window,
+                           bad_tunes):
     """ Divide the plateau in chunks of x seconds and use NAFF on it"""
     # Create a mask to only get the data in the plateau
     d = raw_data.loc[variables + 'H']
@@ -204,108 +170,35 @@ def get_avg_tune_from_naff(raw_data, start_plateau, end_plateau, variables, seco
         for i in range(chunks):
             data = merged_data[plane][elements_per_chunk * i: elements_per_chunk * (i+1)]
 
-            spectrum = pnf.naff(data,
-                                turns=len(data)-1,  # somehow it fails with all the data
-                                nterms=2,
-                                skipTurns=0,
-                                getFullSpectrum=False,
-                                window=1)
+            #spectrum = pnf.naff(data,
+            #                    turns=len(data)-1,  # somehow it fails with all the data
+            #                    nterms=20,
+            #                    skipTurns=0,
+            #                    getFullSpectrum=False,
+            #                    window=1)
 
-            tune = None
-            for j in range(len(spectrum)):
-                if window[plane][0] <= spectrum[j][1] <= window[plane][1]:
-                    tune = spectrum[j][1]
-                    tunes[plane].append(tune)
+            spectrum, _, _ = NAFFlib.get_tunes(data, 20)
+
+            for frequency in spectrum:
+                in_window = window[plane][0] <= frequency <= window[plane][1]
+                not_bad_line = not np.any([(bad_low <= frequency <= bad_high) for bad_low, bad_high in bad_tunes])
+                if in_window and not_bad_line:
+                    tunes[plane].append(frequency)
                     break
-            if tune is None:
-                return {'H': (None, None), 'V': (None, None)}
+
+        # Discard the measurement for both planes if there's no usable data
+        if len(tunes[plane]) == 0:
+            #tunes[plane] = (None, None)
+            return {'H': (None, None), 'V': (None, None)}
+
 
     tune_x = np.average(tunes['H']), np.std(tunes['H'])
     tune_y = np.average(tunes['V']), np.std(tunes['V'])
+    print(tune_x, tune_y)
     return {'H': tune_x, 'V': tune_y}
 
 
-def get_avg_tune_from_harpy(raw_data, start_plateau, end_plateau, variables, qx_window, qy_window, beam, output_path):
-    """
-        Gets the tune from OMC3's harpy.
-        The raw BBQ data is merged and then saved as .sdds for each plateau.
-        Each plateau is then analysed by harpy, yielding Q_x,y and their error
-    """
-    # Create a mask to only get the data in the plateau
-    d = raw_data.loc[variables + 'H']
-    mask = d['TIMESTAMP'].astype('float') >= start_plateau.timestamp()
-    mask = mask & (d['TIMESTAMP'].astype('float') <= end_plateau.timestamp())
-    window = {'H': qx_window, 'V': qy_window}
-
-    # Create chunks x seconds long
-    seconds_step = 3
-    chunks = int((end_plateau - start_plateau).seconds / seconds_step)
-    if chunks == 0:
-        t = (end_plateau - start_plateau).seconds
-        logger.warning(f"The plateau is only {t} seconds long. It will be analyzed in one chunk")
-        chunks = 1
-
-
-    merged_data = {}
-    tunes = {'H': [], 'V': []}
-    # Get the tune via harpy for each plane
-    for plane in ('H', 'V'):
-        # Merge the overlapping data returned by Timber
-        logger.debug(f"Merging data for beam {beam}, plane {plane}")
-        merged_data[plane] = merge_overlap(raw_data.loc[variables + plane]['VALUE'][mask])
-
-    if len(merged_data['H']) != len(merged_data['V']):
-        print(len(merged_data['H']))
-        print(len(merged_data['V']))
-        print()
-
-    for i in range(chunks):
-        elements_per_chunk = int(len(merged_data['H']) / chunks)
-        data_x = merged_data['H'][elements_per_chunk * i: elements_per_chunk * (i + 1)]
-        data_y = merged_data['V'][elements_per_chunk * i: elements_per_chunk * (i + 1)]
-
-        # Save the data as SDDS for each plateau
-        filename = f"raw_bbq_B{beam}_{start_plateau}_{end_plateau}_{i:03}.sdds".replace(' ', '_')
-        output_sdds = output_path / "sdds"
-        output_sdds.mkdir(exist_ok=True)
-
-        if len(data_x) != len(data_y):
-            logger.error("Length of the horizontal and vertical data don't match. The SDDS file can not be created.")
-            continue
-
-        save_data_to_lhc_sdds(start_plateau.timestamp(),
-                              data_x,
-                              data_y,
-                              "BPM_BBQ",
-                              output_sdds / filename)
-
-        # Call Harpy on the chunk!
-        model_path = Path("/afs/cern.ch/work/m/mlegarre/public/beta_beat_output/2023-01-26/LHCB1/Models/test_raw_bbq")
-        hole_in_one.hole_in_one_entrypoint(
-            harpy=True,
-            files=[output_sdds / filename],
-            accel="lhc",
-            model=model_path / 'twiss.dat',
-            to_write=['lin', 'spectra', 'full_spectra', 'bpm_summary'],
-            unit='m',
-            tunes=[.28, .31, 0.],
-            nattunes=[.28, .31, 0.],
-            clean=False,
-            # opposite_direction=opposite_direction,
-            sing_val=12,
-            outputdir=output_sdds,
-            turn_bits=12,
-            free_kick=True,
-        )
-        print("Harpy done")
-        tunes['H'].append(tfs.read(output_sdds / f"{filename}.linx").headers['Q1'])
-        tunes['V'].append(tfs.read(output_sdds / f"{filename}.liny").headers['Q2'])
-
-    tune_x = np.average(tunes['H']), np.std(tunes['H'])
-    tune_y = np.average(tunes['V']), np.std(tunes['V'])
-    return {'H': tune_x, 'V': tune_y}
-
-def get_max_peak(x_data, y_data, plane, window):
+def get_max_peak(x_data, y_data, plane, window, bad_tunes):
     # Plot the maximum peaks for each plane
     # Find the peaks via scipy
     peaks, _ = signal.find_peaks(y_data,  # power density data
@@ -313,6 +206,11 @@ def get_max_peak(x_data, y_data, plane, window):
                                  )
     # Get a window to only get the interesting peaks
     tune_window = (x_data[peaks] >= window[plane][0]) & (x_data[peaks] <= window[plane][1])
+
+    # Remove the bad lines
+    for bad_low, bad_high in bad_tunes:
+        mask = ~((x_data[peaks] > bad_low) & (x_data[peaks] < bad_high))
+        tune_window = tune_window & mask
 
     # Get the peak amplitude associated to a tune (e.g. 2.6)
     # Sort it in reverse order
@@ -322,7 +220,7 @@ def get_max_peak(x_data, y_data, plane, window):
     return tunes[0]
 
 
-def get_avg_tune_from_spectrogram(f, Sxx, kernel_size, qx_window, qy_window):
+def get_avg_tune_from_spectrogram(f, Sxx, kernel_size, qx_window, qy_window, bad_tunes):
     tunes = {'H': [], 'V': []}
     avg_tunes = {'H': [], 'V': []}
     for plane in 'H', 'V':
@@ -335,19 +233,20 @@ def get_avg_tune_from_spectrogram(f, Sxx, kernel_size, qx_window, qy_window):
             # Get the tune
             window = {'H': qx_window,
                       'V': qy_window
-            }
-            tune = get_max_peak(f[plane], data, plane, window)
+                      }
+            tune = get_max_peak(f[plane], data, plane, window, bad_tunes)
             tunes[plane].append(tune)
-            # print(f'  Segment {i}: {tune}')
 
         avg_tunes[plane] = [np.mean(tunes[plane]),
                             np.std(tunes[plane])]
-        # print(f'Average tune in {plane}: {np.mean(tunes[plane])} +/- {np.std(tunes[plane])}')
     return avg_tunes
 
 
 def add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, quartiles, plateau_length, bad_tunes,
                method="bbq", raw_bbq_data=None, seconds_step=None, kernel_size=None, beam=None, output_path=None):
+    """
+        Gets the tune from one of the defined methods and adds it to the TFS
+    """
     # Length of plateau
     length = i - fp - 1
     # If the plateau is shorter than (arbitrary) 15 measurements, drop it
@@ -364,7 +263,7 @@ def add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, qu
         end_plateau = isoparse(data['TIME'][i - 1])
         variables = f'LHC.BQBBQ.CONTINUOUS_HS.B{beam}:ACQ_DATA_'
         f, t, Sxx = get_spectrogram(raw_bbq_data, start_plateau, end_plateau, variables, seconds_step)
-        tunes_from_raw = get_avg_tune_from_spectrogram(f, Sxx, kernel_size, qx_window, qy_window)
+        tunes_from_raw = get_avg_tune_from_spectrogram(f, Sxx, kernel_size, qx_window, qy_window, bad_tunes)
         tune_avg_x, std_x = tunes_from_raw['H']
         tune_avg_y, std_y = tunes_from_raw['V']
     elif method == "raw_bbq_naff":
@@ -372,17 +271,9 @@ def add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, qu
         end_plateau = isoparse(data['TIME'][i - 1])
         variables = f'LHC.BQBBQ.CONTINUOUS_HS.B{beam}:ACQ_DATA_'
         tunes_from_raw = get_avg_tune_from_naff(raw_bbq_data, start_plateau, end_plateau, variables, seconds_step,
-                                                qx_window, qy_window)
+                                                qx_window, qy_window, bad_tunes)
         tune_avg_x, std_x = tunes_from_raw['H']
         tune_avg_y, std_y = tunes_from_raw['V']
-    elif method == "raw_bbq_harpy":
-        start_plateau = isoparse(data['TIME'][fp])
-        end_plateau = isoparse(data['TIME'][i - 1])
-        variables = f'LHC.BQBBQ.CONTINUOUS_HS.B{beam}:ACQ_DATA_'
-        tunes_from_raw = get_avg_tune_from_harpy(raw_bbq_data, start_plateau, end_plateau, variables, qx_window, qy_window, beam, output_path)
-        tune_avg_x, std_x = tunes_from_raw['H']
-        tune_avg_y, std_y = tunes_from_raw['V']
-
 
     # Reject short plateaus that have no std
     if tune_avg_x is None or tune_avg_y is None:
@@ -407,7 +298,8 @@ def add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, qu
 
 
 def clean_data_for_beam(input_file, output_path, output_file, qx_window, qy_window, quartiles, plateau_length,
-                        bad_tunes, method, raw_bbq_file=None, seconds_step=None, kernel_size=None, beam=None):
+                        bad_tunes, method, raw_bbq_file=None, seconds_step=None, kernel_size=None, beam=None,
+                        signal=None):
     data = tfs.read(input_file)
     last_frf = data['F_RF'][0]
 
@@ -444,7 +336,8 @@ def clean_data_for_beam(input_file, output_path, output_file, qx_window, qy_wind
 
         else:  # new plateau
             out_tfs, j = add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, quartiles,
-                                    plateau_length, bad_tunes, method, raw_data, seconds_step, kernel_size, beam, output_path)
+                                    plateau_length, bad_tunes, method, raw_data, seconds_step, kernel_size, beam,
+                                    output_path)
 
             # Reset the counters
             tune_x = []
@@ -452,6 +345,9 @@ def clean_data_for_beam(input_file, output_path, output_file, qx_window, qy_wind
             fp = i
 
         last_frf = data['F_RF'][i]
+
+        # Fire the progress signal to update the GUI, as a rounded down percentage
+        signal.emit(np.floor(i / len(data.index) * 100))
 
     # Last point
     out_tfs, _ = add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, quartiles,

@@ -529,22 +529,6 @@
         <string>Clean Data</string>
        </property>
       </widget>
-      <widget class="QLabel" name="cleaningStatusLabel">
-       <property name="geometry">
-        <rect>
-         <x>340</x>
-         <y>110</y>
-         <width>331</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
@@ -589,19 +573,6 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QCheckBox" name="useHarpyCheckBox">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="layoutDirection">
-           <enum>Qt::LeftToRight</enum>
-          </property>
-          <property name="text">
-           <string>Use harpy</string>
-          </property>
-         </widget>
-        </item>
         <item row="2" column="1" colspan="3">
          <widget class="QDoubleSpinBox" name="secondsStep">
           <property name="enabled">
@@ -635,6 +606,41 @@
          </widget>
         </item>
        </layout>
+      </widget>
+      <widget class="QProgressBar" name="cleaningProgressBar">
+       <property name="geometry">
+        <rect>
+         <x>470</x>
+         <y>101</y>
+         <width>201</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="maximum">
+        <number>200</number>
+       </property>
+       <property name="value">
+        <number>0</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+      <widget class="QLabel" name="cleaningStatusLabel">
+       <property name="geometry">
+        <rect>
+         <x>340</x>
+         <y>100</y>
+         <width>121</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
       </widget>
      </widget>
      <widget class="Line" name="line">
@@ -1759,22 +1765,6 @@
     <hint type="sourcelabel">
      <x>-1</x>
      <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>851</x>
-     <y>512</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>useHarpyCheckBox</sender>
-   <signal>stateChanged(int)</signal>
-   <receiver>mainWindow</receiver>
-   <slot>useHarpyCheckBoxClicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1043</x>
-     <y>76</y>
     </hint>
     <hint type="destinationlabel">
      <x>851</x>
