@@ -4,6 +4,7 @@ include:
  - project: acc-co/devops/python/acc-py-gitlab-ci-templates
    file: v2/python.gitlab-ci.yml
 
+
 variables:
   project_name: chroma_gui
 
@@ -27,11 +28,18 @@ build_wheel:
 # A development installation of chroma-gui tested with pytest.
 test_dev:
   extends: .acc_py_dev_test
-
+  before_script:
+    - yum -y install gcc 
+    - pip install numpy
+    - !reference [.acc_py_dev_test, before_script] 
+      
 
 # A full installation of chroma-gui (as a wheel) tested with pytest on an Acc-Py image.
 test_wheel:
   extends: .acc_py_wheel_test
+  before_script:
+  - yum -y install gcc
+  - !reference [.acc_py_wheel_test, before_script]  
 
 
 # Release the source distribution and the wheel to the acc-py package index, only on git tag.
