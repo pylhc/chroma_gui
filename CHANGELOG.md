@@ -1,5 +1,11 @@
 # Non-Linear Chromaticity GUI
 
+# 2023-01-30 - v0.0.9
+
+* Changed
+  * Removed setup.py in favor of pyproject.toml and setup.cfg
+    The Gitlab-CI has been updated as well.
+
 # 2023-01-30 - v0.0.8
 
 * Removed:
