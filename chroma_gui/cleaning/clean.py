@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 import logging
 from scipy import signal
-import PyNAFF as pnf
 import NAFFlib
 
 from dateutil.parser import isoparse
