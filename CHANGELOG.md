@@ -1,5 +1,9 @@
 # Non-Linear Chromaticity GUI
 
+# 2023-01-31 - v0.0.10
+
+* Fix useless sklearn dependency, also wasn't present in setup.cfg
+
 # 2023-01-30 - v0.0.9
 
 * Changed
