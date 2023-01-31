@@ -5,7 +5,6 @@ import tfs
 import numpy as np
 import pandas as pd
 from functools import partial
-from sklearn.metrics import r2_score
 
 from chroma_gui.chromaticity.chroma_fct import chromaticity_func
 from chroma_gui.timber.extract import read_variables_from_csv
