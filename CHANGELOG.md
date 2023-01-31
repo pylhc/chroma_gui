@@ -1,10 +1,12 @@
 # Non-Linear Chromaticity GUI
 
-# 2023-01-31 - v0.0.10 - v0.0.11
+# 2023-01-31 - v0.0.10 - v0.0.11 - v0.0.12
 
 * Fix unused dependencies:
   * Removed PyNAFF
   * Removed sklearn
+
+* Set the minimum version for PyQt5
 
 # 2023-01-30 - v0.0.9
 
