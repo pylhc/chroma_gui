@@ -1,5 +1,9 @@
 # Non-Linear Chromaticity GUI
 
+# 2023-01-31 - v0.0.13
+
+* Add pytables are requirement, need for hdf
+
 # 2023-01-31 - v0.0.10 - v0.0.11 - v0.0.12
 
 * Fix unused dependencies:
