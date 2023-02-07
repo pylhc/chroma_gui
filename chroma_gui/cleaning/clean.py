@@ -168,14 +168,6 @@ def get_avg_tune_from_naff(raw_data, start_plateau, end_plateau, variables, seco
         # Process each chunk
         for i in range(chunks):
             data = merged_data[plane][elements_per_chunk * i: elements_per_chunk * (i+1)]
-
-            #spectrum = pnf.naff(data,
-            #                    turns=len(data)-1,  # somehow it fails with all the data
-            #                    nterms=20,
-            #                    skipTurns=0,
-            #                    getFullSpectrum=False,
-            #                    window=1)
-
             spectrum, _, _ = NAFFlib.get_tunes(data, 20)
 
             for frequency in spectrum:
@@ -236,8 +228,15 @@ def get_avg_tune_from_spectrogram(f, Sxx, kernel_size, qx_window, qy_window, bad
             tune = get_max_peak(f[plane], data, plane, window, bad_tunes)
             tunes[plane].append(tune)
 
-        avg_tunes[plane] = [np.mean(tunes[plane]),
-                            np.std(tunes[plane])]
+        avg, std = np.mean(tunes[plane]), np.std(tunes[plane])
+
+        # Check that the error bar is reasonable. If it's too big, discard it.
+        if std < 2e-3 and std != 0:
+            avg_tunes[plane] = [avg, std]
+        else:
+            logger.info(f"Plateau not taken into account as std is large or zero: {std}")
+            avg_tunes[plane] = [None, None]
+
     return avg_tunes
 
 
@@ -275,7 +274,7 @@ def add_points(tune_x, tune_y, i, j, fp, out_tfs, data, qx_window, qy_window, qu
         tune_avg_y, std_y = tunes_from_raw['V']
 
     # Reject short plateaus that have no std
-    if tune_avg_x is None or tune_avg_y is None:
+    if std_x is None or std_y is None:
         logger.debug(f"Not logging plateau because of equal tune data: {tune_x[0]}")
         logger.debug(f"  Time: {data['TIME'][fp]} / {data['TIME'][i-1]}")
         return out_tfs, j
