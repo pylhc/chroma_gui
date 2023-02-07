@@ -70,8 +70,8 @@ from chroma_gui.chromaticity import (
     get_chromaticity_formula
 )
 import chroma_gui.cleaning.constants as cleaning_constants
-from chroma_gui.constants import CHROMA_FILE, RESPONSE_MATRICES, CONFIG
-from chroma_gui.corrections import correct
+from chroma_gui.constants import CHROMA_FILE, RESPONSE_MATRICES, CONFIG, CHROMA_COEFFS
+from chroma_gui.corrections import response_matrix
 
 logger = logging.getLogger('chroma_GUI')
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -302,7 +302,6 @@ class ExternalProgram(QThread):
         main_window = findMainWindow()
         main_window.cleaningProgressBar.setValue(self.base_progress + int(progress))
 
-
     def cleanTuneRawBBQ(self):
         (input_file, input_file_raw, output_path, output_filename_B1, output_filename_B2, qx_window, qy_window,
          plateau_length, seconds_step, kernel_size, method, bad_tunes) = self.args
@@ -342,6 +341,77 @@ class ExternalProgram(QThread):
         chroma_tfs = get_chromaticity(input_file_B2, chroma_tfs, dpp_range, fit_orders, 'Y')
 
         tfs.write(output_path / CHROMA_FILE, chroma_tfs)
+
+        self.finished.emit()
+
+    def computeCorrections(self):
+        optics_paths, measurement_path, method, observables, chroma_factor, rcond, keep_dq3_constant,\
+        clean_nan, clean_outliers, clean_IR_number = self.args
+
+        if method == "Global":
+            chromaticity_values = tfs.read(measurement_path / CHROMA_FILE)
+            coefficients = json.load(open(CHROMA_COEFFS))
+
+            for beam in [1, 2]:
+                text = ""
+                for obs in observables:
+                    order = obs.split("DQ")[1]
+
+                    # Get the measured values
+                    mask = chromaticity_values['BEAM'] == f'B{beam}'
+                    mask = mask & (chromaticity_values['UP_TO_ORDER'] == chromaticity_values['UP_TO_ORDER'].max())
+                    mask_x = mask & (chromaticity_values['AXIS'] == 'X')
+                    mask_y = mask & (chromaticity_values['AXIS'] == 'Y')
+                    dqx = chromaticity_values[mask_x][f'Q{order}'].values[0]
+                    dqy = chromaticity_values[mask_y][f'Q{order}'].values[0]
+
+                    # The chromaticity is simply an affine function that depends on the corrector strength
+                    # Get the point where dqx and dqy cross to minimize both planes
+                    dq_corr = (dqy - dqx) / (coefficients[str(beam)][order][0] - coefficients[str(beam)][order][1])
+                    text = text + f'DQ{order}Corrector.B{beam} = {dq_corr:6.4f} ;\n'
+
+                main_window = findMainWindow()
+                main_window.corrections[f'B{beam}'] = text
+
+        elif method == "Local":
+            # Compute the corrections for each beam
+            for beam in [1, 2]:
+                logger.info(f"Computing corrections for Beam {beam}")
+                # Get the strengths of the magnets used for simulation
+                strengths_mcd = json.load(open(RESOURCES / "normal_decapole" / "strengths.json"))
+
+                # Create the basic response matrix object
+                simulations = Path(RESOURCES / "normal_decapole")
+                resp = response_matrix.ResponseMatrix(strengths_mcd[str(beam)], simulations, beam=beam)
+
+                # Add the observables
+                # Add the RDT to the response matrix
+                if "f1004" in observables:
+                    optics_path = optics_path[beam]
+                    model_path = RESOURCES / "normal_decapole" / f"twiss_b{beam}.dat"
+                    resp.add_rdt_observable(Path(optics_path), model_path, "f1004_x")
+
+                # Add the Chromaticity to the response matrix
+                chroma_path = measurement_path
+                if keep_dq3_constant:
+                    resp.add_zero_chromaticity_observable(order=3, weight=chroma_factor)
+                elif "DQ3" in observables:
+                    resp.add_chromaticity_observable(chroma_path, order=3, weight=chroma_factor)
+
+                # Get the corrections
+                corrections = resp.get_corrections(rcond=rcond,
+                                                   clean_nan=clean_nan,
+                                                   clean_outliers=clean_outliers,
+                                                   clean_IR=(clean_IR_number != 0),
+                                                   inside_arc_number=clean_IR_number
+                                                   )
+
+                # Set the text edits with the computed corrections
+                text = ""
+                for key, val in corrections.items():
+                    text += f"{key} = {val:6d} ;\n"
+                main_window = findMainWindow()
+                main_window.corrections[f'B{beam}'] = text
 
         self.finished.emit()
 
@@ -571,11 +641,13 @@ class MainWindow(QMainWindow, main_window_class):
         self.applyMplStyle()
 
         # Disable tabs for now, as no measurement has been created or opened yet
-        # TODO add Correction tab!
         self.enableTimberTab(False)
         self.enableCleaningTab(False)
         self.enableChromaticityTab(False)
+        self.enableCorrectionsTab(False)
 
+        self.available_observables = {}
+        self.corrections = {"B1": None, "B2": None}
         self.setCorrectionComboBox()
 
         # Set the info icons on the labels
@@ -602,9 +674,9 @@ class MainWindow(QMainWindow, main_window_class):
                     icon = QLabel()
                     icon.setPixmap(qta.icon(info_icon_id).pixmap(QSize(16, 16)))
 
-                    layout.addWidget(QLabel(text))
+                    layout.addWidget(QLabel(text), 0, Qt.AlignLeft)
                     layout.addSpacing(1)
-                    layout.addWidget(icon)
+                    layout.addWidget(icon, 0, Qt.AlignLeft)
 
                     # Set the original tool tip to the icon
                     obj.setToolTip("")
@@ -613,6 +685,7 @@ class MainWindow(QMainWindow, main_window_class):
                     obj.setText("")  # remove the old text
                     obj.setLayout(layout)  # and replace by the new layout
                     layout.setSizeConstraint(QLayout.SetMinimumSize)
+                    layout.setAlignment(Qt.AlignLeft)
                     obj.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
 
     def applyMplStyle(self):
@@ -699,6 +772,7 @@ class MainWindow(QMainWindow, main_window_class):
         if chroma_status:
             self.setChromaticityOrders(chroma_orders)
             self.chromaFinished(self.measurement)
+            self.enableCorrectionsTab(True)
 
     def setCorrectionComboBox(self):
         """
@@ -713,9 +787,28 @@ class MainWindow(QMainWindow, main_window_class):
         self.verticalCorrectionLayout.addWidget(self.observablesCorrectionComboBox)
         self.verticalCorrectionLayout.update()
 
-        # Display the available corrections
-        self.observables = json.load(open(RESPONSE_MATRICES))['AVAILABLE_OBSERVABLES']
-        self.observablesCorrectionComboBox.addItems(self.observables)
+        # Display the available correction methods
+        self.available_observables = json.load(open(RESPONSE_MATRICES))['AVAILABLE_OBSERVABLES']
+        self.correctionMethodComboBox.addItems(self.available_observables.keys())
+
+    def correctionMethodComboBoxChanged(self, method: str):
+        """
+        Set the available observables for the selected method.
+        Greys out the unavailable options
+        """
+        selected_method = self.correctionMethodComboBox.currentText()
+
+        # Set the available observables
+        self.observablesCorrectionComboBox.clear()
+        self.observablesCorrectionComboBox.addItems(self.available_observables[selected_method])
+
+        # Greys out the options of the method is global
+        self.factorChromaSpinBox.setEnabled(selected_method == "Local")
+        self.rcondCorrectionSpinBox.setEnabled(selected_method == "Local")
+        self.keepDQ3ConstantcheckBox.setEnabled(selected_method == "Local")
+        self.cleanNaNCheckBox.setEnabled(selected_method == "Local")
+        self.cleanOutliersCheckBox.setEnabled(selected_method == "Local")
+        self.cleanIRSpinBox.setEnabled(selected_method == "Local")
 
     def enableTimberTab(self, value):
         self.timberTab.setEnabled(value)
@@ -725,6 +818,9 @@ class MainWindow(QMainWindow, main_window_class):
 
     def enableChromaticityTab(self, value):
         self.chromaticityTab.setEnabled(value)
+
+    def enableCorrectionsTab(self, value):
+        self.correctionsTab.setEnabled(value)
 
     def newMeasurementClicked(self):
         measurement_dialog = NewMeasurementDialog(self)
@@ -1261,30 +1357,77 @@ class MainWindow(QMainWindow, main_window_class):
             else:
                 dq.setChecked(False)
 
-    def openMeasurementCorrectionClicked(self):
+    def openMeasurementCorrectionB1Clicked(self):
         folder = QFileDialog.getExistingDirectory(
             self,
             "Select the Optics directory of the measurement to correct",
             str(self.config.measurements_path),
         )
         if folder:
-            self.measurementCorrectionLineEdit.setText(folder)
+            self.measurementCorrectionB1LineEdit.setText(folder)
+
+    def openMeasurementCorrectionB2Clicked(self):
+        folder = QFileDialog.getExistingDirectory(
+            self,
+            "Select the Optics directory of the measurement to correct",
+            str(self.config.measurements_path),
+        )
+        if folder:
+            self.measurementCorrectionB2LineEdit.setText(folder)
 
     def correctionButtonClicked(self):
-        # TODO
-        logger.info("Starting Response Matrix creation")
-        optics_path = self.measurementCorrectionLineEdit.text()
+        optics_path_B1 = self.measurementCorrectionB1LineEdit.text()
+        optics_path_B2 = self.measurementCorrectionB2LineEdit.text()
+
         observables = self.observablesCorrectionComboBox.currentData()
         chroma_factor = self.factorChromaSpinBox.value()
+        rcond = self.rcondCorrectionSpinBox.value()
+        method = self.correctionMethodComboBox.currentText()
+        keep_dq3_constant = self.keepDQ3ConstantcheckBox.isChecked()
+        clean_nan = self.cleanNaNCheckBox.isChecked()
+        clean_outliers = self.cleanOutliersCheckBox.isChecked()
+        clean_IR = self.cleanIRSpinBox.value()
 
         if len(observables) == 0:
             logger.error("No observables selected!")
             return
 
-        response = correct.create_response_matrix_f1004_dq3(observables, chroma_factor, beam=1)
-        logger.info('Response matrix created')
-        logger.info(f'  Number of observables: {response.shape[0]}')
-        logger.info(f'  Number of correctors: {response.shape[1]}\n')
+        optics_paths = {}
+        if optics_path_B1.strip() != "":
+            optics_paths[1] = optics_path_B1
+        if optics_path_B2.strip() != "":
+            optics_paths[2] = optics_path_B2
+
+        # Check if we need the optics analysis or not
+        rdt_in_observables = any(["f" in obs for obs in observables])
+        if len(optics_paths) == 0 and rdt_in_observables:
+            logger.error("No measurement path selected!")
+            return
+
+        logger.info("Starting Response Matrix creation")
+        self.startThread("computeCorrections",
+                         "correctionsFinished",
+                         optics_paths,
+                         self.measurement.path,
+                         method,
+                         observables,
+                         chroma_factor,
+                         rcond,
+                         keep_dq3_constant,
+                         clean_nan,
+                         clean_outliers,
+                         clean_IR)
+
+    def correctionsFinished(self):
+        for beam in self.corrections.keys():
+            if self.corrections[beam] is None:
+                continue
+
+            text = self.corrections[f'{beam}'].replace('\n', '<br>')
+            text = text.replace(" ", "&nbsp;")
+            text_edit = getattr(self, f'correction{beam}TextEdit')
+            text_edit.setHtml(text)
+        logger.info("Corrections done!")
 
     # === Matplotlib rcParams
     def rcParamsClicked(self):

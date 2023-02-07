@@ -3,7 +3,10 @@ from pathlib import Path
 # Config file
 CONFIG = Path.home() / ".chroma_gui"
 
+# Resources
+RESOURCES = Path(__file__).parent / "resources"
+
 # Chromaticity
 CHROMA_FILE = "chromaticity.tfs"
-RESPONSE_MATRICES = Path(__file__).parent / "resources" / "response_matrices.json"
-RESOURCES = Path(__file__).parent / "resources"
+CHROMA_COEFFS = RESOURCES / "chromaticity_coefficients.json"
+RESPONSE_MATRICES = RESOURCES / "response_matrices.json"

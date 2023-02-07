@@ -1,3 +1,12 @@
 {
-  "AVAILABLE_OBSERVABLES": ["f1004", "DQ3"]
+  "AVAILABLE_OBSERVABLES": {
+    "Global": [
+      "DQ2",
+      "DQ3"
+    ],
+    "Local": [
+      "f1004",
+      "DQ3"
+    ]
+  }
 }
