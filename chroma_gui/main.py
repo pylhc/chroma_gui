@@ -5,13 +5,13 @@ import sys
 import json
 from json import JSONDecodeError
 import tfs
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 import pyperclip
 import matplotlib.pyplot as plt
 
 import logging
 from pathlib import Path
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, field, fields, asdict
 import traceback
 
 # PyQt libraries
@@ -142,36 +142,53 @@ class ChromaticityTableModel(QAbstractTableModel):
         return self._dataframe
 
 
+@dataclass
 class Measurement:
     """
-    Holds Measurement specific data such as paths
+    holds measurement specific data such as paths and measurement times
     """
+    # Paths for the measurement itself and the two beam models
+    path: Path
+    model_path: Dict[str, Path] = field(default_factory=lambda: {"B1": None, "B2": None})
 
-    def __init__(self, path, description=None, model_path=None, nominal_rf=None, start_time=None, end_time=None):
-        self.path = Path(path)
-        self.description = description
-        self.model_path = model_path
-        self.nominal_rf = nominal_rf
-        self.start_time: datetime = start_time
-        self.end_time: datetime = end_time
+    # Metadata about the measurement
+    description: str = None
 
-        # Momentum compaction factor, retrieved from the model
-        self.alpha = {"B1": None,
-                      "B2": None,
-                      }
+    # Settings for extraction and analysis
+    nominal_rf: float = None
+    alpha: Dict[str, float] = field(default_factory=lambda: {"B1": None, "B2": None})
+    # Extraction times
+    start_time: datetime = None
+    end_time: datetime = None
+    # Analysis times
+    cleaning_start_time: datetime = None
+    cleaning_end_time: datetime = None
 
-        # When opening a measurement, the model path is not specified.
-        # Retrieve all the info from the measurement.info file
-        if not self.model_path:
-            measurement_info_path = Path(self.path) / 'measurement.info'
-            measurement_info = json.load(open(measurement_info_path))
-            self.description = measurement_info['description']
-            self.model_path = measurement_info['model_path']
-            self.nominal_rf = measurement_info['nominal_rf']
-            self.start_time = datetime.fromisoformat(measurement_info['start_time'])
-            self.end_time = datetime.fromisoformat(measurement_info['end_time'])
+    @classmethod
+    def from_folder(cls: typing.Type["Measurement"], path: Path):
+        """
+        Returns a Measurement object created via the "measurement.info" contained in the given folder
+        """
+        measurement_info_path = Path(path) / 'measurement.info'
+        measurement_info = json.load(open(measurement_info_path))
 
-        self.load_twiss()  # load the twiss files containing alfa
+        measurement = cls(**measurement_info)
+        measurement.load_twiss()
+
+        # Fix the datetime and Path types as we're only reading strings from the json
+        for field in fields(measurement):
+            value = getattr(measurement, field.name)
+            if value is None:
+                continue
+            if field.type is datetime:  # Dates
+                setattr(measurement, field.name, datetime.fromisoformat(value))
+            elif field.type is Path:  # Paths
+                setattr(measurement, field.name, Path(value))
+            elif field.type is Dict[str, Path]:  # Dictionaries with Paths
+                for key in value.keys():
+                    getattr(measurement, field.name)[key] = Path(value[key])
+
+        return measurement
 
     def load_twiss(self):
         for beam in self.alpha.keys():
@@ -218,18 +235,29 @@ class Measurement:
         return False, None
 
     def save_as_json(self):
+        """
+        Saves the measurement fields as json
+        """
         measurement_info_path = Path(self.path) / 'measurement.info'
-        start = self.start_time.isoformat() if self.start_time else None
-        end = self.end_time.isoformat() if self.end_time else None
-        data = {"path": str(self.path),
-                "model_path": {"B1": self.model_path['B1'],
-                               "B2": self.model_path['B2']
-                               },
-                "description": self.description,
-                "nominal_rf": self.nominal_rf,
-                "start_time": start,
-                "end_time": end,
-                }
+
+        # Converts the types to something json can serialize
+        data = {}
+        for field in fields(self):
+            value = getattr(self, field.name)
+            if value is None:
+                continue
+
+            if field.type is datetime:  # Dates
+                data[field.name] = value.isoformat()
+            elif field.type is Path:  # Paths
+                data[field.name] = str(value)
+            elif field.type is Dict[str, Path]:  # Dictionaries with Paths
+                data[field.name] = {}
+                for key in value.keys():
+                    data[field.name][key] = str(value[key])
+            else:
+                data[field.name] = value
+
         json.dump(data, open(measurement_info_path, 'w'), indent=4)
 
 
@@ -750,12 +778,15 @@ class MainWindow(QMainWindow, main_window_class):
             self.updateTimberPlot(self.measurement)
             self.updateTimberTable(self.measurement)
             self.enableCleaningTab(True)
-            # Set the times
-            start = QDateTime.fromString(self.measurement.start_time.strftime("%Y-%m-%dT%H:%M:%S"),
-                                         'yyyy-MM-ddThh:mm:ss')
-            end = QDateTime.fromString(self.measurement.end_time.strftime("%Y-%m-%dT%H:%M:%S"), 'yyyy-MM-ddThh:mm:ss')
-            self.startPlateauDateTimeEdit.setDateTime(start)
-            self.endPlateauDateTimeEdit.setDateTime(end)
+            # Get the times from the measurement.info, or set them to the Timber extraction times
+            cleaning_start = QDateTime.fromString(self.measurement.cleaning_start_time.strftime("%Y-%m-%dT%H:%M:%S"),
+                                                  'yyyy-MM-ddThh:mm:ss') if self.measurement.cleaning_start_time \
+                                                                         else start
+            cleaning_end = QDateTime.fromString(self.measurement.cleaning_end_time.strftime("%Y-%m-%dT%H:%M:%S"),
+                                                'yyyy-MM-ddThh:mm:ss') if self.measurement.cleaning_end_time \
+                                                                       else end
+            self.startPlateauDateTimeEdit.setDateTime(cleaning_start)
+            self.endPlateauDateTimeEdit.setDateTime(cleaning_end)
 
         # Check if we got cleaned data already
         dpp, cleaned = self.measurement.get_cleaning_status()
@@ -772,7 +803,6 @@ class MainWindow(QMainWindow, main_window_class):
         if chroma_status:
             self.setChromaticityOrders(chroma_orders)
             self.chromaFinished(self.measurement)
-            self.enableCorrectionsTab(True)
 
     def setCorrectionComboBox(self):
         """
@@ -840,7 +870,7 @@ class MainWindow(QMainWindow, main_window_class):
 
         # Try to open the measurement information file
         try:
-            self.measurement = Measurement(folder)
+            self.measurement = Measurement.from_folder(Path(folder))
         except OSError as e:
             QMessageBox.warning(self,
                                 "Failed to open measurement",
@@ -946,6 +976,11 @@ class MainWindow(QMainWindow, main_window_class):
             logger.warning(msg)
         if nominal_rf is not None:
             nominal_rf = float(nominal_rf)
+
+        # Set the analysis start and end time in the measurement.info
+        self.measurement.cleaning_start_time = start
+        self.measurement.cleaning_end_time = end
+        self.measurement.save_as_json()
 
         # Start the plateau creation
         logger.info("Starting Plateau Creation")
@@ -1174,6 +1209,7 @@ class MainWindow(QMainWindow, main_window_class):
         self.updateChromaTables(measurement)
         self.updateChromaPlots(measurement)
         self.updateR2scores()
+        self.enableCorrectionsTab(True)
 
     def updateR2scores(self):
         # Set the r2 scores
@@ -1514,12 +1550,13 @@ class NewMeasurementDialog(QDialog, new_measurement_class):
         return folder
 
     def createMeasurement(self):
-        model_path = {'B1': self.modelB1LineEdit.text(),
-                      'B2': self.modelB2LineEdit.text()}
+        model_path = {'B1': Path(self.modelB1LineEdit.text()),
+                      'B2': Path(self.modelB2LineEdit.text())
+                      }
         # Set the start and end time of the timber extraction to the current date
         now = datetime.now()
 
-        measurement = Measurement(path=self.locationLineEdit.text(),
+        measurement = Measurement(path=Path(self.locationLineEdit.text()),
                                   description=self.descriptionTextEdit.toPlainText(),
                                   model_path=model_path,
                                   start_time=now,
