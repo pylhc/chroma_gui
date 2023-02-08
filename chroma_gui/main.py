@@ -387,7 +387,7 @@ class ExternalProgram(QThread):
                 # Add the observables
                 # Add the RDT to the response matrix
                 if "f1004" in observables:
-                    optics_path = optics_path[beam]
+                    optics_path = optics_paths[beam]
                     model_path = RESOURCES / "normal_decapole" / f"twiss_b{beam}.dat"
                     resp.add_rdt_observable(Path(optics_path), model_path, "f1004_x")
 
