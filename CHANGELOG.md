@@ -1,5 +1,13 @@
 # Non-Linear Chromaticity GUI
 
+# 2023-02-10 - v0.0.14
+
+* Added:
+  * Global and local corrections
+
+* Changed
+  * Plateaus with large tune std are now removed
+
 # 2023-01-31 - v0.0.13
 
 * Add pytables are requirement, need for hdf
