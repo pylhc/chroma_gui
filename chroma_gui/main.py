@@ -437,7 +437,10 @@ class ExternalProgram(QThread):
                 # Set the text edits with the computed corrections
                 text = ""
                 for key, val in corrections.items():
-                    text += f"{key} = {val:6d} ;\n"
+                    if val > 0:
+                        text += f"{key} := {key} + {val:6d} ;\n"
+                    else:
+                        text += f"{key} := {key} - {val*-1:6d} ;\n"
                 main_window = findMainWindow()
                 main_window.corrections[f'B{beam}'] = text
 
