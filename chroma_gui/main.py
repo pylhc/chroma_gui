@@ -836,6 +836,8 @@ class MainWindow(QMainWindow, main_window_class):
         self.observablesCorrectionComboBox.addItems(self.available_observables[selected_method])
 
         # Greys out the options of the method is global
+        self.measurementCorrectionB1LineEdit.setEnabled(selected_method == "Local")
+        self.measurementCorrectionB2LineEdit.setEnabled(selected_method == "Local")
         self.factorChromaSpinBox.setEnabled(selected_method == "Local")
         self.rcondCorrectionSpinBox.setEnabled(selected_method == "Local")
         self.keepDQ3ConstantcheckBox.setEnabled(selected_method == "Local")
