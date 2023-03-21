@@ -156,7 +156,6 @@ class Measurement:
 
     # Settings for extraction and analysis
     nominal_rf: float = None
-    alpha: Dict[str, float] = field(default_factory=lambda: {"B1": None, "B2": None})
     # Extraction times
     start_time: datetime = None
     end_time: datetime = None
@@ -173,7 +172,6 @@ class Measurement:
         measurement_info = json.load(open(measurement_info_path))
 
         measurement = cls(**measurement_info)
-        measurement.load_twiss()
 
         # Fix the datetime and Path types as we're only reading strings from the json
         for field in fields(measurement):
@@ -190,10 +188,13 @@ class Measurement:
 
         return measurement
 
-    def load_twiss(self):
-        for beam in self.alpha.keys():
+    def get_alpha(self):
+        alpha = {"B1": None, "B2": None}
+        for beam in alpha.keys():
             twiss = tfs.read(Path(self.model_path[beam]) / 'twiss.dat')
-            self.alpha[beam] = twiss.headers['ALFA']
+            alpha[beam] = twiss.headers['ALFA']
+        return alpha
+
 
     def get_timber_status(self):
         """
@@ -361,12 +362,14 @@ class ExternalProgram(QThread):
         chroma_tfs = construct_chroma_tfs(fit_orders)
 
         # Beam 1
-        chroma_tfs = get_chromaticity(input_file_B1, chroma_tfs, dpp_range, fit_orders, 'X')
-        chroma_tfs = get_chromaticity(input_file_B1, chroma_tfs, dpp_range, fit_orders, 'Y')
+        if input_file_B1 is not None:
+            chroma_tfs = get_chromaticity(input_file_B1, chroma_tfs, dpp_range, fit_orders, 'X')
+            chroma_tfs = get_chromaticity(input_file_B1, chroma_tfs, dpp_range, fit_orders, 'Y')
 
         # Beam 2
-        chroma_tfs = get_chromaticity(input_file_B2, chroma_tfs, dpp_range, fit_orders, 'X')
-        chroma_tfs = get_chromaticity(input_file_B2, chroma_tfs, dpp_range, fit_orders, 'Y')
+        if input_file_B2 is not None:
+            chroma_tfs = get_chromaticity(input_file_B2, chroma_tfs, dpp_range, fit_orders, 'X')
+            chroma_tfs = get_chromaticity(input_file_B2, chroma_tfs, dpp_range, fit_orders, 'Y')
 
         tfs.write(output_path / CHROMA_FILE, chroma_tfs)
 
@@ -758,8 +761,9 @@ class MainWindow(QMainWindow, main_window_class):
 
     def updateLineEdits(self):
         # Update the labels in the Main Window
-        self.alfaB1LineEdit.setText(str(self.measurement.alpha['B1']))
-        self.alfaB2LineEdit.setText(str(self.measurement.alpha['B2']))
+        alpha = self.measurement.get_alpha()
+        self.alfaB1LineEdit.setText(str(alpha['B1']))
+        self.alfaB2LineEdit.setText(str(alpha['B2']))
         self.nominalRfLineEdit.setText(str(self.measurement.nominal_rf))
         self.descriptionPlainTextEdit.setPlainText(self.measurement.description)
 
@@ -990,7 +994,7 @@ class MainWindow(QMainWindow, main_window_class):
         # Start the plateau creation
         logger.info("Starting Plateau Creation")
         self.startThread("createPlateaus", "plateauFinished", self.measurement.path, timber.constants.FILENAME,
-                         rf_beam, start, end, nominal_rf, self.measurement.alpha)
+                         rf_beam, start, end, nominal_rf, self.measurement.get_alpha())
 
     def cleanDataClicked(self):
         # Get values from the GUI
@@ -1201,6 +1205,12 @@ class MainWindow(QMainWindow, main_window_class):
         output_path = self.measurement.path
         fit_orders = self.getChromaticityOrders()
         dpp_range = (dpp_range_low, dpp_range_high)
+
+        # Set the files to None if that beam didn't get a measurement
+        if not input_file_B1.exists():
+            input_file_B1 = None
+        if not input_file_B2.exists():
+            input_file_B2 = None
 
         logger.info("Starting Chromaticity Computing")
         self.startThread("computeChroma", "chromaFinished",
