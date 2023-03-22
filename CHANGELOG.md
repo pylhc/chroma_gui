@@ -1,5 +1,18 @@
 # Non-Linear Chromaticity GUI
 
+# 2023-02-10 - v0.0.16
+
+Release patch
+
+# 2023-02-10 - v0.0.15
+
+* Added:
+  * Corrections are now relative and can be used as MAD-X input
+
+* Fixed:
+  * alfa isn't written anymore in the measurement data, but taken from the
+    model when needed
+
 # 2023-02-10 - v0.0.14
 
 * Added:

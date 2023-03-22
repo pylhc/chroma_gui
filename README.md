@@ -20,7 +20,8 @@ acc-py app run chroma-gui
 
 # Deployment
 
-Change the version in [__init__.py](./chroma_gui/__init__.py)
+* Change the version in [__init__.py](./chroma_gui/__init__.py)
+* Update the [CHANGELOD](./CHANGELOD.md)
 
 ```bash
 acc-py app lock .

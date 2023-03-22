@@ -3,4 +3,4 @@ Documentation for the chroma_gui package
 
 """
 
-__version__ = "0.0.15"
+__version__ = "0.0.16"
