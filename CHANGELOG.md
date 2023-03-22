@@ -1,10 +1,15 @@
 # Non-Linear Chromaticity GUI
 
-# 2023-02-10 - v0.0.16 - v0.0.17
+# 2023-03-22 - v0.0.18
+
+* Added:
+  * Version in main window title
+
+# 2023-03-22 - v0.0.16 - v0.0.17
 
 Release patch
 
-# 2023-02-10 - v0.0.15
+# 2023-03-21 - v0.0.15
 
 * Added:
   * Corrections are now relative and can be used as MAD-X input
