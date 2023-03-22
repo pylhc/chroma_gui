@@ -48,6 +48,7 @@ from PyQt5.QtWidgets import (
 )
 
 # Chroma-GUI specific libraries
+from chroma_gui import __version__ as chroma_gui_version
 import chroma_gui.timber as timber
 from chroma_gui.timber import (
     get_variables_names_from_csv,
@@ -643,6 +644,10 @@ class MainWindow(QMainWindow, main_window_class):
     def __init__(self, parent=None):
         QMainWindow.__init__(self, parent)
         self.setupUi(self)
+
+        # Put the version of the GUI in the title
+        self.setWindowTitle(f"Non-Linear Chromaticity GUI — v{chroma_gui_version}")
+
         self.measurement = None
         self.config = None
 
