@@ -1,6 +1,6 @@
 # Non-Linear Chromaticity GUI
 
-# 2023-04-03 - v0.0.20
+# 2023-04-03 - v0.0.20 - v0.0.21
 
 * Release patch
 
