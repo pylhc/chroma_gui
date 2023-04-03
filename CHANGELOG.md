@@ -2,6 +2,11 @@
 
 # 2023-03-22 - v0.0.18
 
+* Changed:
+  * Renamed twiss.dat to twiss.tfs in corrections
+
+# 2023-03-22 - v0.0.18
+
 * Added:
   * Version in main window title
 
