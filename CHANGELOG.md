@@ -1,6 +1,10 @@
 # Non-Linear Chromaticity GUI
 
-# 2023-03-22 - v0.0.18
+# 2023-04-03 - v0.0.20
+
+* Release patch
+
+# 2023-04-03 - v0.0.19
 
 * Changed:
   * Renamed twiss.dat to twiss.tfs in corrections
