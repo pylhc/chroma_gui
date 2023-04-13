@@ -142,7 +142,7 @@ def plot_freq(fig,
 
 
     # Set a higher tick frequency for the time
-    xticks_freq = 10
+    xticks_freq = 5
     if not xticks:
         xticks = [t for i, t in enumerate(time) if (i % (len(time) // xticks_freq) == 0 or i == len(time) - 1)]
         if (xticks[-1] - xticks[-2]).seconds < 10:
@@ -180,6 +180,8 @@ def plot_freq(fig,
     leg = ax2.legend(handles, labels, loc='upper left')
     for lh in leg.legendHandles:
         lh.set_alpha(1)
+
+    ax.ticklabel_format(axis='y', style='sci', useMathText=True)
 
     return xticks
 
