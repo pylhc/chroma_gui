@@ -937,7 +937,7 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>382</width>
+        <width>431</width>
         <height>61</height>
        </rect>
       </property>
@@ -1063,7 +1063,7 @@
        <rect>
         <x>10</x>
         <y>90</y>
-        <width>310</width>
+        <width>431</width>
         <height>27</height>
        </rect>
       </property>
@@ -1087,6 +1087,20 @@
          <property name="text">
           <string>Copy Table</string>
          </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="copyTableComboBox">
+         <item>
+          <property name="text">
+           <string>Markdown</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>LaTeX</string>
+          </property>
+         </item>
         </widget>
        </item>
       </layout>

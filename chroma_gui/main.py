@@ -1334,9 +1334,17 @@ class MainWindow(QMainWindow, main_window_class):
         logger.info(f"Saved Chromaticity plots to {path}")
 
     def copyTableClicked(self):
+        format_table = self.copyTableComboBox.currentText()
         current_beam = self.beamChromaticityTabWidget.currentIndex() + 1  # index starts at 0
-        markdown_df = getattr(self, f"chromaB{current_beam}TableModel").getDataFrame().to_markdown(index=False)
-        pyperclip.copy(markdown_df)
+        df = getattr(self, f"chromaB{current_beam}TableModel").getDataFrame()
+
+        df_text = ""
+        if format_table == "Markdown":
+            df_text = df.to_markdown(index=False)
+        elif format_table == "LaTeX":
+            df_text = df.to_latex(index=False)
+
+        pyperclip.copy(df_text)
         logger.info(f"Chromaticity Table for beam {current_beam} copied to clipboard.")
 
     def useRawBBQCheckBoxClicked(self, value):
