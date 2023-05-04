@@ -27,7 +27,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="timberTab">
      <property name="font">
@@ -1171,19 +1171,6 @@
      <attribute name="title">
       <string>Corrections</string>
      </attribute>
-     <widget class="QPushButton" name="correctionButton">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>580</y>
-        <width>171</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Correct</string>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_19">
       <property name="geometry">
        <rect>
@@ -1259,313 +1246,6 @@
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>190</y>
-        <width>421</width>
-        <height>364</height>
-       </rect>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_5">
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_4">
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_3">
-           <item>
-            <widget class="Line" name="line_8">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout">
-             <item>
-              <layout class="QVBoxLayout" name="verticalLayout_7">
-               <item>
-                <widget class="QLabel" name="label_20">
-                 <property name="text">
-                  <string>Method</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="label_10">
-                 <property name="text">
-                  <string>Observables to correct</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QVBoxLayout" name="verticalCorrectionLayout">
-               <item>
-                <widget class="QComboBox" name="correctionMethodComboBox"/>
-               </item>
-               <item>
-                <widget class="QComboBox" name="observablesCorrectionComboBox"/>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <widget class="Line" name="line_9">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_29">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Analysis path only needs to be supplied if correcting RDTs as well.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>&lt;b&gt;RDT&lt;/b&gt;</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_3">
-             <item>
-              <widget class="QLabel" name="label_9">
-               <property name="toolTip">
-                <string>Optics directory of the measurement to correct</string>
-               </property>
-               <property name="whatsThis">
-                <string/>
-               </property>
-               <property name="text">
-                <string>Measurement Beam 1</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="measurementCorrectionB1LineEdit">
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QToolButton" name="mesurementB1CorrectionToolButton">
-               <property name="text">
-                <string>...</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_6">
-           <item>
-            <widget class="QLabel" name="label_28">
-             <property name="toolTip">
-              <string>Optics directory of the measurement to correct</string>
-             </property>
-             <property name="whatsThis">
-              <string/>
-             </property>
-             <property name="text">
-              <string>Measurement Beam 2</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="measurementCorrectionB2LineEdit">
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QToolButton" name="mesurementB2CorrectionToolButton">
-             <property name="text">
-              <string>...</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_5">
-           <item>
-            <layout class="QVBoxLayout" name="verticalLayout_6">
-             <item>
-              <widget class="QLabel" name="label_23">
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove NaN values from measurement.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>Clean NaN</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_24">
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Removed outliers from measurement.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>Clean Outliers</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_25">
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of BPMs to remove on each side of the IPs&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>Clean IR</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QVBoxLayout" name="verticalLayout_8">
-             <item>
-              <widget class="QCheckBox" name="cleanNaNCheckBox">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="cleanOutliersCheckBox">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QSpinBox" name="cleanIRSpinBox">
-               <property name="suffix">
-                <string> BPMs</string>
-               </property>
-               <property name="value">
-                <number>10</number>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <widget class="Line" name="line_7">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout">
-           <item>
-            <widget class="QLabel" name="label_33">
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of chromaticity observables to add to offset the RDT.&lt;/p&gt;&lt;p&gt;There are about 500 BPMs for each plane of the RDT.&lt;/p&gt;&lt;p&gt;500 is usually a good number to balance the RDT and Q''' correction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Chromaticity Factor</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_34">
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cutoff for small singular values in the SVD decomposition.&lt;/p&gt;&lt;p&gt;A  value of 0 means no cleaning and could lead to large corrections.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>rcond</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_22">
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When correcting the RDT f1004, the chromaticity changes.&lt;/p&gt;&lt;p&gt;Ticking this box adds a &amp;quot;fake&amp;quot; 0 chromaticity measurement to the response matrix to leave it unchanged.&lt;br/&gt;Be sure to set the chromaticity factor.&lt;/p&gt;&lt;p&gt;Adding DQ3 as an observable will not be taken into account if this box is checked.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Keep DQ3 constant</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
-           <item>
-            <widget class="QSpinBox" name="factorChromaSpinBox">
-             <property name="maximum">
-              <number>10000</number>
-             </property>
-             <property name="value">
-              <number>520</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QDoubleSpinBox" name="rcondCorrectionSpinBox">
-             <property name="singleStep">
-              <double>0.000010000000000</double>
-             </property>
-             <property name="value">
-              <double>0.010000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="keepDQ3ConstantcheckBox">
-             <property name="layoutDirection">
-              <enum>Qt::LeftToRight</enum>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="Line" name="line_10">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="layoutWidget">
-      <property name="geometry">
-       <rect>
         <x>620</x>
         <y>50</y>
         <width>391</width>
@@ -1630,6 +1310,342 @@ p, li { white-space: pre-wrap; }
       <property name="alignment">
        <set>Qt::AlignCenter</set>
       </property>
+     </widget>
+     <widget class="QWidget" name="gridLayoutWidget_3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>190</y>
+        <width>521</width>
+        <height>441</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" name="correctionsGridLayout">
+       <item row="2" column="0" colspan="3">
+        <layout class="QHBoxLayout" name="layoutObservables">
+         <item>
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>Observables to correct</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="observablesCorrectionComboBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="8" column="1">
+        <widget class="QLineEdit" name="measurementCorrectionB2LineEdit">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_30">
+         <property name="text">
+          <string>Optics</string>
+         </property>
+        </widget>
+       </item>
+       <item row="17" column="1">
+        <widget class="QDoubleSpinBox" name="rcondCorrectionSpinBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="singleStep">
+          <double>0.000010000000000</double>
+         </property>
+         <property name="value">
+          <double>0.010000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="0" colspan="3">
+        <widget class="Line" name="line_13">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="2">
+        <widget class="QSpinBox" name="cleanIRSpinBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="suffix">
+          <string> BPMs</string>
+         </property>
+         <property name="value">
+          <number>10</number>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="label_31">
+         <property name="text">
+          <string>Cleaning</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_29">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Analysis path only needs to be supplied if correcting RDTs as well.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>&lt;b&gt;RDT&lt;/b&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="QLineEdit" name="measurementCorrectionB1LineEdit">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" colspan="2">
+        <widget class="QComboBox" name="correctionMethodComboBox"/>
+       </item>
+       <item row="0" column="0" colspan="3">
+        <widget class="Line" name="line_11">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" colspan="3">
+        <widget class="Line" name="line_9">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_20">
+         <property name="text">
+          <string>Method</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="toolTip">
+          <string>Optics directory of the measurement to correct</string>
+         </property>
+         <property name="whatsThis">
+          <string/>
+         </property>
+         <property name="text">
+          <string>Measurement Beam 1</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="2">
+        <widget class="QToolButton" name="mesurementB2CorrectionToolButton">
+         <property name="text">
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_28">
+         <property name="toolTip">
+          <string>Optics directory of the measurement to correct</string>
+         </property>
+         <property name="whatsThis">
+          <string/>
+         </property>
+         <property name="text">
+          <string>Measurement Beam 2</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="1">
+        <widget class="QLabel" name="label_23">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remove NaN values from measurement.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Clean NaN</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="2">
+        <widget class="QCheckBox" name="cleanOutliersCheckBox">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="2">
+        <widget class="QCheckBox" name="cleanNaNCheckBox">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="2">
+        <widget class="QToolButton" name="mesurementB1CorrectionToolButton">
+         <property name="text">
+          <string>...</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1" colspan="2">
+        <widget class="QComboBox" name="opticsComboBox"/>
+       </item>
+       <item row="17" column="0">
+        <widget class="QLabel" name="label_34">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cutoff for small singular values in the SVD decomposition.&lt;/p&gt;&lt;p&gt;A  value of 0 means no cleaning and could lead to large corrections.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>rcond</string>
+         </property>
+        </widget>
+       </item>
+       <item row="16" column="0" colspan="3">
+        <widget class="Line" name="line_14">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="1">
+        <widget class="QSpinBox" name="factorChromaSpinBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximum">
+          <number>10000</number>
+         </property>
+         <property name="value">
+          <number>520</number>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="1">
+        <widget class="QLabel" name="label_24">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Removed outliers from measurement.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Clean Outliers</string>
+         </property>
+        </widget>
+       </item>
+       <item row="13" column="0">
+        <widget class="QLabel" name="label_32">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="toolTip">
+          <string/>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Chromaticity&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="15" column="0">
+        <widget class="QLabel" name="label_22">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When correcting the RDT f1004, the chromaticity changes.&lt;/p&gt;&lt;p&gt;Ticking this box adds a &amp;quot;fake&amp;quot; 0 chromaticity measurement to the response matrix to leave it unchanged.&lt;br/&gt;Be sure to set the chromaticity factor.&lt;/p&gt;&lt;p&gt;Adding DQ3 as an observable will not be taken into account if this box is checked.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Keep DQ3 constant</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="1">
+        <widget class="QLabel" name="label_25">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of BPMs to remove on each side of the IPs&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Clean IR</string>
+         </property>
+        </widget>
+       </item>
+       <item row="15" column="1">
+        <widget class="QCheckBox" name="keepDQ3ConstantcheckBox">
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="0">
+        <widget class="QLabel" name="label_33">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of chromaticity observables to add to offset the RDT.&lt;/p&gt;&lt;p&gt;There are about 500 BPMs for each plane of the RDT.&lt;/p&gt;&lt;p&gt;500 is usually a good number to balance the RDT and Q''' correction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Chromaticity Factor</string>
+         </property>
+        </widget>
+       </item>
+       <item row="18" column="0" colspan="3">
+        <widget class="Line" name="line_15">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="19" column="0">
+        <widget class="QPushButton" name="correctionButton">
+         <property name="text">
+          <string>Correct</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
    </widget>

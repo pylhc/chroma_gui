@@ -378,7 +378,7 @@ class ExternalProgram(QThread):
 
     def computeCorrections(self):
         optics_paths, measurement_path, method, observables, chroma_factor, rcond, keep_dq3_constant,\
-        clean_nan, clean_outliers, clean_IR_number = self.args
+        clean_nan, clean_outliers, clean_IR_number, optics_name = self.args
 
         if method == "Global":
             chromaticity_values = tfs.read(measurement_path / CHROMA_FILE)
@@ -409,18 +409,19 @@ class ExternalProgram(QThread):
             # Compute the corrections for each beam
             for beam in [1, 2]:
                 logger.info(f"Computing corrections for Beam {beam}")
+
                 # Get the strengths of the magnets used for simulation
-                strengths_mcd = json.load(open(RESOURCES / "normal_decapole" / "strengths.json"))
+                strengths_mcd = json.load(open(RESOURCES / "corrections" / optics_name / "normal_decapole" / "strengths.json"))
 
                 # Create the basic response matrix object
-                simulations = Path(RESOURCES / "normal_decapole")
+                simulations = Path(RESOURCES / "corrections" / optics_name / "normal_decapole")
                 resp = response_matrix.ResponseMatrix(strengths_mcd[str(beam)], simulations, beam=beam)
 
                 # Add the observables
                 # Add the RDT to the response matrix
                 if "f1004" in observables:
                     optics_path = optics_paths[beam]
-                    model_path = RESOURCES / "normal_decapole" / f"twiss_b{beam}.tfs"
+                    model_path = RESOURCES / "corrections" / optics_name / "normal_decapole" / f"twiss_b{beam}.tfs"
                     resp.add_rdt_observable(Path(optics_path), model_path, "f1004_x")
 
                 # Add the Chromaticity to the response matrix
@@ -821,17 +822,21 @@ class MainWindow(QMainWindow, main_window_class):
         This function replaces the ComboBox containing the observables by one with items that can be clicked
         """
         # Remove the existing widget
-        self.verticalCorrectionLayout.removeWidget(self.observablesCorrectionComboBox)
+        self.layoutObservables.removeWidget(self.observablesCorrectionComboBox)
         self.observablesCorrectionComboBox.close()
 
         # Create a new custom ComboBox and add it to the layout
         self.observablesCorrectionComboBox = CheckableComboBox(self)
-        self.verticalCorrectionLayout.addWidget(self.observablesCorrectionComboBox)
-        self.verticalCorrectionLayout.update()
+        self.layoutObservables.addWidget(self.observablesCorrectionComboBox)
+        self.layoutObservables.update()
 
         # Display the available correction methods
         self.available_observables = json.load(open(RESPONSE_MATRICES))['AVAILABLE_OBSERVABLES']
         self.correctionMethodComboBox.addItems(self.available_observables.keys())
+
+        # Set the possible optics the response matrix was computed for
+        optics = [f.name for f in list(Path.iterdir(RESOURCES / "corrections")) if f.is_dir()]
+        self.opticsComboBox.addItems(optics)
 
     def correctionMethodComboBoxChanged(self, method: str):
         """
@@ -853,6 +858,7 @@ class MainWindow(QMainWindow, main_window_class):
         self.cleanNaNCheckBox.setEnabled(selected_method == "Local")
         self.cleanOutliersCheckBox.setEnabled(selected_method == "Local")
         self.cleanIRSpinBox.setEnabled(selected_method == "Local")
+        self.opticsComboBox.setEnabled(selected_method == "Local")
 
     def enableTimberTab(self, value):
         self.timberTab.setEnabled(value)
@@ -1458,6 +1464,9 @@ class MainWindow(QMainWindow, main_window_class):
         optics_path_B1 = self.measurementCorrectionB1LineEdit.text()
         optics_path_B2 = self.measurementCorrectionB2LineEdit.text()
 
+        # Name of the optics the response matrix was computed for
+        optics_name = self.opticsComboBox.currentText()
+
         observables = self.observablesCorrectionComboBox.currentData()
         chroma_factor = self.factorChromaSpinBox.value()
         rcond = self.rcondCorrectionSpinBox.value()
@@ -1495,7 +1504,8 @@ class MainWindow(QMainWindow, main_window_class):
                          keep_dq3_constant,
                          clean_nan,
                          clean_outliers,
-                         clean_IR)
+                         clean_IR,
+                         optics_name)
 
     def correctionsFinished(self):
         for beam in self.corrections.keys():
