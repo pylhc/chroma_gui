@@ -21,7 +21,7 @@ acc-py app run chroma-gui
 # Deployment
 
 * Change the version in [__init__.py](./chroma_gui/__init__.py)
-* Update the [CHANGELOD](./CHANGELOD.md)
+* Update the [CHANGELOG](./CHANGELOG.md)
 
 ```bash
 alias acc-py="/acc/local/share/python/acc-py/apps/acc-py-cli/2.1.0/bin/acc-py"

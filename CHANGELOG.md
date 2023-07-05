@@ -1,5 +1,12 @@
 # Non-Linear Chromaticity GUI
 
+# 2023-07-05 - v0.0.23
+
+* Added:
+  * Option to keep RDT constant in corrections
+  * Sum for corrections displayed
+  * Label to show computing is in progress
+
 # 2023-05-04 - v0.0.22
 
 * Added:
