@@ -1,5 +1,10 @@
 # Non-Linear Chromaticity GUI
 
+# 2023-05-04 - v0.0.22
+
+* Added:
+  * 2023 optics for RDT response matrix
+
 # 2023-04-03 - v0.0.20 - v0.0.21
 
 * Release patch

@@ -24,6 +24,7 @@ acc-py app run chroma-gui
 * Update the [CHANGELOD](./CHANGELOD.md)
 
 ```bash
+alias acc-py="/acc/local/share/python/acc-py/apps/acc-py-cli/2.1.0/bin/acc-py"
 acc-py app lock .
 acc-py app deploy .
 acc-py app promote chroma-gui <version>
