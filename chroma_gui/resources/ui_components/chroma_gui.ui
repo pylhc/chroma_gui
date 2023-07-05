@@ -1317,10 +1317,17 @@ p, li { white-space: pre-wrap; }
         <x>20</x>
         <y>190</y>
         <width>521</width>
-        <height>441</height>
+        <height>513</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="correctionsGridLayout">
+       <item row="12" column="0">
+        <widget class="QLabel" name="label_36">
+         <property name="text">
+          <string>Keep RDT constant</string>
+         </property>
+        </widget>
+       </item>
        <item row="2" column="0" colspan="3">
         <layout class="QHBoxLayout" name="layoutObservables">
          <item>
@@ -1356,7 +1363,7 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="17" column="1">
+       <item row="19" column="1">
         <widget class="QDoubleSpinBox" name="rcondCorrectionSpinBox">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1372,7 +1379,7 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="12" column="0" colspan="3">
+       <item row="14" column="0" colspan="3">
         <widget class="Line" name="line_13">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -1447,6 +1454,13 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
+       <item row="21" column="0">
+        <widget class="QPushButton" name="correctionButton">
+         <property name="text">
+          <string>Correct</string>
+         </property>
+        </widget>
+       </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_20">
          <property name="text">
@@ -1484,6 +1498,13 @@ p, li { white-space: pre-wrap; }
          </property>
          <property name="text">
           <string>Measurement Beam 2</string>
+         </property>
+        </widget>
+       </item>
+       <item row="20" column="0" colspan="3">
+        <widget class="Line" name="line_15">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
          </property>
         </widget>
        </item>
@@ -1527,7 +1548,7 @@ p, li { white-space: pre-wrap; }
        <item row="6" column="1" colspan="2">
         <widget class="QComboBox" name="opticsComboBox"/>
        </item>
-       <item row="17" column="0">
+       <item row="19" column="0">
         <widget class="QLabel" name="label_34">
          <property name="toolTip">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cutoff for small singular values in the SVD decomposition.&lt;/p&gt;&lt;p&gt;A  value of 0 means no cleaning and could lead to large corrections.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -1537,14 +1558,14 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="16" column="0" colspan="3">
+       <item row="18" column="0" colspan="3">
         <widget class="Line" name="line_14">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
         </widget>
        </item>
-       <item row="14" column="1">
+       <item row="16" column="1">
         <widget class="QSpinBox" name="factorChromaSpinBox">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1570,7 +1591,7 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="13" column="0">
+       <item row="15" column="0">
         <widget class="QLabel" name="label_32">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
@@ -1591,7 +1612,7 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="15" column="0">
+       <item row="17" column="0">
         <widget class="QLabel" name="label_22">
          <property name="toolTip">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When correcting the RDT f1004, the chromaticity changes.&lt;/p&gt;&lt;p&gt;Ticking this box adds a &amp;quot;fake&amp;quot; 0 chromaticity measurement to the response matrix to leave it unchanged.&lt;br/&gt;Be sure to set the chromaticity factor.&lt;/p&gt;&lt;p&gt;Adding DQ3 as an observable will not be taken into account if this box is checked.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -1611,7 +1632,7 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="15" column="1">
+       <item row="17" column="1">
         <widget class="QCheckBox" name="keepDQ3ConstantcheckBox">
          <property name="layoutDirection">
           <enum>Qt::LeftToRight</enum>
@@ -1621,7 +1642,7 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="14" column="0">
+       <item row="16" column="0">
         <widget class="QLabel" name="label_33">
          <property name="toolTip">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of chromaticity observables to add to offset the RDT.&lt;/p&gt;&lt;p&gt;There are about 500 BPMs for each plane of the RDT.&lt;/p&gt;&lt;p&gt;500 is usually a good number to balance the RDT and Q''' correction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -1631,88 +1652,68 @@ p, li { white-space: pre-wrap; }
          </property>
         </widget>
        </item>
-       <item row="18" column="0" colspan="3">
-        <widget class="Line" name="line_15">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+       <item row="12" column="1">
+        <widget class="QCheckBox" name="keepRDTConstantCheckBox">
+         <property name="text">
+          <string/>
          </property>
         </widget>
        </item>
-       <item row="19" column="0">
-        <widget class="QPushButton" name="correctionButton">
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_5">
+      <property name="geometry">
+       <rect>
+        <x>620</x>
+        <y>480</y>
+        <width>160</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLabel" name="label_37">
          <property name="text">
-          <string>Correct</string>
+          <string>Sum B1:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="sumB1Label">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_6">
+      <property name="geometry">
+       <rect>
+        <x>1030</x>
+        <y>480</y>
+        <width>160</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QLabel" name="label_38">
+         <property name="text">
+          <string>Sum B2:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="sumB2Label">
+         <property name="text">
+          <string/>
          </property>
         </widget>
        </item>
       </layout>
      </widget>
     </widget>
-   </widget>
-   <widget class="QPushButton" name="saveSettingsButton">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>440</y>
-      <width>111</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Save Settings</string>
-    </property>
-   </widget>
-   <widget class="QPlainTextEdit" name="descriptionPlainTextEdit">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>260</y>
-      <width>181</width>
-      <height>171</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_11">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>240</y>
-      <width>101</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>11</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Description</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
-   <widget class="QLabel" name="measurementLabel">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>198</y>
-      <width>191</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Measurement Settings</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-    </property>
    </widget>
    <widget class="QLabel" name="modelLabel">
     <property name="geometry">
@@ -1793,13 +1794,69 @@ p, li { white-space: pre-wrap; }
      </item>
     </layout>
    </widget>
-   <zorder>saveSettingsButton</zorder>
-   <zorder>descriptionPlainTextEdit</zorder>
-   <zorder>label_11</zorder>
-   <zorder>measurementLabel</zorder>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>190</y>
+      <width>181</width>
+      <height>381</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QLabel" name="measurementLabel">
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Measurement Settings</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line_7">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_11">
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Description</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPlainTextEdit" name="descriptionPlainTextEdit"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="saveSettingsButton">
+       <property name="text">
+        <string>Save Settings</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
    <zorder>modelLabel</zorder>
    <zorder>layoutWidget</zorder>
    <zorder>tabWidget</zorder>
+   <zorder>verticalLayoutWidget</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

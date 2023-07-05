@@ -1,3 +1,4 @@
+import time
 from datetime import datetime
 import typing
 import ast
@@ -28,7 +29,7 @@ from PyQt5.QtCore import (
     QSize,
     pyqtSlot,
 )
-from PyQt5 import uic
+from PyQt5 import uic, QtTest
 from PyQt5.QtWidgets import (
     QLabel,
     QMainWindow,
@@ -378,14 +379,17 @@ class ExternalProgram(QThread):
 
     def computeCorrections(self):
         optics_paths, measurement_path, method, observables, chroma_factor, rcond, keep_dq3_constant,\
-        clean_nan, clean_outliers, clean_IR_number, optics_name = self.args
+        keep_rdt_constant, clean_nan, clean_outliers, clean_IR_number, optics_name = self.args
 
+        text = {1: '',
+                2: ''}
+        corr_sum = {1: 0,
+                    2: 0}
         if method == "Global":
             chromaticity_values = tfs.read(measurement_path / CHROMA_FILE)
             coefficients = json.load(open(CHROMA_COEFFS))
 
             for beam in [1, 2]:
-                text = ""
                 for obs in observables:
                     order = obs.split("DQ")[1]
 
@@ -400,10 +404,10 @@ class ExternalProgram(QThread):
                     # The chromaticity is simply an affine function that depends on the corrector strength
                     # Get the point where dqx and dqy cross to minimize both planes
                     dq_corr = (dqy - dqx) / (coefficients[str(beam)][order][0] - coefficients[str(beam)][order][1])
-                    text = text + f'DQ{order}Corrector.B{beam} = {dq_corr:6.4f} ;\n'
+                    text[beam] = text[beam] + f'DQ{order}Corrector.B{beam} = {dq_corr:6.4f} ;\n'
 
-                main_window = findMainWindow()
-                main_window.corrections[f'B{beam}'] = text
+                    # Update the sum
+                    corr_sum[beam] += dq_corr
 
         elif method == "Local":
             # Compute the corrections for each beam
@@ -419,7 +423,10 @@ class ExternalProgram(QThread):
 
                 # Add the observables
                 # Add the RDT to the response matrix
-                if "f1004" in observables:
+                if keep_rdt_constant:
+                    model_path = RESOURCES / "corrections" / optics_name / "normal_decapole" / f"twiss_b{beam}.tfs"
+                    resp.add_zero_rdt_observable(model_path, 'f1004_x')
+                elif "f1004" in observables:
                     optics_path = optics_paths[beam]
                     model_path = RESOURCES / "corrections" / optics_name / "normal_decapole" / f"twiss_b{beam}.tfs"
                     resp.add_rdt_observable(Path(optics_path), model_path, "f1004_x")
@@ -440,15 +447,26 @@ class ExternalProgram(QThread):
                                                    )
 
                 # Set the text edits with the computed corrections
-                text = ""
                 for key, val in corrections.items():
                     if val > 0:
-                        text += f"{key} := {key} + {val:6d} ;\n"
+                        text[beam] += f"{key} := {key} + {val:6d} ;\n"
                     else:
-                        text += f"{key} := {key} - {val*-1:6d} ;\n"
-                main_window = findMainWindow()
-                main_window.corrections[f'B{beam}'] = text
+                        text[beam] += f"{key} := {key} - {val*-1:6d} ;\n"
+                    
+                    corr_sum[beam] += val
+        else:
+            logger.error(f"Invalid method for corrections: {method}")
+            self.finished.emit()
+            return
 
+        # Set the text for the corrections
+        main_window = findMainWindow()
+        for beam in [1, 2]:
+            main_window.corrections[f'B{beam}'] = text[beam]
+
+        # Display the sum of corrections
+        main_window.sumB1Label.setText(str(round(corr_sum[1],2)))
+        main_window.sumB2Label.setText(str(round(corr_sum[2],2)))
         self.finished.emit()
 
 
@@ -1472,6 +1490,7 @@ class MainWindow(QMainWindow, main_window_class):
         rcond = self.rcondCorrectionSpinBox.value()
         method = self.correctionMethodComboBox.currentText()
         keep_dq3_constant = self.keepDQ3ConstantcheckBox.isChecked()
+        keep_rdt_constant = self.keepRDTConstantCheckBox.isChecked()
         clean_nan = self.cleanNaNCheckBox.isChecked()
         clean_outliers = self.cleanOutliersCheckBox.isChecked()
         clean_IR = self.cleanIRSpinBox.value()
@@ -1492,6 +1511,12 @@ class MainWindow(QMainWindow, main_window_class):
             logger.error("No measurement path selected!")
             return
 
+        # The computations are too fast, add a cooldown so the user knobs it has computed
+        for beam in self.corrections.keys():
+            text_edit = getattr(self, f'correction{beam}TextEdit')
+            text_edit.setHtml("Computing...")
+        QtTest.QTest.qWait(1000)
+
         logger.info("Starting Response Matrix creation")
         self.startThread("computeCorrections",
                          "correctionsFinished",
@@ -1502,6 +1527,7 @@ class MainWindow(QMainWindow, main_window_class):
                          chroma_factor,
                          rcond,
                          keep_dq3_constant,
+                         keep_rdt_constant,
                          clean_nan,
                          clean_outliers,
                          clean_IR,
@@ -1516,6 +1542,7 @@ class MainWindow(QMainWindow, main_window_class):
             text = text.replace(" ", "&nbsp;")
             text_edit = getattr(self, f'correction{beam}TextEdit')
             text_edit.setHtml(text)
+
         logger.info("Corrections done!")
 
     # === Matplotlib rcParams
