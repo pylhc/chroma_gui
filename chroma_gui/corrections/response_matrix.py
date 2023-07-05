@@ -165,6 +165,7 @@ class ResponseMatrix:
 
         re_kcd = observed_df.loc['Measurement'][f'{rdt} RE'].sort_index()
         imag_kcd = observed_df.loc['Measurement'][f'{rdt} IMAG'].sort_index()
+
         self._add_measured_local_observable(f"{rdt}_re", re_kcd)
         self._add_measured_local_observable(f"{rdt}_imag", imag_kcd)
 
@@ -220,6 +221,29 @@ class ResponseMatrix:
 
         # Load the simulated data
         self._add_base_chromaticity_observable(order=3)
+
+    def add_zero_rdt_observable(self, model, rdt):
+        """
+        Adds the given RDT filled with 0s so it doesn't change
+        """
+        self.model_path = model
+
+        # Read the simulated RDT to have the right BPMs and basically replace values by 0
+        rdt_df = pd.read_csv(self.simulation_path / f'complete_{rdt}_B{self.beam}.csv', header=[0, 1], index_col=0)
+        rdt_df = rdt_df.iloc[0:1]
+        rdt_df.index = ['Measurement']
+        for col in rdt_df.columns:
+            rdt_df[col].values[:] = 0
+
+        # Then as usual, the "zero" measurement is taken as regular Measurement
+        observed_df = rdt_df
+        re_kcd = observed_df.loc['Measurement'][f'{rdt} RE'].sort_index()
+        imag_kcd = observed_df.loc['Measurement'][f'{rdt} IMAG'].sort_index()
+        self._add_measured_local_observable(f"B{self.beam}_{rdt}_re", re_kcd)
+        self._add_measured_local_observable(f"B{self.beam}_{rdt}_imag", imag_kcd)
+
+        # Load the simulated data
+        self._add_base_rdt_observable(rdt)
 
     def _clean_local_observables(self, inside_arc_number, clean_nan, clean_outliers, clean_IR, quartiles):
         """
