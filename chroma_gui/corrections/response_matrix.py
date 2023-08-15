@@ -12,10 +12,36 @@ RESOURCES = Path(__file__).parent.parent / "resources"
 logger = logging.getLogger("response_matrix")
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
+
+def get_rdt_directory(rdt):
+    """
+    Returns the name of the directory in the optics analysis for a given RDT
+    Example: f1004_x => normal_decapole
+    """
+    j, k, l, m = [int(r) for r in rdt[1:-2]]
+    rdt_type = "normal" if (l + m) % 2 == 0 else "skew"
+    orders = dict(((1, "dipole"), 
+                   (2, "quadrupole"), 
+                   (3, "sextupole"), 
+                   (4, "octupole"),
+                   (5, "decapole"),
+                   (6, "dodecapole"),
+                   (7, "tetradecapole"),
+                   (8, "hexadecapole"),
+                   ))
+    return f'{rdt_type}_{orders[j+k+l+m]}'
+    
+
 def save_full_rdt_df(model, measurements, names, rdt, output=None):
+    """
+    Given a list of Optics results directories, will create a single dataframe containing the given `rdt` for each simulation.
+    """
+
     # Create the columns of the dataFrame: f1004 re => BPMs, f1004 img => BPMs
     model = tfs.read(model)
     bpm_names = sorted(list(model['NAME']))
+
+    rdt_directory = get_rdt_directory(rdt)
 
     columns = [[f'{rdt} RE', f'{rdt} IMAG', f'{rdt} AMP'], bpm_names]  # The MultiIndex allows to "embed" columns
     columns_multi = pd.MultiIndex.from_product(columns, names=[f"{rdt}", "BPMs"])
@@ -25,7 +51,7 @@ def save_full_rdt_df(model, measurements, names, rdt, output=None):
 
     # Add the data to the DF from every simulation
     for i, (kcd_dir, name) in enumerate(zip(measurements, names)):
-        rdt_df = tfs.read(kcd_dir / 'rdt' / 'normal_decapole' / f'{rdt}.tfs')
+        rdt_df = tfs.read(kcd_dir / 'rdt' / rdt_directory / f'{rdt}.tfs')
 
         # Get the RDT values, join the model with the outer method to get the missing BPMs
         real = rdt_df[['NAME', 'REAL']].merge(model['NAME'], how='right').set_index('NAME').sort_index().squeeze()
@@ -73,6 +99,9 @@ class ResponseMatrix:
         # Model for RDT BPMs pruning
         self.model_path = None
 
+        # BPMS in the response matrix
+        self.bpms_in_use = []
+
         self.weights = {}  # contains the weight for each global observable
 
     def _add_simulated_local_observable(self, name, corrector, values):
@@ -110,7 +139,7 @@ class ResponseMatrix:
         """
         self.original_measured_global_observables[name] = values
 
-    def _add_base_rdt_observable(self, rdt):
+    def _add_base_rdt_observable(self, rdt, corrector_name="KCD"):
         """
         Helper function to add the simulated RDT to the response matrix
         """
@@ -120,8 +149,8 @@ class ResponseMatrix:
 
         for corrector in self.correctors.keys():
             # Get the Δ of RDT, compared to the base without any MCD
-            real = rdt_df.loc[corrector][f'{rdt} RE'] - rdt_df.loc[f'KCD.NoneB{self.beam}'][f'{rdt} RE']
-            imag = rdt_df.loc[corrector][f'{rdt} IMAG'] - rdt_df.loc[f'KCD.NoneB{self.beam}'][f'{rdt} IMAG']
+            real = rdt_df.loc[corrector][f'{rdt} RE'] - rdt_df.loc[f'{corrector_name}.NoneB{self.beam}'][f'{rdt} RE']
+            imag = rdt_df.loc[corrector][f'{rdt} IMAG'] - rdt_df.loc[f'{corrector_name}.NoneB{self.beam}'][f'{rdt} IMAG']
 
             # Sort the index so we're sure to have the values where we want them
             real = real.sort_index()
@@ -130,6 +159,12 @@ class ResponseMatrix:
             # Add the RDT to the observables dict
             self._add_simulated_local_observable(f"{rdt}_re", corrector, real)
             self._add_simulated_local_observable(f"{rdt}_imag", corrector, imag)
+
+            # Create the list of BPMs
+            bpms = list(rdt_df.loc[corrector][f"{rdt} RE"].index)
+            for bpm in bpms:
+                if bpm not in self.bpms_in_use:
+                    self.bpms_in_use.append(bpm)
 
     def _add_base_chromaticity_observable(self, order):
         """
@@ -152,7 +187,7 @@ class ResponseMatrix:
             self._add_simulated_global_observable(f"DQ{order}X", corrector, dqx)
             self._add_simulated_global_observable(f"DQ{order}Y", corrector, dqy)
 
-    def add_rdt_observable(self, measurement, model, rdt):
+    def add_rdt_observable(self, measurement, model, rdt, corrector_name="KCD"):
         """
         Adds the given measured RDT and its simulation counterpart to the response matrix
         """
@@ -170,7 +205,7 @@ class ResponseMatrix:
         self._add_measured_local_observable(f"{rdt}_imag", imag_kcd)
 
         # Load the simulated data
-        self._add_base_rdt_observable(rdt)
+        self._add_base_rdt_observable(rdt, corrector_name=corrector_name)
 
     def add_chromaticity_observable(self, measurement, order, weight):
         """
@@ -222,7 +257,7 @@ class ResponseMatrix:
         # Load the simulated data
         self._add_base_chromaticity_observable(order=3)
 
-    def add_zero_rdt_observable(self, model, rdt):
+    def add_zero_rdt_observable(self, model, rdt, corrector_name):
         """
         Adds the given RDT filled with 0s so it doesn't change
         """
@@ -243,7 +278,7 @@ class ResponseMatrix:
         self._add_measured_local_observable(f"B{self.beam}_{rdt}_imag", imag_kcd)
 
         # Load the simulated data
-        self._add_base_rdt_observable(rdt)
+        self._add_base_rdt_observable(rdt, corrector_name=corrector_name)
 
     def _clean_local_observables(self, inside_arc_number, clean_nan, clean_outliers, clean_IR, quartiles):
         """
@@ -301,6 +336,11 @@ class ResponseMatrix:
         for observable in self.measured_local_observables:
             self.measured_local_observables[observable] =\
                 remove_bpms(self.measured_local_observables[observable], bpms)
+
+        # Update the BPMs that are still in use
+        for bpm in bpms:
+            if bpm in self.bpms_in_use:
+                self.bpms_in_use.remove(bpm)
         logger.info(f"Removed {len(bpms)} BPMs as outliers")
 
     def _remove_ir_bpms(self, inside_arc_number):
@@ -325,6 +365,7 @@ class ResponseMatrix:
         # Since we're removing based on BPM name, there is no need to aggregate the names before
 
         original_len, end_len = 0, 0
+        remaining_bpms = []
         # Simulated observables
         for observable in self.simulated_local_observables.keys():
             for corrector in self.correctors:
@@ -333,10 +374,18 @@ class ResponseMatrix:
                     filter_bpm(self.simulated_local_observables[observable][corrector])
                 end_len = len(self.simulated_local_observables[observable][corrector])
 
+                # Update the remaining BPMS, it will be the same for each observables/corr
+                remaining_bpms = list(self.simulated_local_observables[observable][corrector].index)
+
         # Measured observables
         for observable in self.measured_local_observables:
             self.measured_local_observables[observable] = \
                 filter_bpm(self.measured_local_observables[observable])
+
+        # Update the bpms still in use
+        for bpm in self.bpms_in_use:
+            if bpm not in remaining_bpms:
+                self.bpms_in_use.remove(bpm)
 
         logger.info(f"Removed {original_len - end_len} IR BPMs from data (BPM.(N). < {inside_arc_number})")
 
@@ -357,15 +406,24 @@ class ResponseMatrix:
 
         # Iterate over the observables again, and this time remove the values
         logger.info(f"Removing {len(indices)} BPMs with NaN values from the observables")
+        remaining_bpms = []
         for observable in self.simulated_local_observables.keys():
             for corrector in self.correctors:
                 self.simulated_local_observables[observable][corrector] = \
                     self.simulated_local_observables[observable][corrector].drop(
                         self.simulated_local_observables[observable][corrector].index[indices])
+                # Update the remaining BPMS, it will be the same for each observables/corr
+                remaining_bpms = list(self.simulated_local_observables[observable][corrector].index)
+
         for observable in self.measured_local_observables.keys():
             self.measured_local_observables[observable] = \
                 self.measured_local_observables[observable].drop(
                     self.measured_local_observables[observable].index[indices])
+        
+        # Update the bpms still in use
+        for bpm in self.bpms_in_use:
+            if bpm not in remaining_bpms:
+                self.bpms_in_use.remove(bpm)
 
     def _get_response_matrix(self):
         """
@@ -450,8 +508,8 @@ class ResponseMatrix:
             self.measured_global_observables[observable] = \
                 self.original_measured_global_observables[observable].copy()
 
-    def get_corrections(self, clean_nan=True, clean_outliers=True, clean_IR=True, rcond=0.01, inside_arc_number=10,
-                        quartiles=None):
+    def get_corrections(self, clean_nan=True, clean_outliers=True, clean_IR=True, 
+                        rcond=0.01, inside_arc_number=10, quartiles=None, decimals_round=0):
         """
         Computes corrections for the previously given observables.
         """
@@ -478,7 +536,8 @@ class ResponseMatrix:
 
         corrections = {}
         for key, val in zip(self.correctors, values):
-            corrections[f'{key}'] = -round(val)  # Negative because it's a correction
+            # Negative because it's a correction
+            corrections[f'{key}'] = -round(val, decimals_round)  
 
         return corrections
 
