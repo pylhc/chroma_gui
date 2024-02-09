@@ -68,7 +68,9 @@ def plot_freq(fig,
               dpp_flag=True,
               alpha=(1, 1),
               start=None,
-              end=None):
+              end=None,
+              qx_flag=True,
+              qy_flag=True):
     # Plot Tune, DPP, RF and Time
 
     data = tfs.read(filename)
@@ -110,10 +112,15 @@ def plot_freq(fig,
         err_x = data['QXERR']
         err_y = data['QYERR']
         f = ax2.plot
-        ax2.fill_between(time, tune_x - err_x, tune_x + err_x, color=TUNE_X_COLOR, alpha=alpha[0]/4)
-        ax2.fill_between(time, tune_y - err_y, tune_y + err_y, color=TUNE_Y_COLOR, alpha=alpha[1]/4)
-    f(time, tune_x, color=TUNE_X_COLOR, label='$Q_x$', alpha=alpha[0])
-    f(time, tune_y, color=TUNE_Y_COLOR, label='$Q_y$', alpha=alpha[1])
+        if qx_flag:
+            ax2.fill_between(time, tune_x - err_x, tune_x + err_x, color=TUNE_X_COLOR, alpha=alpha[0]/4)
+        if qy_flag:
+            ax2.fill_between(time, tune_y - err_y, tune_y + err_y, color=TUNE_Y_COLOR, alpha=alpha[1]/4)
+
+    if qx_flag:
+        f(time, tune_x, color=TUNE_X_COLOR, label='$Q_x$', alpha=alpha[0])
+    if qy_flag:
+        f(time, tune_y, color=TUNE_Y_COLOR, label='$Q_y$', alpha=alpha[1])
     ax2.set_ylabel('Tune [$2 \pi$]')
     zp.append(ax2.get_legend_handles_labels())
 

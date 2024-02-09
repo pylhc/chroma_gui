@@ -27,7 +27,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="timberTab">
      <property name="font">
@@ -797,30 +797,50 @@
       <property name="geometry">
        <rect>
         <x>1150</x>
-        <y>40</y>
+        <y>33</y>
         <width>88</width>
-        <height>85</height>
+        <height>123</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_8">
-       <item row="1" column="0">
-        <widget class="QCheckBox" name="showDeltaRfCheckBox">
-         <property name="text">
-          <string>Show ΔRF</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
+       <item row="2" column="0">
         <widget class="QCheckBox" name="showDppCheckBox">
          <property name="text">
           <string>Show dp/p</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="3" column="0">
+        <widget class="QCheckBox" name="showDeltaRfCheckBox">
+         <property name="text">
+          <string>Show ΔRF</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="showQyCheckBox">
+         <property name="text">
+          <string>Show Qy</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
         <widget class="QPushButton" name="RePlotCleaningButton">
          <property name="text">
           <string>RePlot</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="showQxCheckBox">
+         <property name="text">
+          <string>Show Qx</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
