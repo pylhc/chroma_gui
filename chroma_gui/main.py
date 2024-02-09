@@ -1218,7 +1218,7 @@ class MainWindow(QMainWindow, main_window_class):
         Returns a list containing the checked chromaticity orders
         """
         checked = []
-        for order in range(3, 8):
+        for order in range(1, 8):
             dq = getattr(self, f'ChromaOrder{order}CheckBox').isChecked()
             if dq:
                 checked.append(order)
