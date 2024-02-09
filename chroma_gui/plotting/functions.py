@@ -235,6 +235,9 @@ def plot_chromaticity(fig, ax, dpp_filename, chroma_tfs, axis, fit_orders, beam)
                 elinewidth=2,
                 capsize=3)
 
+    # Remove the scientific notation on Y axis to have the full tunes displayed
+    ax.ticklabel_format(useOffset=False)
+
     #ax.set_title(f"Chromaticity for Beam {beam[1]}")
     ax.set_xlabel(r"$\delta$")
     ax.set_ylabel(f'$Q_{axis}$')
