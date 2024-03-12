@@ -23,8 +23,9 @@ def chromaticity_func(x, *args):
 
 def get_chromaticity_formula(order):
     dpp = r'\left( \frac{\Delta p}{p} \right)'
-    chroma = f'Q {dpp} = Q_0 '
-    chroma += f'+ Q\' {dpp} '
+    dpp = '\\delta'
+    chroma = f'Q({dpp}) = Q_0 '
+    chroma += f'+ Q\' \cdot {dpp} '
 
     for o in range(2, order+1):
         q_str = "Q" + "'"*o
