@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import logging
 from scipy import signal
-import NAFFlib
+import nafflib
 
 from dateutil.parser import isoparse
 from pathlib import Path
