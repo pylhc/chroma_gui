@@ -797,23 +797,26 @@
       <property name="geometry">
        <rect>
         <x>1150</x>
-        <y>33</y>
+        <y>23</y>
         <width>88</width>
-        <height>123</height>
+        <height>131</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_8">
-       <item row="2" column="0">
+       <item row="3" column="0">
         <widget class="QCheckBox" name="showDppCheckBox">
          <property name="text">
           <string>Show dp/p</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QCheckBox" name="showDeltaRfCheckBox">
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="showQxCheckBox">
          <property name="text">
-          <string>Show ΔRF</string>
+          <string>Show Qx</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -827,17 +830,24 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="6" column="0">
         <widget class="QPushButton" name="RePlotCleaningButton">
          <property name="text">
           <string>RePlot</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="QCheckBox" name="showQxCheckBox">
+       <item row="5" column="0">
+        <widget class="QCheckBox" name="showDeltaRfCheckBox">
          <property name="text">
-          <string>Show Qx</string>
+          <string>Show ΔRF</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QCheckBox" name="showRfCheckBox">
+         <property name="text">
+          <string>Show RF</string>
          </property>
          <property name="checked">
           <bool>true</bool>

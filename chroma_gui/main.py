@@ -1156,12 +1156,13 @@ class MainWindow(QMainWindow, main_window_class):
         delta_rf_flag = self.showDeltaRfCheckBox.isChecked()
         show_qx_flag = self.showQxCheckBox.isChecked()
         show_qy_flag = self.showQyCheckBox.isChecked()
+        show_rf_flag = self.showRfCheckBox.isChecked()
 
         # Beam 1
         filepath = measurement.path / cleaning_constants.DPP_FILE.format(beam=1)
         plot_freq(self.plotRawTuneB1Widget.canvas.fig, self.plotRawTuneB1Widget.canvas.ax, filepath,
                   'Raw Tune Measurement for Beam 1', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag,
-                  qx_flag=show_qx_flag, qy_flag=show_qy_flag)
+                  qx_flag=show_qx_flag, qy_flag=show_qy_flag, rf_flag=show_rf_flag)
         self.plotRawTuneB1Widget.canvas.draw()
         self.plotRawTuneB1Widget.show()
 
@@ -1169,7 +1170,7 @@ class MainWindow(QMainWindow, main_window_class):
         filepath = measurement.path / cleaning_constants.DPP_FILE.format(beam=2)
         plot_freq(self.plotRawTuneB2Widget.canvas.fig, self.plotRawTuneB2Widget.canvas.ax, filepath,
                   f'Raw Tune Measurement for Beam 2', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag,
-                  qx_flag=show_qx_flag, qy_flag=show_qy_flag)
+                  qx_flag=show_qx_flag, qy_flag=show_qy_flag, rf_flag=show_rf_flag)
         self.plotRawTuneB2Widget.canvas.draw()
         self.plotRawTuneB2Widget.show()
 
@@ -1190,12 +1191,13 @@ class MainWindow(QMainWindow, main_window_class):
         delta_rf_flag = self.showDeltaRfCheckBox.isChecked()
         show_qx_flag = self.showQxCheckBox.isChecked()
         show_qy_flag = self.showQyCheckBox.isChecked()
+        show_rf_flag = self.showRfCheckBox.isChecked()
 
         # Beam 1
         filepath = measurement.path / cleaning_constants.CLEANED_DPP_FILE.format(beam=1)
         plot_freq(self.plotCleanTuneB1Widget.canvas.fig, self.plotCleanTuneB1Widget.canvas.ax, filepath,
                   'Cleaned Tune Measurement for Beam 1', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag,
-                  plot_style="line", qx_flag=show_qx_flag, qy_flag=show_qy_flag)
+                  plot_style="line", qx_flag=show_qx_flag, qy_flag=show_qy_flag, rf_flag=show_rf_flag)
         self.plotCleanTuneB1Widget.canvas.draw()
         self.plotCleanTuneB1Widget.show()
 
@@ -1203,7 +1205,7 @@ class MainWindow(QMainWindow, main_window_class):
         filepath = measurement.path / cleaning_constants.CLEANED_DPP_FILE.format(beam=2)
         plot_freq(self.plotCleanTuneB2Widget.canvas.fig, self.plotCleanTuneB2Widget.canvas.ax, filepath,
                   f'Cleaned Tune Measurement for Beam 2', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag,
-                  plot_style="line", qx_flag=show_qx_flag, qy_flag=show_qy_flag)
+                  plot_style="line", qx_flag=show_qx_flag, qy_flag=show_qy_flag, rf_flag=show_rf_flag)
         self.plotCleanTuneB2Widget.canvas.draw()
         self.plotCleanTuneB2Widget.show()
 

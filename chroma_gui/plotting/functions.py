@@ -70,7 +70,8 @@ def plot_freq(fig,
               start=None,
               end=None,
               qx_flag=True,
-              qy_flag=True):
+              qy_flag=True,
+              rf_flag=True):
     # Plot Tune, DPP, RF and Time
 
     data = tfs.read(filename)
@@ -95,10 +96,13 @@ def plot_freq(fig,
 
     zp = []  # to store the labels for legend
     # Plot the RF
-    ax.plot(time, frequencies, label='RF Frequency')
+    if rf_flag:
+        ax.plot(time, frequencies, label='RF Frequency')
     #ax.set_title(title)
     ax.set_xlabel('Time [s]')
-    ax.set_ylabel('Frequency [Hz]')
+
+    if rf_flag:
+        ax.set_ylabel('Frequency [Hz]')
     zp.append(ax.get_legend_handles_labels())
 
     # rotate and align the tick labels so they look better
@@ -139,8 +143,13 @@ def plot_freq(fig,
 
     # Add a ΔRF
     if delta_rf_flag:
-        ax4 = ax.twinx()
-        ax4.spines.left.set_position(("axes", -0.1))
+        if rf_flag:
+            ax4 = ax.twinx()
+            ax4.spines.left.set_position(("axes", -0.1))
+        else:
+            ax4 = ax
+            ax4.plot(time, frequencies, label='RF Frequency')
+            zp.append(ax4.get_legend_handles_labels())
         ax4.yaxis.set_ticks_position('left')
         ax4.yaxis.set_label_position('left')
         ax4.set_ylabel('$\Delta$RF [Hz]')
