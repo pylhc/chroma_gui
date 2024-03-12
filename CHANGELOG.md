@@ -1,6 +1,6 @@
 # Non-Linear Chromaticity GUI
 
-# 2024-03-12 - v0.0.24 - v0.0.25
+# 2024-03-12 - v0.0.24 - v0.0.26
 
 * Added:
   * Response Matrix:
