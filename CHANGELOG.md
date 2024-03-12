@@ -1,5 +1,18 @@
 # Non-Linear Chromaticity GUI
 
+# 2024-03-12 - v0.0.24
+
+* Added:
+  * Response Matrix:
+    * Support for other multipoles than decapoles
+    * Support of common aperture multipoles, like in the IRs
+  * Fitting of chromaticity orders from 1 to 10
+  * Individual tune plotting and other flags in dpp tab
+ 
+* Fixes:
+  * Full tune display, would be messed up when tune shift was small
+  * $\delta$ instead of dp/p in chromaticity formula to make it denser
+
 # 2023-07-05 - v0.0.23
 
 * Added:
