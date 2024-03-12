@@ -707,6 +707,7 @@ class MainWindow(QMainWindow, main_window_class):
         self.available_observables = {}
         self.corrections = {"B1": None, "B2": None}
         self.setCorrectionComboBox()
+        self.setChromaticityComboBox()
 
         # Set the info icons on the labels
         self.setInfoIcons()
@@ -834,6 +835,22 @@ class MainWindow(QMainWindow, main_window_class):
         if chroma_status:
             self.setChromaticityOrders(chroma_orders)
             self.chromaFinished(self.measurement)
+
+    def setChromaticityComboBox(self):
+        """
+        Creates a combobox with clickable numbers for the chromaticity function
+        """
+        self.chromaOrderLayout.removeWidget(self.chromaOrderComboBox)
+        self.chromaOrderComboBox.close()
+
+        # Create a new custom ComboBox and add it to the layout
+        self.chromaOrderComboBox = CheckableComboBox(self)
+        self.chromaOrderLayout.addWidget(self.chromaOrderComboBox, 0, 1)
+        self.chromaOrderLayout.update()
+
+        # Display the available correction methods
+        max_chroma = 10
+        self.chromaOrderComboBox.addItems([str(e) for e in list(range(1, max_chroma))])
 
     def setCorrectionComboBox(self):
         """
@@ -1225,11 +1242,8 @@ class MainWindow(QMainWindow, main_window_class):
         """
         Returns a list containing the checked chromaticity orders
         """
-        checked = []
-        for order in range(1, 8):
-            dq = getattr(self, f'ChromaOrder{order}CheckBox').isChecked()
-            if dq:
-                checked.append(order)
+        checked = [int(e) for e in self.chromaOrderComboBox.currentData()]
+
         return checked
 
     def computeChromaClicked(self):
@@ -1461,12 +1475,16 @@ class MainWindow(QMainWindow, main_window_class):
         self.plotTimberWidget.show()
 
     def setChromaticityOrders(self, orders):
-        for order in range(3, max(orders) + 1):
-            dq = getattr(self, f'ChromaOrder{order}CheckBox')
+        all_orders = [int(self.chromaOrderComboBox.itemText(i)) for i in range(self.chromaOrderComboBox.count())]
+
+        for order in all_orders:
+            index = self.chromaOrderComboBox.findText(str(order))
+            dq = self.chromaOrderComboBox.model().item(index)
+
             if order in orders:
-                dq.setChecked(True)
+                dq.setCheckState(Qt.Checked)
             else:
-                dq.setChecked(False)
+                dq.setCheckState(Qt.Unchecked)
 
     def openMeasurementCorrectionB1Clicked(self):
         folder = QFileDialog.getExistingDirectory(

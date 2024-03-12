@@ -27,7 +27,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="timberTab">
      <property name="font">
@@ -797,16 +797,29 @@
       <property name="geometry">
        <rect>
         <x>1150</x>
-        <y>23</y>
+        <y>30</y>
         <width>88</width>
         <height>131</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_8">
-       <item row="3" column="0">
-        <widget class="QCheckBox" name="showDppCheckBox">
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="showQyCheckBox">
          <property name="text">
-          <string>Show dp/p</string>
+          <string>Show Qy</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QCheckBox" name="showRfCheckBox">
+         <property name="text">
+          <string>Show RF</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -820,13 +833,10 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QCheckBox" name="showQyCheckBox">
+       <item row="3" column="0">
+        <widget class="QCheckBox" name="showDppCheckBox">
          <property name="text">
-          <string>Show Qy</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
+          <string>Show dp/p</string>
          </property>
         </widget>
        </item>
@@ -841,16 +851,6 @@
         <widget class="QCheckBox" name="showDeltaRfCheckBox">
          <property name="text">
           <string>Show ΔRF</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QCheckBox" name="showRfCheckBox">
-         <property name="text">
-          <string>Show RF</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -967,44 +967,17 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>431</width>
-        <height>61</height>
+        <width>441</width>
+        <height>111</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_12">
        <item row="0" column="0">
-        <layout class="QGridLayout" name="gridLayout_9">
-         <item row="0" column="4">
-          <widget class="QCheckBox" name="ChromaOrder4CheckBox">
-           <property name="text">
-            <string>4</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QCheckBox" name="ChromaOrder2CheckBox">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="text">
-            <string>2</string>
-           </property>
-           <property name="checked">
+        <layout class="QGridLayout" name="chromaOrderLayout">
+         <item row="0" column="1">
+          <widget class="QComboBox" name="chromaOrderComboBox">
+           <property name="editable">
             <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="5">
-          <widget class="QCheckBox" name="ChromaOrder5CheckBox">
-           <property name="text">
-            <string>5</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="7">
-          <widget class="QCheckBox" name="ChromaOrder7CheckBox">
-           <property name="text">
-            <string>7</string>
            </property>
           </widget>
          </item>
@@ -1015,33 +988,6 @@
            </property>
            <property name="text">
             <string>Chromaticity Orders to Plot</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="6">
-          <widget class="QCheckBox" name="ChromaOrder6CheckBox">
-           <property name="text">
-            <string>6</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="3">
-          <widget class="QCheckBox" name="ChromaOrder3CheckBox">
-           <property name="text">
-            <string>3</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QCheckBox" name="ChromaOrder1CheckBox">
-           <property name="text">
-            <string>1</string>
-           </property>
-           <property name="checked">
-            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -1059,6 +1005,20 @@
            </property>
           </widget>
          </item>
+         <item row="2" column="0">
+          <widget class="QPushButton" name="computeChromaButton">
+           <property name="text">
+            <string>Compute Chromaticity</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QPushButton" name="copyTableButton">
+           <property name="text">
+            <string>Copy Table</string>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="1">
           <widget class="QDoubleSpinBox" name="dppRangeLowSpinBox">
            <property name="decimals">
@@ -1071,8 +1031,29 @@
             <double>0.000100000000000</double>
            </property>
            <property name="value">
-            <double>-0.005000000000000</double>
+            <double>-0.007000000000000</double>
            </property>
+          </widget>
+         </item>
+         <item row="2" column="3">
+          <widget class="QPushButton" name="savePlotsButton">
+           <property name="text">
+            <string>Save Plots</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="2">
+          <widget class="QComboBox" name="copyTableComboBox">
+           <item>
+            <property name="text">
+             <string>Markdown</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>LaTeX</string>
+            </property>
+           </item>
           </widget>
          </item>
          <item row="0" column="2">
@@ -1087,7 +1068,7 @@
             <double>0.000100000000000</double>
            </property>
            <property name="value">
-            <double>0.005000000000000</double>
+            <double>0.007000000000000</double>
            </property>
           </widget>
          </item>
@@ -1110,53 +1091,6 @@
       <property name="alignment">
        <set>Qt::AlignCenter</set>
       </property>
-     </widget>
-     <widget class="QWidget" name="layoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>90</y>
-        <width>431</width>
-        <height>27</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <widget class="QPushButton" name="computeChromaButton">
-         <property name="text">
-          <string>Compute Chromaticity</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="savePlotsButton">
-         <property name="text">
-          <string>Save Plots</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="copyTableButton">
-         <property name="text">
-          <string>Copy Table</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="copyTableComboBox">
-         <item>
-          <property name="text">
-           <string>Markdown</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>LaTeX</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-      </layout>
      </widget>
      <widget class="QLabel" name="r2_y">
       <property name="geometry">
@@ -1917,7 +1851,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1704</width>
-     <height>18</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
