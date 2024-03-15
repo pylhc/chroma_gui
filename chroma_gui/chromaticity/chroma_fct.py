@@ -60,8 +60,8 @@ def get_chromaticity(filename, chroma_tfs, dpp_range, fit_orders, axis):
     fit_funcs = list()
     for order in range(min_fit_order, max_fit_order+1):
         # Initial guesses for the chroma, Q0, Q1, then 1e3, 1e6, 1e9, etc
-        p0 = [0.3, 2, *[pow(10, int(o)*3) for o in range(1, order)]]
-
+        p0 = np.array([0.3, 2, *[pow(10, int(o)*3) for o in range(1, order)]], dtype='float64')
+        
         # Create the fit function with all the parameters
         f = partial(curve_fit, chromaticity_func, data['DPP'], data[f'Q{axis}'], p0=p0)
         # Apply the errors to the fit if we got some
