@@ -204,7 +204,9 @@ class Measurement:
         Otherwise, just say there is nothing.
         """
         path_timber_data = Path(self.path / timber.constants.FILENAME)
+        path_timber_raw = Path(self.path / timber.constants.FILENAME_HDF)
         if path_timber_data.exists():
+            # First add the metadata from the timber extraction
             start = None
             end = None
             extracted_on = None
@@ -219,8 +221,11 @@ class Measurement:
                         extracted_on = line.strip()
                     if not line.startswith("#"):
                         break
+            # Add some text to check if the raw data has been extracted already
+            raw_extracted = path_timber_raw.exists()
             message = "Existing extracted data:"
             message += f"\n{extracted_on}\n{start}\n{end}"
+            message += f"\nRaw extracted: {raw_extracted}"
             return message, True
         else:
             return "No extraction in directory yet", False
@@ -449,9 +454,9 @@ class ExternalProgram(QThread):
                 # Set the text edits with the computed corrections
                 for key, val in corrections.items():
                     if val > 0:
-                        text[beam] += f"{key} := {key} + {val:6d} ;\n"
+                        text[beam] += f"{key} := {key} + {val} ;\n"
                     else:
-                        text[beam] += f"{key} := {key} - {val*-1:6d} ;\n"
+                        text[beam] += f"{key} := {key} - {val*-1} ;\n"
                     
                     corr_sum[beam] += val
         else:
