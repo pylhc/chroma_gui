@@ -1,0 +1,319 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>chroma_gui.cleaning.plateau &mdash; omc3-gui 0.0.26 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=178c8cd6" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=6a9d8632"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/omc_logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Main</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../main/chroma_gui.html">Chroma-GUI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../main/chroma_gui.html#main">Main</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/chromaticity.html">Chromaticity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/chromaticity.html#chromaticity-module">Chromaticity Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/chromaticity.html#chromaticity-functions">Chromaticity Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/cleaning.html">Cleaning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/cleaning.html#cleaning-module">Cleaning Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/cleaning.html#clean">Clean</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/cleaning.html#constants">Constants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/cleaning.html#plateau-finder">Plateau Finder</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/corrections.html">Corrections</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/corrections.html#corrections-module">Corrections Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/corrections.html#response-matrix">Response Matrix</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/plotting.html">Plotting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/plotting.html#plotting-module">Plotting Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/plotting.html#functions">Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/plotting.html#widget">Widget</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/timber.html">Timber</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/timber.html#timber-module">Timber Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/timber.html#constants">Constants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/timber.html#extract">Extract</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">omc3-gui</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">chroma_gui.cleaning.plateau</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+  
+  
+           <div itemprop="articleBody">
+             
+  <h1>Source code for chroma_gui.cleaning.plateau</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Plateau Finder</span>
+<span class="sd">--------------</span>
+
+<span class="sd">Functions to find the tune plateaus of the measurement.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tfs</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">chroma_gui.cleaning.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DPP_FILE</span><span class="p">,</span>
+    <span class="n">RF_VARIABLE</span><span class="p">,</span>
+    <span class="n">TUNE_VARS</span><span class="p">,</span>
+    <span class="n">X_VAR_INDICATOR</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="c1"># Read the data to get the RF first</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_time_data</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+    <span class="n">timestamp</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+    <span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">timestamp</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S.</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">value</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">append</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">dict_to_add</span><span class="p">):</span>
+    <span class="n">new_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([</span><span class="n">dict_to_add</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="n">dict_to_add</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">res_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df</span><span class="p">,</span> <span class="n">new_df</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res_df</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">construct_rf_data_from_csv</span><span class="p">(</span><span class="n">timber_data</span><span class="p">,</span> <span class="n">rf_beam</span><span class="p">):</span>
+    <span class="n">rf_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;TIME&quot;</span><span class="p">,</span> <span class="s2">&quot;F_RF&quot;</span><span class="p">])</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">timber_data</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">freq</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># boolean flag to check the variable</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;VARIABLE&quot;</span><span class="p">):</span>
+                <span class="n">freq</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;VARIABLE: &quot;</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="n">RF_VARIABLE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">beam</span><span class="o">=</span><span class="n">rf_beam</span><span class="p">):</span>
+                    <span class="n">freq</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">freq</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Timestamp&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">timestamp</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">get_time_data</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="n">rf_data</span> <span class="o">=</span> <span class="n">append</span><span class="p">(</span><span class="n">rf_data</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;TIME&quot;</span><span class="p">:</span> <span class="n">timestamp</span><span class="p">,</span> <span class="s2">&quot;F_RF&quot;</span><span class="p">:</span> <span class="n">value</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">rf_data</span>
+
+
+<span class="c1"># The timestamps aren&#39;t always equal for each variable</span>
+<span class="c1"># The idea is to get the last known frequency for a specific timestamp</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_rf</span><span class="p">(</span><span class="n">rf_data</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">nominal_rf</span><span class="p">):</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">rf_data</span><span class="p">[</span><span class="s2">&quot;TIME&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">timestamp</span>
+    <span class="n">rf_before</span> <span class="o">=</span> <span class="n">rf_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rf_before</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># can happen if data has been redacted</span>
+        <span class="k">return</span> <span class="n">nominal_rf</span>
+
+    <span class="n">last_rf</span> <span class="o">=</span> <span class="n">rf_before</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">last_rf</span><span class="p">[</span><span class="s2">&quot;F_RF&quot;</span><span class="p">]</span>
+
+
+<span class="c1"># Same thing for the DPP</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_dpp</span><span class="p">(</span><span class="n">dpp_data</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">):</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">dpp_data</span><span class="p">[</span><span class="s2">&quot;TIME&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">timestamp</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">dpp_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">last_dpp</span> <span class="o">=</span> <span class="n">dpp_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="s2">&quot;DPP&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Sometimes the DPP is in the middle of two plateaus, fix that</span>
+    <span class="n">dpp_m1</span> <span class="o">=</span> <span class="n">dpp_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;DPP&quot;</span><span class="p">]</span>
+    <span class="n">dpp_p1</span> <span class="o">=</span> <span class="n">dpp_data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="s2">&quot;DPP&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">last_dpp</span> <span class="o">!=</span> <span class="n">dpp_m1</span> <span class="ow">and</span> <span class="n">last_dpp</span> <span class="o">!=</span> <span class="n">dpp_p1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dpp_m1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">last_dpp</span>
+
+
+<span class="c1"># Then get the tunes</span>
+<div class="viewcode-block" id="get_tunes_plateaus">
+<a class="viewcode-back" href="../../../modules/cleaning.html#chroma_gui.cleaning.plateau.get_tunes_plateaus">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_tunes_plateaus</span><span class="p">(</span><span class="n">timber_data</span><span class="p">,</span> <span class="n">beam</span><span class="p">,</span> <span class="n">rf_beam</span><span class="p">,</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">nominal_rf</span><span class="p">,</span> <span class="n">alpha</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Builds a dataFrame with the tune, RF and DPP &#39;chunked&#39; into plateaus</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get the RF as a dataframe</span>
+    <span class="n">rf_data</span> <span class="o">=</span> <span class="n">construct_rf_data_from_csv</span><span class="p">(</span><span class="n">timber_data</span><span class="p">,</span> <span class="n">rf_beam</span><span class="p">)</span>
+
+    <span class="c1"># If the nominal_rf is None, set it right now as it is the first point of the measurement</span>
+    <span class="k">if</span> <span class="n">nominal_rf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">nominal_rf</span> <span class="o">=</span> <span class="n">rf_data</span><span class="p">[</span><span class="s2">&quot;F_RF&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;TIME&quot;</span><span class="p">,</span> <span class="s2">&quot;F_RF&quot;</span><span class="p">,</span> <span class="s2">&quot;QX&quot;</span><span class="p">,</span> <span class="s2">&quot;QY&quot;</span><span class="p">,</span> <span class="s2">&quot;DPP&quot;</span><span class="p">])</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">timber_data</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">tune</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># boolean flag to check the variable</span>
+        <span class="n">axis</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;VARIABLE&quot;</span><span class="p">):</span>
+                <span class="n">tune</span> <span class="o">=</span> <span class="mi">0</span>
+
+                <span class="n">beam_tune_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">var</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">beam</span><span class="o">=</span><span class="n">beam</span><span class="p">)</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">TUNE_VARS</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;VARIABLE: &quot;</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">in</span> <span class="n">beam_tune_vars</span><span class="p">:</span>
+                    <span class="n">tune</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">axis</span> <span class="o">=</span> <span class="s2">&quot;X&quot;</span> <span class="k">if</span> <span class="n">X_VAR_INDICATOR</span> <span class="ow">in</span> <span class="n">line</span> <span class="k">else</span> <span class="s2">&quot;Y&quot;</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">tune</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Timestamp&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">timestamp</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">get_time_data</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">timestamp</span> <span class="o">&lt;</span> <span class="n">start_time</span> <span class="ow">or</span> <span class="n">timestamp</span> <span class="o">&gt;</span> <span class="n">end_time</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="n">qx</span> <span class="o">=</span> <span class="n">value</span> <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="s2">&quot;X&quot;</span> <span class="k">else</span> <span class="mi">0</span>
+                <span class="n">qy</span> <span class="o">=</span> <span class="n">value</span> <span class="k">if</span> <span class="n">axis</span> <span class="o">==</span> <span class="s2">&quot;Y&quot;</span> <span class="k">else</span> <span class="mi">0</span>
+
+                <span class="c1"># Check if the timestamp exists already</span>
+                <span class="c1"># If not, add the line</span>
+                <span class="n">mask</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;TIME&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">timestamp</span>
+                <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                    <span class="c1"># Get the RF frequency of the point</span>
+                    <span class="n">freq</span> <span class="o">=</span> <span class="n">get_rf</span><span class="p">(</span><span class="n">rf_data</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">nominal_rf</span><span class="p">)</span>
+
+                    <span class="c1"># Compute the DPP</span>
+                    <span class="n">dpp</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">freq</span> <span class="o">-</span> <span class="n">nominal_rf</span><span class="p">)</span> <span class="o">/</span> <span class="n">nominal_rf</span>
+
+                    <span class="c1"># And add the tunes</span>
+                    <span class="n">to_add</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;TIME&quot;</span><span class="p">:</span> <span class="n">timestamp</span><span class="p">,</span> <span class="s2">&quot;F_RF&quot;</span><span class="p">:</span> <span class="n">freq</span><span class="p">,</span> <span class="s2">&quot;QX&quot;</span><span class="p">:</span> <span class="n">qx</span><span class="p">,</span> <span class="s2">&quot;QY&quot;</span><span class="p">:</span> <span class="n">qy</span><span class="p">,</span> <span class="s2">&quot;DPP&quot;</span><span class="p">:</span> <span class="n">dpp</span><span class="p">}</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">to_add</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">i</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">qy</span><span class="p">:</span>
+                        <span class="n">data</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;QY&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">qy</span>
+                    <span class="k">elif</span> <span class="n">qx</span><span class="p">:</span>
+                        <span class="n">data</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;QX&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">qx</span>
+
+    <span class="c1"># Fix types</span>
+    <span class="n">new_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+        <span class="p">{</span><span class="s2">&quot;TIME&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;F_RF&quot;</span><span class="p">:</span> <span class="s2">&quot;float64&quot;</span><span class="p">,</span> <span class="s2">&quot;QX&quot;</span><span class="p">:</span> <span class="s2">&quot;float64&quot;</span><span class="p">,</span> <span class="s2">&quot;QY&quot;</span><span class="p">:</span> <span class="s2">&quot;float64&quot;</span><span class="p">,</span> <span class="s2">&quot;DPP&quot;</span><span class="p">:</span> <span class="s2">&quot;float64&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Create the TFS with its headers</span>
+    <span class="n">tfs_data</span> <span class="o">=</span> <span class="n">tfs</span><span class="o">.</span><span class="n">TfsDataFrame</span><span class="p">(</span><span class="n">new_data</span><span class="p">)</span>
+    <span class="n">tfs_data</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;ALFA&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">alpha</span>
+    <span class="n">tfs_data</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;F_RF&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nominal_rf</span>
+    <span class="n">tfs_data</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;BEAM&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;B</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">return</span> <span class="n">tfs_data</span></div>
+
+
+
+<div class="viewcode-block" id="create_plateau">
+<a class="viewcode-back" href="../../../modules/cleaning.html#chroma_gui.cleaning.plateau.create_plateau">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_plateau</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">timber_data</span><span class="p">,</span> <span class="n">rf_beam</span><span class="p">,</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">nominal_rf</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wrapper function to get plateaus from B1 and B2 and save them</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">plateau_b1</span> <span class="o">=</span> <span class="n">get_tunes_plateaus</span><span class="p">(</span>
+        <span class="n">path</span> <span class="o">/</span> <span class="n">timber_data</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">rf_beam</span><span class="p">,</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">nominal_rf</span><span class="p">,</span> <span class="n">alpha</span><span class="p">[</span><span class="s2">&quot;B1&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">plateau_b2</span> <span class="o">=</span> <span class="n">get_tunes_plateaus</span><span class="p">(</span>
+        <span class="n">path</span> <span class="o">/</span> <span class="n">timber_data</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">rf_beam</span><span class="p">,</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">nominal_rf</span><span class="p">,</span> <span class="n">alpha</span><span class="p">[</span><span class="s2">&quot;B2&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">tfs</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">path</span> <span class="o">/</span> <span class="n">DPP_FILE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">beam</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">plateau_b1</span><span class="p">)</span>
+    <span class="n">tfs</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">path</span> <span class="o">/</span> <span class="n">DPP_FILE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">beam</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">plateau_b2</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

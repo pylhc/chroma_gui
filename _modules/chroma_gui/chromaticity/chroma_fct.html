@@ -1,0 +1,302 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>chroma_gui.chromaticity.chroma_fct &mdash; omc3-gui 0.0.26 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=178c8cd6" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=6a9d8632"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/omc_logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Main</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../main/chroma_gui.html">Chroma-GUI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../main/chroma_gui.html#main">Main</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/chromaticity.html">Chromaticity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/chromaticity.html#chromaticity-module">Chromaticity Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/chromaticity.html#chromaticity-functions">Chromaticity Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/cleaning.html">Cleaning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/cleaning.html#cleaning-module">Cleaning Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/cleaning.html#clean">Clean</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/cleaning.html#constants">Constants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/cleaning.html#plateau-finder">Plateau Finder</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/corrections.html">Corrections</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/corrections.html#corrections-module">Corrections Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/corrections.html#response-matrix">Response Matrix</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/plotting.html">Plotting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/plotting.html#plotting-module">Plotting Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/plotting.html#functions">Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/plotting.html#widget">Widget</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/timber.html">Timber</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/timber.html#timber-module">Timber Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/timber.html#constants">Constants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/timber.html#extract">Extract</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">omc3-gui</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">chroma_gui.chromaticity.chroma_fct</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+  
+  
+           <div itemprop="articleBody">
+             
+  <h1>Source code for chroma_gui.chromaticity.chroma_fct</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">Chromaticity Functions</span>
+<span class="sd">----------------------</span>
+
+<span class="sd">Functions to compute the chromaticity.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">factorial</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tfs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">curve_fit</span>
+
+
+<div class="viewcode-block" id="chromaticity_func">
+<a class="viewcode-back" href="../../../modules/chromaticity.html#chroma_gui.chromaticity.chroma_fct.chromaticity_func">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">chromaticity_func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the taylor expansion of the chromaticity</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    .. code-block::</span>
+<span class="sd">    </span>
+<span class="sd">        q0</span>
+<span class="sd">        + q1 * x</span>
+<span class="sd">        + q2 * x**2 * 1/2!</span>
+<span class="sd">        + q3 * x**3 * 1/3!</span>
+<span class="sd">        ...</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">order</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">res</span> <span class="o">+=</span> <span class="n">val</span> <span class="o">*</span> <span class="n">x</span> <span class="o">**</span> <span class="p">(</span><span class="n">order</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">factorial</span><span class="p">(</span><span class="n">order</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_chromaticity_formula</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
+    <span class="n">dpp</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;\left( \frac{\Delta p}</span><span class="si">{p}</span><span class="s2"> \right)&quot;</span>
+    <span class="n">dpp</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">delta&quot;</span>
+    <span class="n">chroma</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Q(</span><span class="si">{</span><span class="n">dpp</span><span class="si">}</span><span class="s2">) = Q_0 &quot;</span>
+    <span class="n">chroma</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;+ Q&#39; \cdot </span><span class="si">{</span><span class="n">dpp</span><span class="si">}</span><span class="s2"> &quot;</span>
+
+    <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">q_str</span> <span class="o">=</span> <span class="s2">&quot;Q&quot;</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span> <span class="o">*</span> <span class="n">o</span>
+        <span class="n">chroma</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;+ </span><span class="se">\\</span><span class="s2">frac</span><span class="se">{{</span><span class="s2">1</span><span class="se">}}{{</span><span class="si">{</span><span class="n">o</span><span class="si">}</span><span class="s2">!</span><span class="se">}}</span><span class="s2"> </span><span class="si">{</span><span class="n">q_str</span><span class="si">}</span><span class="s2"> \cdot </span><span class="si">{</span><span class="n">dpp</span><span class="si">}</span><span class="s2">^</span><span class="si">{</span><span class="n">o</span><span class="si">}</span><span class="s2"> &quot;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;$</span><span class="si">{</span><span class="n">chroma</span><span class="si">}</span><span class="s2">$&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">construct_chroma_tfs</span><span class="p">(</span><span class="n">fit_orders</span><span class="p">):</span>
+    <span class="n">max_fit_order</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">fit_orders</span><span class="p">)</span>
+    <span class="n">q_val</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Q</span><span class="si">{</span><span class="n">o</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_fit_order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+    <span class="n">q_err</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Q</span><span class="si">{</span><span class="n">o</span><span class="si">}</span><span class="s2">_ERR&quot;</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_fit_order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+    <span class="n">chroma_tfs</span> <span class="o">=</span> <span class="n">tfs</span><span class="o">.</span><span class="n">TfsDataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;AXIS&quot;</span><span class="p">,</span> <span class="s2">&quot;BEAM&quot;</span><span class="p">,</span> <span class="s2">&quot;UP_TO_ORDER&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">q_val</span><span class="p">,</span> <span class="o">*</span><span class="n">q_err</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">chroma_tfs</span>
+
+
+<div class="viewcode-block" id="get_chromaticity">
+<a class="viewcode-back" href="../../../modules/chromaticity.html#chroma_gui.chromaticity.chroma_fct.get_chromaticity">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_chromaticity</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">chroma_tfs</span><span class="p">,</span> <span class="n">dpp_range</span><span class="p">,</span> <span class="n">fit_orders</span><span class="p">,</span> <span class="n">axis</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the chromaticity for a given plane and DPP file</span>
+<span class="sd">    The values are computed via a fit, for all orders between min(fit_orders) and max(fit_orders), inclusive</span>
+
+<span class="sd">    The TFS given as input is then returned with an added row containing the chromaticity values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Print the general formula</span>
+    <span class="n">min_fit_order</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">fit_orders</span><span class="p">)</span>
+    <span class="n">max_fit_order</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">fit_orders</span><span class="p">)</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">tfs</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;DPP&quot;</span><span class="p">])</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;DPP&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">dpp_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;DPP&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">dpp_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+
+    <span class="c1"># Create a list of all the fit functions, we&#39;re going to fit against all orders</span>
+    <span class="n">fit_funcs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">min_fit_order</span><span class="p">,</span> <span class="n">max_fit_order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="c1"># Initial guesses for the chroma, Q0, Q1, then 1e3, 1e6, 1e9, etc</span>
+        <span class="n">p0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">*</span><span class="p">[</span><span class="nb">pow</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">order</span><span class="p">)]],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create the fit function with all the parameters</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">curve_fit</span><span class="p">,</span> <span class="n">chromaticity_func</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;DPP&quot;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Q</span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span> <span class="n">p0</span><span class="o">=</span><span class="n">p0</span><span class="p">)</span>
+        <span class="c1"># Apply the errors to the fit if we got some</span>
+        <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Q</span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2">ERR&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Q</span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2">ERR&quot;</span><span class="p">])</span>
+        <span class="n">fit_funcs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="c1"># Finally call the function and store the result!</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">fit_func</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">fit_funcs</span><span class="p">):</span>
+        <span class="n">popt</span><span class="p">,</span> <span class="n">pcov</span> <span class="o">=</span> <span class="n">fit_func</span><span class="p">()</span>
+        <span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">pcov</span><span class="p">))</span>
+
+        <span class="c1"># Populate the chromaticity TFS</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">min_fit_order</span>
+        <span class="n">remaining</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">max_fit_order</span> <span class="o">-</span> <span class="n">min_fit_order</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">popt</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">min_fit_order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="p">)</span>  <span class="c1"># we have Q0, so +1</span>
+
+        <span class="n">new_data</span> <span class="o">=</span> <span class="n">tfs</span><span class="o">.</span><span class="n">TfsDataFrame</span><span class="p">(</span>
+            <span class="p">[[</span><span class="n">axis</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;BEAM&quot;</span><span class="p">],</span> <span class="n">order</span><span class="p">,</span> <span class="o">*</span><span class="n">popt</span><span class="p">,</span> <span class="o">*</span><span class="n">remaining</span><span class="p">,</span> <span class="o">*</span><span class="n">std</span><span class="p">,</span> <span class="o">*</span><span class="n">remaining</span><span class="p">]],</span>
+            <span class="n">columns</span><span class="o">=</span><span class="n">chroma_tfs</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">chroma_tfs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">chroma_tfs</span><span class="p">,</span> <span class="n">new_data</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">chroma_tfs</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;MIN_FIT_ORDER&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">fit_orders</span><span class="p">)</span>
+    <span class="n">chroma_tfs</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;MAX_FIT_ORDER&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">fit_orders</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">chroma_tfs</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_maximum_chromaticity</span><span class="p">(</span><span class="n">chroma_tfs</span><span class="p">):</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">chroma_tfs</span><span class="p">[</span><span class="n">chroma_tfs</span><span class="p">[</span><span class="s2">&quot;UP_TO_ORDER&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">chroma_tfs</span><span class="p">[</span><span class="s2">&quot;UP_TO_ORDER&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;UP_TO_ORDER&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span>
+
+
+<div class="viewcode-block" id="get_chromaticity_df_with_notation">
+<a class="viewcode-back" href="../../../modules/chromaticity.html#chroma_gui.chromaticity.chroma_fct.get_chromaticity_df_with_notation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_chromaticity_df_with_notation</span><span class="p">(</span><span class="n">chroma_tfs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns a dataFrame with the chromaticity with the headers set with exponents and the values divided</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">max_order</span> <span class="o">=</span> <span class="n">chroma_tfs</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;MAX_FIT_ORDER&quot;</span><span class="p">]</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;BEAM&quot;</span><span class="p">,</span> <span class="s2">&quot;AXIS&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">prime</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">order</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">if</span> <span class="n">order</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">power</span> <span class="o">=</span> <span class="p">(</span><span class="n">order</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span> <span class="k">if</span> <span class="n">order</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">headers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Q&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">order</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">headers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Q^</span><span class="si">{</span><span class="n">prime</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">headers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Q^</span><span class="si">{</span><span class="n">prime</span><span class="si">}</span><span class="s2"> [x10^</span><span class="si">{</span><span class="n">power</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+
+    <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">chroma_tfs</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">beam</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;BEAM&quot;</span><span class="p">]</span>
+        <span class="n">axis</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;AXIS&quot;</span><span class="p">]</span>
+
+        <span class="n">new_row</span> <span class="o">=</span> <span class="p">[</span><span class="n">beam</span><span class="p">,</span> <span class="n">axis</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">power</span> <span class="o">=</span> <span class="p">(</span><span class="n">order</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span> <span class="k">if</span> <span class="n">order</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Q</span><span class="si">{</span><span class="n">order</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">10</span><span class="o">**</span><span class="n">power</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Q</span><span class="si">{</span><span class="n">order</span><span class="si">}</span><span class="s2">_ERR&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">10</span><span class="o">**</span><span class="n">power</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">new_row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2"> ± </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_row</span><span class="p">)</span>
+
+    <span class="n">new_tfs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">new_tfs</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,227 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cleaning &mdash; omc3-gui 0.0.26 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=178c8cd6" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=6a9d8632"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Corrections" href="corrections.html" />
+    <link rel="prev" title="Chromaticity" href="chromaticity.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/omc_logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Main</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../main/chroma_gui.html">Chroma-GUI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../main/chroma_gui.html#main">Main</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="chromaticity.html">Chromaticity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="chromaticity.html#chromaticity-module">Chromaticity Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="chromaticity.html#chromaticity-functions">Chromaticity Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Cleaning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#cleaning-module">Cleaning Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#clean">Clean</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#constants">Constants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plateau-finder">Plateau Finder</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="corrections.html">Corrections</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="corrections.html#corrections-module">Corrections Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="corrections.html#response-matrix">Response Matrix</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="plotting.html#plotting-module">Plotting Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plotting.html#functions">Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plotting.html#widget">Widget</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="timber.html">Timber</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="timber.html#timber-module">Timber Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timber.html#constants">Constants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timber.html#extract">Extract</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">omc3-gui</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Cleaning</li>
+      <li class="wy-breadcrumbs-aside">
+              <!-- User defined GitHub URL -->
+              <a href="https://github.com/pylhc/chroma_gui" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+  <nav id="local-table-of-contents" role="navigation" aria-labelledby="local-table-of-contents-title">
+    <h4 id="local-table-of-contents-title">On This Page</h4>
+    <ul>
+<li><a class="reference internal" href="#">Cleaning</a><ul>
+<li><a class="reference internal" href="#cleaning-module">Cleaning Module</a></li>
+<li><a class="reference internal" href="#clean">Clean</a></li>
+<li><a class="reference internal" href="#constants">Constants</a></li>
+<li><a class="reference internal" href="#plateau-finder">Plateau Finder</a></li>
+</ul>
+</li>
+</ul>
+
+  </nav>
+  
+  
+           <div itemprop="articleBody">
+             
+  <section id="cleaning">
+<h1>Cleaning<a class="headerlink" href="#cleaning" title="Link to this heading"></a></h1>
+<section id="cleaning-module">
+<h2>Cleaning Module<a class="headerlink" href="#cleaning-module" title="Link to this heading"></a></h2>
+<p>Functions to clean the chromaticity data.</p>
+</section>
+<section id="clean">
+<h2>Clean<a class="headerlink" href="#clean" title="Link to this heading"></a></h2>
+<p>Main functions to clean the chromaticity data.</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">chroma_gui.cleaning.clean.</span></span><span class="sig-name descname"><span class="pre">add_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tune_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tune_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_tfs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qx_window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qy_window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quartiles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plateau_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bad_tunes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bbq'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw_bbq_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seconds_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chroma_gui/cleaning/clean.html#add_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Gets the tune from one of the defined methods and adds it to the TFS</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">chroma_gui.cleaning.clean.</span></span><span class="sig-name descname"><span class="pre">get_avg_tune_from_naff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_plateau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_plateau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seconds_step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qx_window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qy_window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bad_tunes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chroma_gui/cleaning/clean.html#get_avg_tune_from_naff"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Divide the plateau in chunks of x seconds and use NAFF on it</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">chroma_gui.cleaning.clean.</span></span><span class="sig-name descname"><span class="pre">get_spectrogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_plateau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_plateau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seconds_step</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chroma_gui/cleaning/clean.html#get_spectrogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Divide the plateau in chunks of x seconds and apply a spectrogram on it</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">chroma_gui.cleaning.clean.</span></span><span class="sig-name descname"><span class="pre">merge_overlap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chroma_gui/cleaning/clean.html#merge_overlap"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Merge the overlapping arrays contained in the given array</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">chroma_gui.cleaning.clean.</span></span><span class="sig-name descname"><span class="pre">tune_window</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plane</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chroma_gui/cleaning/clean.html#tune_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Returns the tune data without the points outside the defined windows
+:param - qx: tuple of lower and upper bounds for Qx, e.g. (0.26, 0.28)
+:param - qy: tuple of lower and upper bounds for Qy</p>
+</dd></dl>
+
+<section id="constants">
+<h2>Constants<a class="headerlink" href="#constants" title="Link to this heading"></a></h2>
+<p>Constants for the cleaning module.</p>
+</section>
+<section id="plateau-finder">
+<h2>Plateau Finder<a class="headerlink" href="#plateau-finder" title="Link to this heading"></a></h2>
+<p>Functions to find the tune plateaus of the measurement.</p>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">chroma_gui.cleaning.plateau.</span></span><span class="sig-name descname"><span class="pre">create_plateau</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timber_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rf_beam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nominal_rf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chroma_gui/cleaning/plateau.html#create_plateau"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Wrapper function to get plateaus from B1 and B2 and save them</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">chroma_gui.cleaning.plateau.</span></span><span class="sig-name descname"><span class="pre">get_tunes_plateaus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timber_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rf_beam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nominal_rf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chroma_gui/cleaning/plateau.html#get_tunes_plateaus"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Builds a dataFrame with the tune, RF and DPP ‘chunked’ into plateaus</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="chromaticity.html" class="btn btn-neutral float-left" title="Chromaticity" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="corrections.html" class="btn btn-neutral float-right" title="Corrections" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

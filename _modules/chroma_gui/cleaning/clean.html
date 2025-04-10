@@ -1,0 +1,529 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>chroma_gui.cleaning.clean &mdash; omc3-gui 0.0.26 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/custom.css?v=178c8cd6" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=6a9d8632"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/omc_logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Main</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../main/chroma_gui.html">Chroma-GUI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../main/chroma_gui.html#main">Main</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/chromaticity.html">Chromaticity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/chromaticity.html#chromaticity-module">Chromaticity Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/chromaticity.html#chromaticity-functions">Chromaticity Functions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/cleaning.html">Cleaning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/cleaning.html#cleaning-module">Cleaning Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/cleaning.html#clean">Clean</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/cleaning.html#constants">Constants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/cleaning.html#plateau-finder">Plateau Finder</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/corrections.html">Corrections</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/corrections.html#corrections-module">Corrections Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/corrections.html#response-matrix">Response Matrix</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/plotting.html">Plotting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/plotting.html#plotting-module">Plotting Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/plotting.html#functions">Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/plotting.html#widget">Widget</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/timber.html">Timber</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/timber.html#timber-module">Timber Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/timber.html#constants">Constants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/timber.html#extract">Extract</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Bibliography</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../bibliography.html">Bibliography</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">omc3-gui</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">chroma_gui.cleaning.clean</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+  
+  
+           <div itemprop="articleBody">
+             
+  <h1>Source code for chroma_gui.cleaning.clean</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">Clean</span>
+<span class="sd">-----</span>
+
+<span class="sd">Main functions to clean the chromaticity data.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">nafflib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tfs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dateutil.parser</span><span class="w"> </span><span class="kn">import</span> <span class="n">isoparse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">signal</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;chroma_GUI - Cleaning&#39;</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(name)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># Compute the plateaus via the F_RF</span>
+<span class="c1"># If the current F_RF is the same as the last one, we&#39;re still on the plateau.</span>
+<span class="c1"># For the tune, we need to compute the average</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">append</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">df2</span><span class="p">,</span> <span class="n">new_headers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">res_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df</span><span class="p">,</span> <span class="n">df2</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">res_df</span> <span class="o">=</span> <span class="n">tfs</span><span class="o">.</span><span class="n">TfsDataFrame</span><span class="p">(</span><span class="n">res_df</span><span class="p">)</span>
+    <span class="n">res_df</span><span class="o">.</span><span class="n">headers</span> <span class="o">=</span> <span class="n">new_headers</span>
+    <span class="k">return</span> <span class="n">res_df</span>
+
+
+<div class="viewcode-block" id="tune_window">
+<a class="viewcode-back" href="../../../modules/cleaning.html#chroma_gui.cleaning.clean.tune_window">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">tune_window</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">plane</span><span class="p">,</span> <span class="n">qx</span><span class="p">,</span> <span class="n">qy</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the tune data without the points outside the defined windows</span>
+<span class="sd">    Arguments:</span>
+<span class="sd">        - qx: tuple of lower and upper bounds for Qx, e.g. (0.26, 0.28)</span>
+<span class="sd">        - qy: tuple of lower and upper bounds for Qy</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">plane</span> <span class="o">==</span> <span class="s1">&#39;X&#39;</span><span class="p">:</span>
+        <span class="n">clean</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">data</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">qx</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">data</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">qx</span><span class="p">[</span><span class="mi">0</span><span class="p">]))]</span>
+    <span class="k">if</span> <span class="n">plane</span> <span class="o">==</span> <span class="s1">&#39;Y&#39;</span><span class="p">:</span>
+        <span class="n">clean</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">data</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">qy</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">data</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">qy</span><span class="p">[</span><span class="mi">0</span><span class="p">]))]</span>
+
+    <span class="k">return</span> <span class="n">clean</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">remove_bad_tune_line</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">plane</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">):</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span> <span class="o">&gt;</span> <span class="n">low</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">data</span> <span class="o">&lt;</span> <span class="n">high</span><span class="p">)</span>
+    <span class="n">clean</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span>
+
+    <span class="n">removed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">removed</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Removed </span><span class="si">{</span><span class="n">removed</span><span class="si">}</span><span class="s1"> data points from a bad line&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">clean</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">remove_bad_time</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">t1</span><span class="p">):</span>
+    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">])</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="o">~</span><span class="p">((</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">t0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">t1</span><span class="p">))]</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Removed data from </span><span class="si">{</span><span class="n">t0</span><span class="si">}</span><span class="s1"> to </span><span class="si">{</span><span class="n">t1</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">reject_outliers</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">plane</span><span class="p">,</span> <span class="n">qx_window</span><span class="p">,</span> <span class="n">qy_window</span><span class="p">,</span> <span class="n">quartiles</span><span class="p">,</span> <span class="n">bad_tunes</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">tune_window</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">plane</span><span class="p">,</span> <span class="n">qx_window</span><span class="p">,</span> <span class="n">qy_window</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">q0</span><span class="p">,</span> <span class="n">q1</span> <span class="ow">in</span> <span class="n">bad_tunes</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">remove_bad_tune_line</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">plane</span><span class="p">,</span> <span class="n">q0</span><span class="p">,</span> <span class="n">q1</span><span class="p">)</span>
+
+    <span class="n">Q1</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">quartiles</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">Q3</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">quartiles</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">IQR</span> <span class="o">=</span> <span class="n">Q3</span> <span class="o">-</span> <span class="n">Q1</span>
+
+    <span class="n">fence_low</span> <span class="o">=</span> <span class="n">Q1</span> <span class="o">-</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">IQR</span>
+    <span class="n">fence_high</span> <span class="o">=</span> <span class="n">Q3</span> <span class="o">+</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">IQR</span>
+    <span class="n">data_cleaned</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">data</span> <span class="o">&gt;</span> <span class="n">fence_low</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">data</span> <span class="o">&lt;</span> <span class="n">fence_high</span><span class="p">)]</span>
+
+    <span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">data_cleaned</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data_cleaned</span><span class="p">,</span> <span class="n">std</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_cleaned_tune</span><span class="p">(</span><span class="n">tunes</span><span class="p">,</span> <span class="n">plane</span><span class="p">,</span> <span class="n">qx_window</span><span class="p">,</span> <span class="n">qy_window</span><span class="p">,</span> <span class="n">quartiles</span><span class="p">,</span> <span class="n">bad_tunes</span><span class="p">):</span>
+    <span class="n">cleaned_tunes</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="n">reject_outliers</span><span class="p">(</span><span class="n">tunes</span><span class="p">,</span> <span class="n">plane</span><span class="p">,</span> <span class="n">qx_window</span><span class="p">,</span> <span class="n">qy_window</span><span class="p">,</span> <span class="n">quartiles</span><span class="p">,</span> <span class="n">bad_tunes</span><span class="p">)</span>
+
+    <span class="c1"># if all the points are the same, the cleaned tunes would be empty</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cleaned_tunes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">tunes</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">tunes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">tunes</span><span class="p">):</span>  <span class="c1"># all the same</span>
+            <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">tunes</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">tunes</span><span class="p">),</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">cleaned_tunes</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">cleaned_tunes</span><span class="p">),</span> <span class="n">std</span>
+
+
+<div class="viewcode-block" id="merge_overlap">
+<a class="viewcode-back" href="../../../modules/cleaning.html#chroma_gui.cleaning.clean.merge_overlap">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">merge_overlap</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Merge the overlapping arrays contained in the given array &quot;&quot;&quot;</span>
+    <span class="c1"># Initialize and empty array of the maximum possible size</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+    <span class="n">res_counter</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># position of the last inserted data in res</span>
+    <span class="k">for</span> <span class="n">next_array</span> <span class="ow">in</span> <span class="n">array</span><span class="p">:</span>
+        <span class="n">n_res</span> <span class="o">=</span> <span class="n">res_counter</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">n_res</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">next_array</span><span class="p">))</span>  <span class="c1"># should be 2048 anyway</span>
+
+        <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># to iterate over res</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>  <span class="c1"># to iterate over next_array</span>
+            <span class="k">if</span> <span class="n">next_array</span><span class="p">[</span><span class="n">n</span><span class="o">-</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">res</span><span class="p">[</span><span class="n">n_res</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">j</span><span class="p">]:</span>
+                <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">data_to_add</span> <span class="o">=</span> <span class="n">next_array</span><span class="p">[</span><span class="n">j</span><span class="p">:]</span>
+        <span class="n">res</span><span class="p">[</span><span class="n">res_counter</span><span class="p">:</span><span class="n">res_counter</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">data_to_add</span><span class="p">)]</span> <span class="o">=</span> <span class="n">data_to_add</span>
+
+        <span class="n">res_counter</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_to_add</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">res</span><span class="p">[:</span><span class="n">res_counter</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="get_spectrogram">
+<a class="viewcode-back" href="../../../modules/cleaning.html#chroma_gui.cleaning.clean.get_spectrogram">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_spectrogram</span><span class="p">(</span><span class="n">raw_data</span><span class="p">,</span> <span class="n">start_plateau</span><span class="p">,</span> <span class="n">end_plateau</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">seconds_step</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Divide the plateau in chunks of x seconds and apply a spectrogram on it &quot;&quot;&quot;</span>
+    <span class="c1"># Create a mask to only get the data in the plateau</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">raw_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">variables</span> <span class="o">+</span> <span class="s1">&#39;H&#39;</span><span class="p">]</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">start_plateau</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">end_plateau</span><span class="o">.</span><span class="n">timestamp</span><span class="p">())</span>
+
+    <span class="c1"># Create chunks x seconds long</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">end_plateau</span> <span class="o">-</span> <span class="n">start_plateau</span><span class="p">)</span><span class="o">.</span><span class="n">seconds</span> <span class="o">/</span> <span class="n">seconds_step</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">chunks</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">end_plateau</span> <span class="o">-</span> <span class="n">start_plateau</span><span class="p">)</span><span class="o">.</span><span class="n">seconds</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The plateau is only </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2"> seconds long. It will be analyzed in one chunk&quot;</span><span class="p">)</span>
+        <span class="n">chunks</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">f</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">Sxx</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>
+    <span class="n">merged_data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># Do the spectrogram analysis for each plane</span>
+    <span class="k">for</span> <span class="n">plane</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">):</span>
+        <span class="c1"># Merge the overlapping data returned by Timber</span>
+        <span class="n">merged_data</span><span class="p">[</span><span class="n">plane</span><span class="p">]</span> <span class="o">=</span> <span class="n">merge_overlap</span><span class="p">(</span><span class="n">raw_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">variables</span> <span class="o">+</span> <span class="n">plane</span><span class="p">][</span><span class="s1">&#39;VALUE&#39;</span><span class="p">][</span><span class="n">mask</span><span class="p">])</span>
+        <span class="n">elements_per_chunk</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">merged_data</span><span class="p">[</span><span class="n">plane</span><span class="p">])</span> <span class="o">/</span> <span class="n">chunks</span><span class="p">)</span>
+
+        <span class="c1"># print(f&#39;  Plateau will be analyzed in {chunks} chunks, each of {seconds_step} seconds ({seconds_step*11_000} turns)&#39;)</span>
+        <span class="n">f</span><span class="p">[</span><span class="n">plane</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="n">plane</span><span class="p">],</span> <span class="n">Sxx</span><span class="p">[</span><span class="n">plane</span><span class="p">]</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">spectrogram</span><span class="p">(</span><span class="n">merged_data</span><span class="p">[</span><span class="n">plane</span><span class="p">],</span>
+                                                            <span class="n">nperseg</span><span class="o">=</span><span class="n">elements_per_chunk</span><span class="p">,</span>
+                                                            <span class="n">noverlap</span><span class="o">=</span><span class="n">elements_per_chunk</span> <span class="o">//</span> <span class="mi">8</span><span class="p">,</span>
+                                                            <span class="n">fs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">f</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">Sxx</span></div>
+
+
+
+<div class="viewcode-block" id="get_avg_tune_from_naff">
+<a class="viewcode-back" href="../../../modules/cleaning.html#chroma_gui.cleaning.clean.get_avg_tune_from_naff">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_avg_tune_from_naff</span><span class="p">(</span><span class="n">raw_data</span><span class="p">,</span> <span class="n">start_plateau</span><span class="p">,</span> <span class="n">end_plateau</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">seconds_step</span><span class="p">,</span> <span class="n">qx_window</span><span class="p">,</span> <span class="n">qy_window</span><span class="p">,</span>
+                           <span class="n">bad_tunes</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Divide the plateau in chunks of x seconds and use NAFF on it&quot;&quot;&quot;</span>
+    <span class="c1"># Create a mask to only get the data in the plateau</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">raw_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">variables</span> <span class="o">+</span> <span class="s1">&#39;H&#39;</span><span class="p">]</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">start_plateau</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;TIMESTAMP&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">end_plateau</span><span class="o">.</span><span class="n">timestamp</span><span class="p">())</span>
+    <span class="n">window</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;H&#39;</span><span class="p">:</span> <span class="n">qx_window</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">:</span> <span class="n">qy_window</span><span class="p">}</span>
+
+    <span class="c1"># Create chunks x seconds long</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">end_plateau</span> <span class="o">-</span> <span class="n">start_plateau</span><span class="p">)</span><span class="o">.</span><span class="n">seconds</span> <span class="o">/</span> <span class="n">seconds_step</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">chunks</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">end_plateau</span> <span class="o">-</span> <span class="n">start_plateau</span><span class="p">)</span><span class="o">.</span><span class="n">seconds</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The plateau is only </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2"> seconds long. It will be analyzed in one chunk&quot;</span><span class="p">)</span>
+        <span class="n">chunks</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="n">merged_data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">tunes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;H&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;V&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+    <span class="c1"># Get the tune via NAFF for each plane</span>
+    <span class="k">for</span> <span class="n">plane</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">):</span>
+        <span class="c1"># Merge the overlapping data returned by Timber</span>
+        <span class="n">merged_data</span><span class="p">[</span><span class="n">plane</span><span class="p">]</span> <span class="o">=</span> <span class="n">merge_overlap</span><span class="p">(</span><span class="n">raw_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">variables</span> <span class="o">+</span> <span class="n">plane</span><span class="p">][</span><span class="s1">&#39;VALUE&#39;</span><span class="p">][</span><span class="n">mask</span><span class="p">])</span>
+        <span class="n">elements_per_chunk</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">merged_data</span><span class="p">[</span><span class="n">plane</span><span class="p">])</span> <span class="o">/</span> <span class="n">chunks</span><span class="p">)</span>
+
+        <span class="c1"># Process each chunk</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">chunks</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">merged_data</span><span class="p">[</span><span class="n">plane</span><span class="p">][</span><span class="n">elements_per_chunk</span> <span class="o">*</span> <span class="n">i</span><span class="p">:</span> <span class="n">elements_per_chunk</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+            <span class="n">spectrum</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">nafflib</span><span class="o">.</span><span class="n">get_tunes</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">frequency</span> <span class="ow">in</span> <span class="n">spectrum</span><span class="p">:</span>
+                <span class="n">in_window</span> <span class="o">=</span> <span class="n">window</span><span class="p">[</span><span class="n">plane</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">frequency</span> <span class="o">&lt;=</span> <span class="n">window</span><span class="p">[</span><span class="n">plane</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">not_bad_line</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">([(</span><span class="n">bad_low</span> <span class="o">&lt;=</span> <span class="n">frequency</span> <span class="o">&lt;=</span> <span class="n">bad_high</span><span class="p">)</span> <span class="k">for</span> <span class="n">bad_low</span><span class="p">,</span> <span class="n">bad_high</span> <span class="ow">in</span> <span class="n">bad_tunes</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">in_window</span> <span class="ow">and</span> <span class="n">not_bad_line</span><span class="p">:</span>
+                    <span class="n">tunes</span><span class="p">[</span><span class="n">plane</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">frequency</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+        <span class="c1"># Discard the measurement for both planes if there&#39;s no usable data</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tunes</span><span class="p">[</span><span class="n">plane</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1">#tunes[plane] = (None, None)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;H&#39;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="s1">&#39;V&#39;</span><span class="p">:</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)}</span>
+
+
+    <span class="n">tune_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">tunes</span><span class="p">[</span><span class="s1">&#39;H&#39;</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">tunes</span><span class="p">[</span><span class="s1">&#39;H&#39;</span><span class="p">])</span>
+    <span class="n">tune_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">tunes</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">tunes</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">tune_x</span><span class="p">,</span> <span class="n">tune_y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;H&#39;</span><span class="p">:</span> <span class="n">tune_x</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">:</span> <span class="n">tune_y</span><span class="p">}</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_max_peak</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">,</span> <span class="n">plane</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">bad_tunes</span><span class="p">):</span>
+    <span class="c1"># Plot the maximum peaks for each plane</span>
+    <span class="c1"># Find the peaks via scipy</span>
+    <span class="n">peaks</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">find_peaks</span><span class="p">(</span><span class="n">y_data</span><span class="p">,</span>  <span class="c1"># power density data</span>
+                                 <span class="n">distance</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>  <span class="c1"># minimum distance between peaks</span>
+                                 <span class="p">)</span>
+    <span class="c1"># Get a window to only get the interesting peaks</span>
+    <span class="n">tune_window</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_data</span><span class="p">[</span><span class="n">peaks</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">window</span><span class="p">[</span><span class="n">plane</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x_data</span><span class="p">[</span><span class="n">peaks</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">window</span><span class="p">[</span><span class="n">plane</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># Remove the bad lines</span>
+    <span class="k">for</span> <span class="n">bad_low</span><span class="p">,</span> <span class="n">bad_high</span> <span class="ow">in</span> <span class="n">bad_tunes</span><span class="p">:</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="o">~</span><span class="p">((</span><span class="n">x_data</span><span class="p">[</span><span class="n">peaks</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">bad_low</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">x_data</span><span class="p">[</span><span class="n">peaks</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">bad_high</span><span class="p">))</span>
+        <span class="n">tune_window</span> <span class="o">=</span> <span class="n">tune_window</span> <span class="o">&amp;</span> <span class="n">mask</span>
+
+    <span class="c1"># Get the peak amplitude associated to a tune (e.g. 2.6)</span>
+    <span class="c1"># Sort it in reverse order</span>
+    <span class="n">peak_amp</span><span class="p">,</span> <span class="n">tunes</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">y_data</span><span class="p">[</span><span class="n">peaks</span><span class="p">][</span><span class="n">tune_window</span><span class="p">],</span>
+                                      <span class="n">x_data</span><span class="p">[</span><span class="n">peaks</span><span class="p">][</span><span class="n">tune_window</span><span class="p">]),</span>
+                                  <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">tunes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_avg_tune_from_spectrogram</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">Sxx</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">,</span> <span class="n">qx_window</span><span class="p">,</span> <span class="n">qy_window</span><span class="p">,</span> <span class="n">bad_tunes</span><span class="p">):</span>
+    <span class="n">tunes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;H&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;V&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+    <span class="n">avg_tunes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;H&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;V&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+    <span class="k">for</span> <span class="n">plane</span> <span class="ow">in</span> <span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">:</span>
+        <span class="c1"># print(f&#39;Plane {plane}:&#39;)</span>
+        <span class="c1"># Iterate on the segments</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Sxx</span><span class="p">[</span><span class="n">plane</span><span class="p">][</span><span class="mi">0</span><span class="p">])):</span>
+            <span class="c1"># Filter the data</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">medfilt</span><span class="p">(</span><span class="n">Sxx</span><span class="p">[</span><span class="n">plane</span><span class="p">][:,</span> <span class="n">i</span><span class="p">],</span>
+                                  <span class="n">kernel_size</span><span class="o">=</span><span class="n">kernel_size</span><span class="p">)</span>
+            <span class="c1"># Get the tune</span>
+            <span class="n">window</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;H&#39;</span><span class="p">:</span> <span class="n">qx_window</span><span class="p">,</span>
+                      <span class="s1">&#39;V&#39;</span><span class="p">:</span> <span class="n">qy_window</span>
+                      <span class="p">}</span>
+            <span class="n">tune</span> <span class="o">=</span> <span class="n">get_max_peak</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">plane</span><span class="p">],</span> <span class="n">data</span><span class="p">,</span> <span class="n">plane</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">bad_tunes</span><span class="p">)</span>
+            <span class="n">tunes</span><span class="p">[</span><span class="n">plane</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tune</span><span class="p">)</span>
+
+        <span class="n">avg</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tunes</span><span class="p">[</span><span class="n">plane</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">tunes</span><span class="p">[</span><span class="n">plane</span><span class="p">])</span>
+
+        <span class="c1"># Check that the error bar is reasonable. If it&#39;s too big, discard it.</span>
+        <span class="k">if</span> <span class="n">std</span> <span class="o">&lt;</span> <span class="mf">2e-3</span> <span class="ow">and</span> <span class="n">std</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">avg_tunes</span><span class="p">[</span><span class="n">plane</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">avg</span><span class="p">,</span> <span class="n">std</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Plateau not taken into account as std is large or zero: </span><span class="si">{</span><span class="n">std</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">avg_tunes</span><span class="p">[</span><span class="n">plane</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">avg_tunes</span>
+
+
+<div class="viewcode-block" id="add_points">
+<a class="viewcode-back" href="../../../modules/cleaning.html#chroma_gui.cleaning.clean.add_points">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_points</span><span class="p">(</span><span class="n">tune_x</span><span class="p">,</span> <span class="n">tune_y</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">out_tfs</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">qx_window</span><span class="p">,</span> <span class="n">qy_window</span><span class="p">,</span> <span class="n">quartiles</span><span class="p">,</span> <span class="n">plateau_length</span><span class="p">,</span> <span class="n">bad_tunes</span><span class="p">,</span>
+               <span class="n">method</span><span class="o">=</span><span class="s2">&quot;bbq&quot;</span><span class="p">,</span> <span class="n">raw_bbq_data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">seconds_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">beam</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the tune from one of the defined methods and adds it to the TFS</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Length of plateau</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="n">fp</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="c1"># If the plateau is shorter than (arbitrary) 15 measurements, drop it</span>
+    <span class="k">if</span> <span class="n">length</span> <span class="o">&lt;</span> <span class="n">plateau_length</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Not logging plateau because of its short length: </span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">fp</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out_tfs</span><span class="p">,</span> <span class="n">j</span>
+
+    <span class="c1"># Use the selected method to compute the tune</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;bbq&quot;</span><span class="p">:</span>  <span class="c1"># Use the already processed tune from TIMBER</span>
+        <span class="n">tune_avg_x</span><span class="p">,</span> <span class="n">std_x</span> <span class="o">=</span> <span class="n">get_cleaned_tune</span><span class="p">(</span><span class="n">tune_x</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="n">qx_window</span><span class="p">,</span> <span class="n">qy_window</span><span class="p">,</span> <span class="n">quartiles</span><span class="p">,</span> <span class="n">bad_tunes</span><span class="p">)</span>
+        <span class="n">tune_avg_y</span><span class="p">,</span> <span class="n">std_y</span> <span class="o">=</span> <span class="n">get_cleaned_tune</span><span class="p">(</span><span class="n">tune_y</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="n">qx_window</span><span class="p">,</span> <span class="n">qy_window</span><span class="p">,</span> <span class="n">quartiles</span><span class="p">,</span> <span class="n">bad_tunes</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;raw_bbq_spectrogram&quot;</span><span class="p">:</span>  <span class="c1"># Do our own magic on the raw BBQ data using a spectrogram</span>
+        <span class="n">start_plateau</span> <span class="o">=</span> <span class="n">isoparse</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">][</span><span class="n">fp</span><span class="p">])</span>
+        <span class="n">end_plateau</span> <span class="o">=</span> <span class="n">isoparse</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">][</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;LHC.BQBBQ.CONTINUOUS_HS.B</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">:ACQ_DATA_&#39;</span>
+        <span class="n">f</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">Sxx</span> <span class="o">=</span> <span class="n">get_spectrogram</span><span class="p">(</span><span class="n">raw_bbq_data</span><span class="p">,</span> <span class="n">start_plateau</span><span class="p">,</span> <span class="n">end_plateau</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">seconds_step</span><span class="p">)</span>
+        <span class="n">tunes_from_raw</span> <span class="o">=</span> <span class="n">get_avg_tune_from_spectrogram</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">Sxx</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">,</span> <span class="n">qx_window</span><span class="p">,</span> <span class="n">qy_window</span><span class="p">,</span> <span class="n">bad_tunes</span><span class="p">)</span>
+        <span class="n">tune_avg_x</span><span class="p">,</span> <span class="n">std_x</span> <span class="o">=</span> <span class="n">tunes_from_raw</span><span class="p">[</span><span class="s1">&#39;H&#39;</span><span class="p">]</span>
+        <span class="n">tune_avg_y</span><span class="p">,</span> <span class="n">std_y</span> <span class="o">=</span> <span class="n">tunes_from_raw</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;raw_bbq_naff&quot;</span><span class="p">:</span>
+        <span class="n">start_plateau</span> <span class="o">=</span> <span class="n">isoparse</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">][</span><span class="n">fp</span><span class="p">])</span>
+        <span class="n">end_plateau</span> <span class="o">=</span> <span class="n">isoparse</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">][</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">variables</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;LHC.BQBBQ.CONTINUOUS_HS.B</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">:ACQ_DATA_&#39;</span>
+        <span class="n">tunes_from_raw</span> <span class="o">=</span> <span class="n">get_avg_tune_from_naff</span><span class="p">(</span><span class="n">raw_bbq_data</span><span class="p">,</span> <span class="n">start_plateau</span><span class="p">,</span> <span class="n">end_plateau</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">seconds_step</span><span class="p">,</span>
+                                                <span class="n">qx_window</span><span class="p">,</span> <span class="n">qy_window</span><span class="p">,</span> <span class="n">bad_tunes</span><span class="p">)</span>
+        <span class="n">tune_avg_x</span><span class="p">,</span> <span class="n">std_x</span> <span class="o">=</span> <span class="n">tunes_from_raw</span><span class="p">[</span><span class="s1">&#39;H&#39;</span><span class="p">]</span>
+        <span class="n">tune_avg_y</span><span class="p">,</span> <span class="n">std_y</span> <span class="o">=</span> <span class="n">tunes_from_raw</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Reject short plateaus that have no std</span>
+    <span class="k">if</span> <span class="n">std_x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">std_y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Not logging plateau because of equal tune data: </span><span class="si">{</span><span class="n">tune_x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Time: </span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">][</span><span class="n">fp</span><span class="p">]</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">][</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out_tfs</span><span class="p">,</span> <span class="n">j</span>
+
+    <span class="c1"># add the first point of the plateau</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">tfs</span><span class="o">.</span><span class="n">TfsDataFrame</span><span class="p">([[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">][</span><span class="n">fp</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;F_RF&#39;</span><span class="p">][</span><span class="n">fp</span><span class="p">],</span> <span class="n">tune_avg_x</span><span class="p">,</span> <span class="n">tune_avg_y</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;DPP&#39;</span><span class="p">][</span><span class="n">fp</span><span class="p">],</span> <span class="n">std_x</span><span class="p">,</span> <span class="n">std_y</span><span class="p">]],</span>
+                         <span class="n">columns</span><span class="o">=</span><span class="n">out_tfs</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="n">out_tfs</span> <span class="o">=</span> <span class="n">append</span><span class="p">(</span><span class="n">out_tfs</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">new_headers</span><span class="o">=</span><span class="n">out_tfs</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># And the last point</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">tfs</span><span class="o">.</span><span class="n">TfsDataFrame</span><span class="p">(</span>
+        <span class="p">[[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">][</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;F_RF&#39;</span><span class="p">][</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">tune_avg_x</span><span class="p">,</span> <span class="n">tune_avg_y</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;DPP&#39;</span><span class="p">][</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">std_x</span><span class="p">,</span> <span class="n">std_y</span><span class="p">]],</span>
+        <span class="n">columns</span><span class="o">=</span><span class="n">out_tfs</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="n">out_tfs</span> <span class="o">=</span> <span class="n">append</span><span class="p">(</span><span class="n">out_tfs</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">new_headers</span><span class="o">=</span><span class="n">out_tfs</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">out_tfs</span><span class="p">,</span> <span class="n">j</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">clean_data_for_beam</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">qx_window</span><span class="p">,</span> <span class="n">qy_window</span><span class="p">,</span> <span class="n">quartiles</span><span class="p">,</span> <span class="n">plateau_length</span><span class="p">,</span>
+                        <span class="n">bad_tunes</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">raw_bbq_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">seconds_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">beam</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">signal</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">tfs</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">input_file</span><span class="p">)</span>
+    <span class="n">last_frf</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;F_RF&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;bbq&quot;</span><span class="p">:</span>  <span class="c1"># can be &quot;bbq&quot;, &quot;raw_bbq_naff&quot;, &quot;raw_bbq_spectrogram&quot;</span>
+        <span class="n">raw_data</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1">#raw_data = pd.read_pickle(raw_bbq_file)</span>
+        <span class="n">raw_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">raw_bbq_file</span><span class="p">)</span>
+
+    <span class="n">tune_x</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># temporary list to hold the tune to further clean</span>
+    <span class="n">tune_y</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Create the resulting tfs</span>
+    <span class="n">out_tfs</span> <span class="o">=</span> <span class="n">tfs</span><span class="o">.</span><span class="n">TfsDataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="n">headers_backup</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">headers</span>
+    <span class="n">out_tfs</span><span class="p">[</span><span class="s1">&#39;QXERR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">out_tfs</span><span class="p">[</span><span class="s1">&#39;QYERR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">fp</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># first point of the plateau</span>
+    <span class="c1"># out_tfs.loc[0] = data.loc[0]</span>
+
+    <span class="c1"># Clean the data given a time</span>
+    <span class="c1"># t0 = datetime(2022, 5, 27, 20, 47, 22)</span>
+    <span class="c1"># t1 = datetime(2022, 5, 27, 20, 49, 41)</span>
+    <span class="c1"># data = remove_bad_time(data, t0, t1)</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;F_RF&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">last_frf</span><span class="p">:</span>
+            <span class="n">tune_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;QX&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">tune_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;QY&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># new plateau</span>
+            <span class="n">out_tfs</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">add_points</span><span class="p">(</span><span class="n">tune_x</span><span class="p">,</span> <span class="n">tune_y</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">out_tfs</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">qx_window</span><span class="p">,</span> <span class="n">qy_window</span><span class="p">,</span> <span class="n">quartiles</span><span class="p">,</span>
+                                    <span class="n">plateau_length</span><span class="p">,</span> <span class="n">bad_tunes</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">raw_data</span><span class="p">,</span> <span class="n">seconds_step</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">,</span> <span class="n">beam</span><span class="p">,</span>
+                                    <span class="n">output_path</span><span class="p">)</span>
+
+            <span class="c1"># Reset the counters</span>
+            <span class="n">tune_x</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">tune_y</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">fp</span> <span class="o">=</span> <span class="n">i</span>
+
+        <span class="n">last_frf</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;F_RF&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="c1"># Fire the progress signal to update the GUI, as a rounded down percentage</span>
+        <span class="n">signal</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span>
+
+    <span class="c1"># Last point</span>
+    <span class="n">out_tfs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">add_points</span><span class="p">(</span><span class="n">tune_x</span><span class="p">,</span> <span class="n">tune_y</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">fp</span><span class="p">,</span> <span class="n">out_tfs</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">qx_window</span><span class="p">,</span> <span class="n">qy_window</span><span class="p">,</span> <span class="n">quartiles</span><span class="p">,</span>
+                            <span class="n">plateau_length</span><span class="p">,</span> <span class="n">bad_tunes</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">raw_data</span><span class="p">,</span> <span class="n">seconds_step</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">,</span> <span class="n">beam</span><span class="p">,</span> <span class="n">output_path</span><span class="p">)</span>
+
+    <span class="c1"># TFS can&#39;t write dates, convert it to str</span>
+    <span class="n">out_tfs</span> <span class="o">=</span> <span class="n">tfs</span><span class="o">.</span><span class="n">TfsDataFrame</span><span class="p">(</span><span class="n">out_tfs</span><span class="o">.</span><span class="n">astype</span><span class="p">({</span><span class="s1">&#39;TIME&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">}))</span>
+    <span class="c1"># Restore the headers</span>
+    <span class="n">out_tfs</span><span class="o">.</span><span class="n">headers</span> <span class="o">=</span> <span class="n">headers_backup</span>
+
+    <span class="k">if</span> <span class="n">beam</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out_tfs</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;BEAM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;B</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="n">tfs</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">output_path</span> <span class="o">/</span> <span class="n">output_file</span><span class="p">,</span> <span class="n">out_tfs</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
