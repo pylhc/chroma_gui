@@ -47,7 +47,6 @@ classifiers = [
 dependencies = [
     "matplotlib",
     "tfs-pandas",
-    "pytimber",
     "pyqt5 >= 5.14",  # for Qt.MarkdownText
     "pandas",
     "numpy",
@@ -68,8 +67,12 @@ doc = [
   "sphinx >= 7.0",
   "sphinx_rtd_theme >= 2.0",
 ]
+cern = [
+    "pytimber",
+]
 
 all = [
+  "chroma_gui[cern]",
   "chroma_gui[test]",
   "chroma_gui[doc]",
 ]

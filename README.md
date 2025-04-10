@@ -6,7 +6,7 @@ The Chromaticity GUI is a tool to compute non-linear chromaticity via measuremen
 ## Running via acc-py environment
 
 * [Create a virtual environment via `acc-py`](https://pylhc.github.io/packages/development/howto_venv.html) if you do not have one already.
-* Install the package via `pip install chroma-gui`
+* Install the package via `pip install chroma-gui[cern]` or `pip install chroma-gui[all]`
 * Run the GUI via `python -m chroma_gui`
 
 ## Running via acc-py apps
