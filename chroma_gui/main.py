@@ -1,82 +1,90 @@
-import time
-from datetime import datetime
-import typing
-import ast
-import sys
-import json
-from json import JSONDecodeError
-import tfs
-from typing import Tuple, List, Dict
-import pyperclip
-import matplotlib.pyplot as plt
+""" 
+Main
+----
 
+Main module for the chroma-gui.
+"""
+from __future__ import annotations
+
+import ast
+import json
 import logging
-from pathlib import Path
-from dataclasses import dataclass, field, fields, asdict
+import sys
 import traceback
+import typing
+from dataclasses import dataclass, field, fields
+from datetime import datetime
+from json import JSONDecodeError
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import pyperclip
 
 # PyQt libraries
 import qtawesome as qta
-from PyQt5.QtGui import QPalette, QStandardItem, QFontMetrics
+import tfs
+from PyQt5 import QtTest, uic
 from PyQt5.QtCore import (
-    QDateTime,
-    pyqtSignal,
-    QThread,
     QAbstractTableModel,
-    QModelIndex,
-    Qt,
+    QDateTime,
     QEvent,
+    QModelIndex,
     QSize,
+    Qt,
+    QThread,
+    pyqtSignal,
     pyqtSlot,
 )
-from PyQt5 import uic, QtTest
+from PyQt5.QtGui import QFontMetrics, QPalette, QStandardItem
 from PyQt5.QtWidgets import (
-    QLabel,
-    QMainWindow,
     QApplication,
+    QComboBox,
     QDialog,
     QFileDialog,
-    QMessageBox,
-    QTableView,
-    QSizePolicy,
-    QHeaderView,
-    QComboBox,
-    QStyledItemDelegate,
-    qApp,
-    QListWidgetItem,
     QHBoxLayout,
+    QHeaderView,
+    QLabel,
     QLayout,
+    QListWidgetItem,
+    QMainWindow,
+    QMessageBox,
+    QSizePolicy,
+    QStyledItemDelegate,
+    QTableView,
+    qApp,
 )
+
+import chroma_gui.cleaning.constants as cleaning_constants
+import chroma_gui.timber as timber
 
 # Chroma-GUI specific libraries
 from chroma_gui import __version__ as chroma_gui_version
-import chroma_gui.timber as timber
-from chroma_gui.timber import (
-    get_variables_names_from_csv,
-    read_variables_from_csv,
+from chroma_gui.chromaticity import (
+    construct_chroma_tfs,
+    get_chromaticity,
+    get_chromaticity_df_with_notation,
+    get_chromaticity_formula,
+    get_maximum_chromaticity,
 )
-from chroma_gui.plotting.widget import MplWidget, mathTex_to_QPixmap
+from chroma_gui.cleaning import clean, plateau
+from chroma_gui.constants import CHROMA_COEFFS, CHROMA_FILE, CONFIG, RESPONSE_MATRICES
+from chroma_gui.corrections import response_matrix
 from chroma_gui.plotting import (
+    plot_chromaticity,
     plot_dpp,
     plot_freq,
     plot_timber,
-    plot_chromaticity,
     save_chromaticity_plot,
 )
-from chroma_gui.cleaning import plateau, clean
-from chroma_gui.chromaticity import (
-    get_chromaticity,
-    construct_chroma_tfs,
-    get_maximum_chromaticity,
-    get_chromaticity_df_with_notation,
-    get_chromaticity_formula
+from chroma_gui.plotting.widget import MplWidget, mathTex_to_QPixmap
+from chroma_gui.timber import (
+    get_variables_names_from_csv,
 )
-import chroma_gui.cleaning.constants as cleaning_constants
-from chroma_gui.constants import CHROMA_FILE, RESPONSE_MATRICES, CONFIG, CHROMA_COEFFS
-from chroma_gui.corrections import response_matrix
 
-logger = logging.getLogger('chroma_GUI')
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger("chroma_GUI")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 
 RESOURCES = Path(__file__).parent / "resources"
 
@@ -92,7 +100,7 @@ class ChromaticityTableModel(QAbstractTableModel):
         self._dataframe = dataframe
 
     def rowCount(self, parent=QModelIndex()) -> int:
-        """ Override method from QAbstractTableModel
+        """Override method from QAbstractTableModel
 
         Return row count of the pandas DataFrame
         """
@@ -149,9 +157,10 @@ class Measurement:
     """
     holds measurement specific data such as paths and measurement times
     """
+
     # Paths for the measurement itself and the two beam models
     path: Path
-    model_path: Dict[str, Path] = field(default_factory=lambda: {"B1": None, "B2": None})
+    model_path: dict[str, Path] = field(default_factory=lambda: {"B1": None, "B2": None})
 
     # Metadata about the measurement
     description: str = None
@@ -166,11 +175,11 @@ class Measurement:
     cleaning_end_time: datetime = None
 
     @classmethod
-    def from_folder(cls: typing.Type["Measurement"], path: Path):
+    def from_folder(cls: Measurement, path: Path):
         """
         Returns a Measurement object created via the "measurement.info" contained in the given folder
         """
-        measurement_info_path = Path(path) / 'measurement.info'
+        measurement_info_path = Path(path) / "measurement.info"
         measurement_info = json.load(open(measurement_info_path))
 
         measurement = cls(**measurement_info)
@@ -184,7 +193,7 @@ class Measurement:
                 setattr(measurement, field.name, datetime.fromisoformat(value))
             elif field.type is Path:  # Paths
                 setattr(measurement, field.name, Path(value))
-            elif field.type is Dict[str, Path]:  # Dictionaries with Paths
+            elif field.type is dict[str, Path]:  # Dictionaries with Paths
                 for key in value.keys():
                     getattr(measurement, field.name)[key] = Path(value[key])
 
@@ -193,10 +202,9 @@ class Measurement:
     def get_alpha(self):
         alpha = {"B1": None, "B2": None}
         for beam in alpha.keys():
-            twiss = tfs.read(Path(self.model_path[beam]) / 'twiss.dat')
-            alpha[beam] = twiss.headers['ALFA']
+            twiss = tfs.read(Path(self.model_path[beam]) / "twiss.dat")
+            alpha[beam] = twiss.headers["ALFA"]
         return alpha
-
 
     def get_timber_status(self):
         """
@@ -239,14 +247,14 @@ class Measurement:
         path_chroma = Path(self.path / CHROMA_FILE)
         if path_chroma.exists():
             chroma_tfs = tfs.read(path_chroma)
-            return True, (chroma_tfs.headers['MIN_FIT_ORDER'], chroma_tfs.headers['MAX_FIT_ORDER'])
+            return True, (chroma_tfs.headers["MIN_FIT_ORDER"], chroma_tfs.headers["MAX_FIT_ORDER"])
         return False, None
 
     def save_as_json(self):
         """
         Saves the measurement fields as json
         """
-        measurement_info_path = Path(self.path) / 'measurement.info'
+        measurement_info_path = Path(self.path) / "measurement.info"
 
         # Converts the types to something json can serialize
         data = {}
@@ -259,14 +267,14 @@ class Measurement:
                 data[field.name] = value.isoformat()
             elif field.type is Path:  # Paths
                 data[field.name] = str(value)
-            elif field.type is Dict[str, Path]:  # Dictionaries with Paths
+            elif field.type is dict[str, Path]:  # Dictionaries with Paths
                 data[field.name] = {}
                 for key in value.keys():
                     data[field.name][key] = str(value[key])
             else:
                 data[field.name] = value
 
-        json.dump(data, open(measurement_info_path, 'w'), indent=4)
+        json.dump(data, open(measurement_info_path, "w"), indent=4)
 
 
 class ExternalProgram(QThread):
@@ -301,7 +309,7 @@ class ExternalProgram(QThread):
         # If the user tells us to extract the RAW data, save it
         if main_window.rawBBQCheckBox.isChecked():
             data = timber.extract.extract_raw_variables(start, end)
-            #timber.extract.save_as_pickle(measurement_path, data)
+            # timber.extract.save_as_pickle(measurement_path, data)
             timber.extract.save_as_hdf(measurement_path, data)
 
         logger.info("PyTimber extraction finished")
@@ -309,26 +317,63 @@ class ExternalProgram(QThread):
 
     def createPlateaus(self):
         path, filename, rf_beam, start, end, nominal_rf, alpha = self.args
-        plateau.create_plateau(path, filename, rf_beam, start_time=start,
-                               end_time=end, nominal_rf=nominal_rf, alpha=alpha)
+        plateau.create_plateau(
+            path,
+            filename,
+            rf_beam,
+            start_time=start,
+            end_time=end,
+            nominal_rf=nominal_rf,
+            alpha=alpha,
+        )
         self.finished.emit()
 
     def cleanTune(self):
-        (input_file_B1, input_file_B2, output_path, output_filename_B1, output_filename_B2, qx_window, qy_window,
-         quartiles, plateau_length, bad_tunes) = self.args
+        (
+            input_file_B1,
+            input_file_B2,
+            output_path,
+            output_filename_B1,
+            output_filename_B2,
+            qx_window,
+            qy_window,
+            quartiles,
+            plateau_length,
+            bad_tunes,
+        ) = self.args
 
         # Reset the progress bar
         self.base_progress = 0
         self.progress_callback(0)
 
         # Beam 1
-        clean.clean_data_for_beam(input_file_B1, output_path, output_filename_B1, qx_window, qy_window, quartiles,
-                                  plateau_length, bad_tunes, method="bbq", signal=self.progress)
+        clean.clean_data_for_beam(
+            input_file_B1,
+            output_path,
+            output_filename_B1,
+            qx_window,
+            qy_window,
+            quartiles,
+            plateau_length,
+            bad_tunes,
+            method="bbq",
+            signal=self.progress,
+        )
 
         # Beam 2
         self.base_progress = 100  # max value is 200
-        clean.clean_data_for_beam(input_file_B2, output_path, output_filename_B2, qx_window, qy_window, quartiles,
-                                  plateau_length, bad_tunes, method="bbq", signal=self.progress)
+        clean.clean_data_for_beam(
+            input_file_B2,
+            output_path,
+            output_filename_B2,
+            qx_window,
+            qy_window,
+            quartiles,
+            plateau_length,
+            bad_tunes,
+            method="bbq",
+            signal=self.progress,
+        )
 
         self.progress_callback(100)
         self.finished.emit()
@@ -339,8 +384,20 @@ class ExternalProgram(QThread):
         main_window.cleaningProgressBar.setValue(self.base_progress + int(progress))
 
     def cleanTuneRawBBQ(self):
-        (input_file, input_file_raw, output_path, output_filename_B1, output_filename_B2, qx_window, qy_window,
-         plateau_length, seconds_step, kernel_size, method, bad_tunes) = self.args
+        (
+            input_file,
+            input_file_raw,
+            output_path,
+            output_filename_B1,
+            output_filename_B2,
+            qx_window,
+            qy_window,
+            plateau_length,
+            seconds_step,
+            kernel_size,
+            method,
+            bad_tunes,
+        ) = self.args
 
         quartiles = None
 
@@ -349,15 +406,41 @@ class ExternalProgram(QThread):
         self.progress_callback(0)
 
         # Beam 1
-        clean.clean_data_for_beam(input_file, output_path, output_filename_B1, qx_window, qy_window, quartiles,
-                                  plateau_length, bad_tunes, method=method, raw_bbq_file=input_file_raw,
-                                  seconds_step=seconds_step, kernel_size=kernel_size, beam=1, signal=self.progress)
+        clean.clean_data_for_beam(
+            input_file,
+            output_path,
+            output_filename_B1,
+            qx_window,
+            qy_window,
+            quartiles,
+            plateau_length,
+            bad_tunes,
+            method=method,
+            raw_bbq_file=input_file_raw,
+            seconds_step=seconds_step,
+            kernel_size=kernel_size,
+            beam=1,
+            signal=self.progress,
+        )
 
         # Beam 2
         self.base_progress = 100
-        clean.clean_data_for_beam(input_file, output_path, output_filename_B2, qx_window, qy_window, quartiles,
-                                  plateau_length, bad_tunes, method=method, raw_bbq_file=input_file_raw,
-                                  seconds_step=seconds_step, kernel_size=kernel_size, beam=2, signal=self.progress)
+        clean.clean_data_for_beam(
+            input_file,
+            output_path,
+            output_filename_B2,
+            qx_window,
+            qy_window,
+            quartiles,
+            plateau_length,
+            bad_tunes,
+            method=method,
+            raw_bbq_file=input_file_raw,
+            seconds_step=seconds_step,
+            kernel_size=kernel_size,
+            beam=2,
+            signal=self.progress,
+        )
 
         self.progress_callback(100)
         self.finished.emit()
@@ -370,26 +453,36 @@ class ExternalProgram(QThread):
 
         # Beam 1
         if input_file_B1 is not None:
-            chroma_tfs = get_chromaticity(input_file_B1, chroma_tfs, dpp_range, fit_orders, 'X')
-            chroma_tfs = get_chromaticity(input_file_B1, chroma_tfs, dpp_range, fit_orders, 'Y')
+            chroma_tfs = get_chromaticity(input_file_B1, chroma_tfs, dpp_range, fit_orders, "X")
+            chroma_tfs = get_chromaticity(input_file_B1, chroma_tfs, dpp_range, fit_orders, "Y")
 
         # Beam 2
         if input_file_B2 is not None:
-            chroma_tfs = get_chromaticity(input_file_B2, chroma_tfs, dpp_range, fit_orders, 'X')
-            chroma_tfs = get_chromaticity(input_file_B2, chroma_tfs, dpp_range, fit_orders, 'Y')
+            chroma_tfs = get_chromaticity(input_file_B2, chroma_tfs, dpp_range, fit_orders, "X")
+            chroma_tfs = get_chromaticity(input_file_B2, chroma_tfs, dpp_range, fit_orders, "Y")
 
         tfs.write(output_path / CHROMA_FILE, chroma_tfs)
 
         self.finished.emit()
 
     def computeCorrections(self):
-        optics_paths, measurement_path, method, observables, chroma_factor, rcond, keep_dq3_constant,\
-        keep_rdt_constant, clean_nan, clean_outliers, clean_IR_number, optics_name = self.args
+        (
+            optics_paths,
+            measurement_path,
+            method,
+            observables,
+            chroma_factor,
+            rcond,
+            keep_dq3_constant,
+            keep_rdt_constant,
+            clean_nan,
+            clean_outliers,
+            clean_IR_number,
+            optics_name,
+        ) = self.args
 
-        text = {1: '',
-                2: ''}
-        corr_sum = {1: 0,
-                    2: 0}
+        text = {1: "", 2: ""}
+        corr_sum = {1: 0, 2: 0}
         if method == "Global":
             chromaticity_values = tfs.read(measurement_path / CHROMA_FILE)
             coefficients = json.load(open(CHROMA_COEFFS))
@@ -399,17 +492,22 @@ class ExternalProgram(QThread):
                     order = obs.split("DQ")[1]
 
                     # Get the measured values
-                    mask = chromaticity_values['BEAM'] == f'B{beam}'
-                    mask = mask & (chromaticity_values['UP_TO_ORDER'] == chromaticity_values['UP_TO_ORDER'].max())
-                    mask_x = mask & (chromaticity_values['AXIS'] == 'X')
-                    mask_y = mask & (chromaticity_values['AXIS'] == 'Y')
-                    dqx = chromaticity_values[mask_x][f'Q{order}'].values[0]
-                    dqy = chromaticity_values[mask_y][f'Q{order}'].values[0]
+                    mask = chromaticity_values["BEAM"] == f"B{beam}"
+                    mask = mask & (
+                        chromaticity_values["UP_TO_ORDER"]
+                        == chromaticity_values["UP_TO_ORDER"].max()
+                    )
+                    mask_x = mask & (chromaticity_values["AXIS"] == "X")
+                    mask_y = mask & (chromaticity_values["AXIS"] == "Y")
+                    dqx = chromaticity_values[mask_x][f"Q{order}"].values[0]
+                    dqy = chromaticity_values[mask_y][f"Q{order}"].values[0]
 
                     # The chromaticity is simply an affine function that depends on the corrector strength
                     # Get the point where dqx and dqy cross to minimize both planes
-                    dq_corr = (dqy - dqx) / (coefficients[str(beam)][order][0] - coefficients[str(beam)][order][1])
-                    text[beam] = text[beam] + f'DQ{order}Corrector.B{beam} = {dq_corr:6.4f} ;\n'
+                    dq_corr = (dqy - dqx) / (
+                        coefficients[str(beam)][order][0] - coefficients[str(beam)][order][1]
+                    )
+                    text[beam] = text[beam] + f"DQ{order}Corrector.B{beam} = {dq_corr:6.4f} ;\n"
 
                     # Update the sum
                     corr_sum[beam] += dq_corr
@@ -420,20 +518,42 @@ class ExternalProgram(QThread):
                 logger.info(f"Computing corrections for Beam {beam}")
 
                 # Get the strengths of the magnets used for simulation
-                strengths_mcd = json.load(open(RESOURCES / "corrections" / optics_name / "normal_decapole" / "strengths.json"))
+                strengths_mcd = json.load(
+                    open(
+                        RESOURCES
+                        / "corrections"
+                        / optics_name
+                        / "normal_decapole"
+                        / "strengths.json"
+                    )
+                )
 
                 # Create the basic response matrix object
                 simulations = Path(RESOURCES / "corrections" / optics_name / "normal_decapole")
-                resp = response_matrix.ResponseMatrix(strengths_mcd[str(beam)], simulations, beam=beam)
+                resp = response_matrix.ResponseMatrix(
+                    strengths_mcd[str(beam)], simulations, beam=beam
+                )
 
                 # Add the observables
                 # Add the RDT to the response matrix
                 if keep_rdt_constant:
-                    model_path = RESOURCES / "corrections" / optics_name / "normal_decapole" / f"twiss_b{beam}.tfs"
-                    resp.add_zero_rdt_observable(model_path, 'f1004_x')
+                    model_path = (
+                        RESOURCES
+                        / "corrections"
+                        / optics_name
+                        / "normal_decapole"
+                        / f"twiss_b{beam}.tfs"
+                    )
+                    resp.add_zero_rdt_observable(model_path, "f1004_x")
                 elif "f1004" in observables:
                     optics_path = optics_paths[beam]
-                    model_path = RESOURCES / "corrections" / optics_name / "normal_decapole" / f"twiss_b{beam}.tfs"
+                    model_path = (
+                        RESOURCES
+                        / "corrections"
+                        / optics_name
+                        / "normal_decapole"
+                        / f"twiss_b{beam}.tfs"
+                    )
                     resp.add_rdt_observable(Path(optics_path), model_path, "f1004_x")
 
                 # Add the Chromaticity to the response matrix
@@ -444,20 +564,21 @@ class ExternalProgram(QThread):
                     resp.add_chromaticity_observable(chroma_path, order=3, weight=chroma_factor)
 
                 # Get the corrections
-                corrections = resp.get_corrections(rcond=rcond,
-                                                   clean_nan=clean_nan,
-                                                   clean_outliers=clean_outliers,
-                                                   clean_IR=(clean_IR_number != 0),
-                                                   inside_arc_number=clean_IR_number
-                                                   )
+                corrections = resp.get_corrections(
+                    rcond=rcond,
+                    clean_nan=clean_nan,
+                    clean_outliers=clean_outliers,
+                    clean_IR=(clean_IR_number != 0),
+                    inside_arc_number=clean_IR_number,
+                )
 
                 # Set the text edits with the computed corrections
                 for key, val in corrections.items():
                     if val > 0:
                         text[beam] += f"{key} := {key} + {val} ;\n"
                     else:
-                        text[beam] += f"{key} := {key} - {val*-1} ;\n"
-                    
+                        text[beam] += f"{key} := {key} - {val * -1} ;\n"
+
                     corr_sum[beam] += val
         else:
             logger.error(f"Invalid method for corrections: {method}")
@@ -467,11 +588,11 @@ class ExternalProgram(QThread):
         # Set the text for the corrections
         main_window = findMainWindow()
         for beam in [1, 2]:
-            main_window.corrections[f'B{beam}'] = text[beam]
+            main_window.corrections[f"B{beam}"] = text[beam]
 
         # Display the sum of corrections
-        main_window.sumB1Label.setText(str(round(corr_sum[1],2)))
-        main_window.sumB2Label.setText(str(round(corr_sum[2],2)))
+        main_window.sumB1Label.setText(str(round(corr_sum[1], 2)))
+        main_window.sumB2Label.setText(str(round(corr_sum[2], 2)))
         self.finished.emit()
 
 
@@ -596,20 +717,21 @@ class Config:
     """
     Class for storing user preferences
     """
+
     # New Measurement Window
-    model_path: Path = Path('/user/slops/data/LHC_DATA/OP_DATA/Betabeat/')
-    measurements_path: Path = Path('/user/slops/data/LHC_DATA/OP_DATA/Betabeat/')
+    model_path: Path = Path("/user/slops/data/LHC_DATA/OP_DATA/Betabeat/")
+    measurements_path: Path = Path("/user/slops/data/LHC_DATA/OP_DATA/Betabeat/")
 
     # Timber
     extract_raw_timber: bool = False
 
     # Cleaning
     rf_beam: float = 1
-    qx_window: Tuple[float, float] = (0.24, 0.31)
-    qy_window: Tuple[float, float] = (0.29, 0.34)
-    quartiles: Tuple[float, float] = (0.20, 0.80)
+    qx_window: tuple[float, float] = (0.24, 0.31)
+    qy_window: tuple[float, float] = (0.29, 0.34)
+    quartiles: tuple[float, float] = (0.20, 0.80)
     plateau_length: int = 15
-    bad_tune_lines: List[Tuple[float, float]] = field(default_factory=lambda: [(0.2665, 0.2670)])
+    bad_tune_lines: list[tuple[float, float]] = field(default_factory=lambda: [(0.2665, 0.2670)])
 
     plot_dpp: bool = False
     plot_delta_rf: bool = False
@@ -618,10 +740,8 @@ class Config:
     rcParams: str = None
 
     @classmethod
-    def from_dict(cls: typing.Type["Config"], obj: dict):
-        return cls(
-            **obj
-        )
+    def from_dict(cls: Config, obj: dict):
+        return cls(**obj)
 
     def save_field(self, field, data):
         """
@@ -630,7 +750,7 @@ class Config:
         logger.info(f"Saving config field {field}")
 
         # Read the config
-        config_fp = open(CONFIG, 'r+')
+        config_fp = open(CONFIG, "r+")
         file = json.load(config_fp)
         file[field] = data
         config_fp.close()
@@ -718,15 +838,14 @@ class MainWindow(QMainWindow, main_window_class):
         self.setInfoIcons()
 
         # R2 scores for each chromaticity fit
-        self.r2scores = {"B1": {"X": 0, "Y": 0},
-                         "B2": {"X": 0, "Y": 0}}
+        self.r2scores = {"B1": {"X": 0, "Y": 0}, "B2": {"X": 0, "Y": 0}}
 
     def setInfoIcons(self):
         """
         Iterate through all the labels in the class that have a tooltip, and place a proper info icon next to it
         """
         for name, obj in vars(self).items():
-            if type(obj) == QLabel:
+            if type(obj) is QLabel:
                 text = obj.text()
                 tooltip = obj.toolTip()
                 if tooltip.strip() != "":
@@ -755,11 +874,12 @@ class MainWindow(QMainWindow, main_window_class):
     def applyMplStyle(self):
         if self.config.rcParams is None:
             plt.style.use(RESOURCES / "chroma_gui.mplstyle")
-        else:
-            for line in self.config.rcParams.split('\n'):
-                if not line.startswith("#") and line.strip() != "":
-                    key, value = [e.strip() for e in line.split(':')]
-                    plt.style.use({key: value})
+            return
+        
+        for line in self.config.rcParams.split("\n"):
+            if not line.startswith("#") and line.strip() != "":
+                key, value = [e.strip() for e in line.split(":")]
+                plt.style.use({key: value})
 
     def loadConfig(self):
         if CONFIG.exists():
@@ -781,7 +901,9 @@ class MainWindow(QMainWindow, main_window_class):
         self.qyWindowHigh.setValue(self.config.qy_window[1])
         self.q1Quartile.setValue(self.config.quartiles[0])
         self.q3Quartile.setValue(self.config.quartiles[1])
-        self.rfBeamComboBox.setCurrentIndex(self.config.rf_beam - 1)  # Index starts at 0: Beam - 1 = index
+        self.rfBeamComboBox.setCurrentIndex(
+            self.config.rf_beam - 1
+        )  # Index starts at 0: Beam - 1 = index
         self.plateauLength.setValue(self.config.plateau_length)
         self.badTunesLineEdit.setText(str(self.config.bad_tune_lines))
 
@@ -792,14 +914,18 @@ class MainWindow(QMainWindow, main_window_class):
     def updateLineEdits(self):
         # Update the labels in the Main Window
         alpha = self.measurement.get_alpha()
-        self.alfaB1LineEdit.setText(str(alpha['B1']))
-        self.alfaB2LineEdit.setText(str(alpha['B2']))
+        self.alfaB1LineEdit.setText(str(alpha["B1"]))
+        self.alfaB2LineEdit.setText(str(alpha["B2"]))
         self.nominalRfLineEdit.setText(str(self.measurement.nominal_rf))
         self.descriptionPlainTextEdit.setPlainText(self.measurement.description)
 
         # Set the extraction dates via Qt objects
-        start = QDateTime.fromString(self.measurement.start_time.strftime("%Y-%m-%dT%H:%M:%S"), 'yyyy-MM-ddThh:mm:ss')
-        end = QDateTime.fromString(self.measurement.end_time.strftime("%Y-%m-%dT%H:%M:%S"), 'yyyy-MM-ddThh:mm:ss')
+        start = QDateTime.fromString(
+            self.measurement.start_time.strftime("%Y-%m-%dT%H:%M:%S"), "yyyy-MM-ddThh:mm:ss"
+        )
+        end = QDateTime.fromString(
+            self.measurement.end_time.strftime("%Y-%m-%dT%H:%M:%S"), "yyyy-MM-ddThh:mm:ss"
+        )
         self.startTimeTimberEdit.setDateTime(start)
         self.endTimeTimberEdit.setDateTime(end)
 
@@ -816,12 +942,22 @@ class MainWindow(QMainWindow, main_window_class):
             self.updateTimberTable(self.measurement)
             self.enableCleaningTab(True)
             # Get the times from the measurement.info, or set them to the Timber extraction times
-            cleaning_start = QDateTime.fromString(self.measurement.cleaning_start_time.strftime("%Y-%m-%dT%H:%M:%S"),
-                                                  'yyyy-MM-ddThh:mm:ss') if self.measurement.cleaning_start_time \
-                                                                         else start
-            cleaning_end = QDateTime.fromString(self.measurement.cleaning_end_time.strftime("%Y-%m-%dT%H:%M:%S"),
-                                                'yyyy-MM-ddThh:mm:ss') if self.measurement.cleaning_end_time \
-                                                                       else end
+            cleaning_start = (
+                QDateTime.fromString(
+                    self.measurement.cleaning_start_time.strftime("%Y-%m-%dT%H:%M:%S"),
+                    "yyyy-MM-ddThh:mm:ss",
+                )
+                if self.measurement.cleaning_start_time
+                else start
+            )
+            cleaning_end = (
+                QDateTime.fromString(
+                    self.measurement.cleaning_end_time.strftime("%Y-%m-%dT%H:%M:%S"),
+                    "yyyy-MM-ddThh:mm:ss",
+                )
+                if self.measurement.cleaning_end_time
+                else end
+            )
             self.startPlateauDateTimeEdit.setDateTime(cleaning_start)
             self.endPlateauDateTimeEdit.setDateTime(cleaning_end)
 
@@ -871,7 +1007,7 @@ class MainWindow(QMainWindow, main_window_class):
         self.layoutObservables.update()
 
         # Display the available correction methods
-        self.available_observables = json.load(open(RESPONSE_MATRICES))['AVAILABLE_OBSERVABLES']
+        self.available_observables = json.load(open(RESPONSE_MATRICES))["AVAILABLE_OBSERVABLES"]
         self.correctionMethodComboBox.addItems(self.available_observables.keys())
 
         # Set the possible optics the response matrix was computed for
@@ -923,28 +1059,30 @@ class MainWindow(QMainWindow, main_window_class):
             str(self.config.measurements_path),
         )
         if not folder:
-            QMessageBox.warning(self,
-                                "Failed to open directory",
-                                f"The directory '{folder}' could not be opened")
+            QMessageBox.warning(
+                self, "Failed to open directory", f"The directory '{folder}' could not be opened"
+            )
             return False
 
         # Try to open the measurement information file
         try:
             self.measurement = Measurement.from_folder(Path(folder))
         except OSError as e:
-            QMessageBox.warning(self,
-                                "Failed to open measurement",
-                                f"{str(e)}")
+            QMessageBox.warning(self, "Failed to open measurement", f"{str(e)}")
             logger.error(e)
         except JSONDecodeError as e:
-            QMessageBox.warning(self,
-                                "Failed to open measurement",
-                                f"The file 'measurement.info' is not a valid JSON file")
+            QMessageBox.warning(
+                self,
+                "Failed to open measurement",
+                "The file 'measurement.info' is not a valid JSON file",
+            )
             logger.error(e)
         except KeyError as e:
-            QMessageBox.warning(self,
-                                "Failed to open measurement",
-                                f"The file 'measurement.info' does not contain the required keys")
+            QMessageBox.warning(
+                self,
+                "Failed to open measurement",
+                "The file 'measurement.info' does not contain the required keys",
+            )
             logger.error(e)
 
         if self.measurement is not None:
@@ -956,12 +1094,14 @@ class MainWindow(QMainWindow, main_window_class):
         """
         # Check if a measurement has been opened or created already, otherwise why would we save something?
         if not self.measurement:
-            logger.warning("No measurement has been opened or created, the settings can't be saved.")
+            logger.warning(
+                "No measurement has been opened or created, the settings can't be saved."
+            )
             return
 
         # Nominal RF
         nominal_rf = self.nominalRfLineEdit.text()
-        if nominal_rf.strip() == "0" or nominal_rf.strip() == 'None':
+        if nominal_rf.strip() == "0" or nominal_rf.strip() == "None":
             nominal_rf = None
         if nominal_rf is not None:
             nominal_rf = float(nominal_rf)
@@ -972,7 +1112,7 @@ class MainWindow(QMainWindow, main_window_class):
 
         # Save the measurement
         self.measurement.save_as_json()
-        logger.info('Settings saved!')
+        logger.info("Settings saved!")
 
     def startThread(self, main_function, finish_function, *args):
         """
@@ -980,8 +1120,9 @@ class MainWindow(QMainWindow, main_window_class):
         Arguments:
             - main_function: method of the class `ExternalProgram` to be started as main function of the thread
             - finish_function: method of the class  `MainWindow` to be called when the thread has finished
-            - *args: arguments to be passed to the instantiation of the `ExternalProgram` class, those are the
-            `main_function` arguments
+            - args: arguments to be passed to the instantiation of the `ExternalProgram` class, 
+            those are the `main_function` arguments
+            
         """
         # Check if we've got a thread already running
         try:
@@ -1029,7 +1170,7 @@ class MainWindow(QMainWindow, main_window_class):
 
         # Check of the nominal RF exists
         # If it is 0 or None, the plateau creation will take the first value in the dataFrame
-        if nominal_rf.strip() == "0" or nominal_rf.strip() == 'None':
+        if nominal_rf.strip() == "0" or nominal_rf.strip() == "None":
             nominal_rf = None
             msg = "The nominal frequency is not set. The first point of the data extracted will be taken. "
             msg += "Be sure that this point is the expected one!"
@@ -1044,8 +1185,17 @@ class MainWindow(QMainWindow, main_window_class):
 
         # Start the plateau creation
         logger.info("Starting Plateau Creation")
-        self.startThread("createPlateaus", "plateauFinished", self.measurement.path, timber.constants.FILENAME,
-                         rf_beam, start, end, nominal_rf, self.measurement.get_alpha())
+        self.startThread(
+            "createPlateaus",
+            "plateauFinished",
+            self.measurement.path,
+            timber.constants.FILENAME,
+            rf_beam,
+            start,
+            end,
+            nominal_rf,
+            self.measurement.get_alpha(),
+        )
 
     def cleanDataClicked(self):
         # Get values from the GUI
@@ -1078,38 +1228,41 @@ class MainWindow(QMainWindow, main_window_class):
 
         logger.info("Starting Tune Cleaning")
         if not self.useRawBBQCheckBox.isChecked():  # classic BBQ
-            self.startThread("cleanTune",
-                             "cleaningFinished",
-                             self.measurement.path / cleaning_constants.DPP_FILE.format(beam=1),
-                             self.measurement.path / cleaning_constants.DPP_FILE.format(beam=2),
-                             self.measurement.path,
-                             cleaning_constants.CLEANED_DPP_FILE.format(beam=1),
-                             cleaning_constants.CLEANED_DPP_FILE.format(beam=2),
-                             (qx_low, qx_high),
-                             (qy_low, qy_high),
-                             (q1_quartile, q3_quartile),
-                             plateau_length,
-                             bad_tunes)
+            self.startThread(
+                "cleanTune",
+                "cleaningFinished",
+                self.measurement.path / cleaning_constants.DPP_FILE.format(beam=1),
+                self.measurement.path / cleaning_constants.DPP_FILE.format(beam=2),
+                self.measurement.path,
+                cleaning_constants.CLEANED_DPP_FILE.format(beam=1),
+                cleaning_constants.CLEANED_DPP_FILE.format(beam=2),
+                (qx_low, qx_high),
+                (qy_low, qy_high),
+                (q1_quartile, q3_quartile),
+                plateau_length,
+                bad_tunes,
+            )
         else:  # raw BBQ
             # Select the method to be called for processing the raw BBQ
             method = "raw_bbq_spectrogram"
             if self.useNAFFCheckBox.isChecked():
                 method = "raw_bbq_naff"
-            self.startThread("cleanTuneRawBBQ",
-                             "cleaningFinished",
-                             self.measurement.path / cleaning_constants.DPP_FILE.format(beam=1),
-                             self.measurement.path / timber.constants.FILENAME_HDF,
-                             self.measurement.path,
-                             cleaning_constants.CLEANED_DPP_FILE.format(beam=1),
-                             cleaning_constants.CLEANED_DPP_FILE.format(beam=2),
-                             (qx_low, qx_high),
-                             (qy_low, qy_high),
-                             plateau_length,
-                             int(seconds_step),
-                             int(kernel_size),
-                             method,
-                             bad_tunes,
-                             )
+            self.startThread(
+                "cleanTuneRawBBQ",
+                "cleaningFinished",
+                self.measurement.path / cleaning_constants.DPP_FILE.format(beam=1),
+                self.measurement.path / timber.constants.FILENAME_HDF,
+                self.measurement.path,
+                cleaning_constants.CLEANED_DPP_FILE.format(beam=1),
+                cleaning_constants.CLEANED_DPP_FILE.format(beam=2),
+                (qx_low, qx_high),
+                (qy_low, qy_high),
+                plateau_length,
+                int(seconds_step),
+                int(kernel_size),
+                method,
+                bad_tunes,
+            )
 
     def plateauFinished(self, measurement=None):
         logger.info("Plateaus done!")
@@ -1182,17 +1335,33 @@ class MainWindow(QMainWindow, main_window_class):
 
         # Beam 1
         filepath = measurement.path / cleaning_constants.DPP_FILE.format(beam=1)
-        plot_freq(self.plotRawTuneB1Widget.canvas.fig, self.plotRawTuneB1Widget.canvas.ax, filepath,
-                  'Raw Tune Measurement for Beam 1', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag,
-                  qx_flag=show_qx_flag, qy_flag=show_qy_flag, rf_flag=show_rf_flag)
+        plot_freq(
+            self.plotRawTuneB1Widget.canvas.fig,
+            self.plotRawTuneB1Widget.canvas.ax,
+            filepath,
+            "Raw Tune Measurement for Beam 1",
+            dpp_flag=dpp_flag,
+            delta_rf_flag=delta_rf_flag,
+            qx_flag=show_qx_flag,
+            qy_flag=show_qy_flag,
+            rf_flag=show_rf_flag,
+        )
         self.plotRawTuneB1Widget.canvas.draw()
         self.plotRawTuneB1Widget.show()
 
         # Beam 2
         filepath = measurement.path / cleaning_constants.DPP_FILE.format(beam=2)
-        plot_freq(self.plotRawTuneB2Widget.canvas.fig, self.plotRawTuneB2Widget.canvas.ax, filepath,
-                  f'Raw Tune Measurement for Beam 2', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag,
-                  qx_flag=show_qx_flag, qy_flag=show_qy_flag, rf_flag=show_rf_flag)
+        plot_freq(
+            self.plotRawTuneB2Widget.canvas.fig,
+            self.plotRawTuneB2Widget.canvas.ax,
+            filepath,
+            "Raw Tune Measurement for Beam 2",
+            dpp_flag=dpp_flag,
+            delta_rf_flag=delta_rf_flag,
+            qx_flag=show_qx_flag,
+            qy_flag=show_qy_flag,
+            rf_flag=show_rf_flag,
+        )
         self.plotRawTuneB2Widget.canvas.draw()
         self.plotRawTuneB2Widget.show()
 
@@ -1217,17 +1386,35 @@ class MainWindow(QMainWindow, main_window_class):
 
         # Beam 1
         filepath = measurement.path / cleaning_constants.CLEANED_DPP_FILE.format(beam=1)
-        plot_freq(self.plotCleanTuneB1Widget.canvas.fig, self.plotCleanTuneB1Widget.canvas.ax, filepath,
-                  'Cleaned Tune Measurement for Beam 1', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag,
-                  plot_style="line", qx_flag=show_qx_flag, qy_flag=show_qy_flag, rf_flag=show_rf_flag)
+        plot_freq(
+            self.plotCleanTuneB1Widget.canvas.fig,
+            self.plotCleanTuneB1Widget.canvas.ax,
+            filepath,
+            "Cleaned Tune Measurement for Beam 1",
+            dpp_flag=dpp_flag,
+            delta_rf_flag=delta_rf_flag,
+            plot_style="line",
+            qx_flag=show_qx_flag,
+            qy_flag=show_qy_flag,
+            rf_flag=show_rf_flag,
+        )
         self.plotCleanTuneB1Widget.canvas.draw()
         self.plotCleanTuneB1Widget.show()
 
         # Beam 2
         filepath = measurement.path / cleaning_constants.CLEANED_DPP_FILE.format(beam=2)
-        plot_freq(self.plotCleanTuneB2Widget.canvas.fig, self.plotCleanTuneB2Widget.canvas.ax, filepath,
-                  f'Cleaned Tune Measurement for Beam 2', dpp_flag=dpp_flag, delta_rf_flag=delta_rf_flag,
-                  plot_style="line", qx_flag=show_qx_flag, qy_flag=show_qy_flag, rf_flag=show_rf_flag)
+        plot_freq(
+            self.plotCleanTuneB2Widget.canvas.fig,
+            self.plotCleanTuneB2Widget.canvas.ax,
+            filepath,
+            f"Cleaned Tune Measurement for Beam 2",
+            dpp_flag=dpp_flag,
+            delta_rf_flag=delta_rf_flag,
+            plot_style="line",
+            qx_flag=show_qx_flag,
+            qy_flag=show_qy_flag,
+            rf_flag=show_rf_flag,
+        )
         self.plotCleanTuneB2Widget.canvas.draw()
         self.plotCleanTuneB2Widget.show()
 
@@ -1269,12 +1456,19 @@ class MainWindow(QMainWindow, main_window_class):
             input_file_B2 = None
 
         logger.info("Starting Chromaticity Computing")
-        self.startThread("computeChroma", "chromaFinished",
-                         input_file_B1, input_file_B2, output_path, fit_orders, dpp_range)
+        self.startThread(
+            "computeChroma",
+            "chromaFinished",
+            input_file_B1,
+            input_file_B2,
+            output_path,
+            fit_orders,
+            dpp_range,
+        )
         return
 
     def chromaFinished(self, measurement=None):
-        logger.info('Chromaticity finished computing')
+        logger.info("Chromaticity finished computing")
         if not measurement:
             measurement = self.measurement
         self.updateChromaTables(measurement)
@@ -1305,8 +1499,12 @@ class MainWindow(QMainWindow, main_window_class):
         self.chromaticityFormulaLabel.setPixmap(pixmap)
 
         # Beam 1 and Beam 2 models
-        self.chromaB1TableModel = ChromaticityTableModel(chroma_tfs[chroma_tfs['BEAM'] == 'B1'].drop('BEAM', axis=1))
-        self.chromaB2TableModel = ChromaticityTableModel(chroma_tfs[chroma_tfs['BEAM'] == 'B2'].drop('BEAM', axis=1))
+        self.chromaB1TableModel = ChromaticityTableModel(
+            chroma_tfs[chroma_tfs["BEAM"] == "B1"].drop("BEAM", axis=1)
+        )
+        self.chromaB2TableModel = ChromaticityTableModel(
+            chroma_tfs[chroma_tfs["BEAM"] == "B2"].drop("BEAM", axis=1)
+        )
 
         # Set the model of the beam depending on the tab selected
         current_beam = self.beamChromaticityTabWidget.currentIndex() + 1  # index starts at 0
@@ -1355,21 +1553,45 @@ class MainWindow(QMainWindow, main_window_class):
 
         # Beam 1
         dpp_file_b1 = measurement.path / cleaning_constants.CLEANED_DPP_FILE.format(beam=1)
-        self.r2scores['B1']['X'] = plot_chromaticity(self.plotChromaB1XWidget.canvas.fig,
-                                                     self.plotChromaB1XWidget.canvas.ax,
-                                                     dpp_file_b1, chroma_tfs_file, 'X', fit_orders, "B1")
-        self.r2scores['B1']['Y'] = plot_chromaticity(self.plotChromaB1YWidget.canvas.fig,
-                                                     self.plotChromaB1YWidget.canvas.ax,
-                                                     dpp_file_b1, chroma_tfs_file, 'Y', fit_orders, "B1")
+        self.r2scores["B1"]["X"] = plot_chromaticity(
+            self.plotChromaB1XWidget.canvas.fig,
+            self.plotChromaB1XWidget.canvas.ax,
+            dpp_file_b1,
+            chroma_tfs_file,
+            "X",
+            fit_orders,
+            "B1",
+        )
+        self.r2scores["B1"]["Y"] = plot_chromaticity(
+            self.plotChromaB1YWidget.canvas.fig,
+            self.plotChromaB1YWidget.canvas.ax,
+            dpp_file_b1,
+            chroma_tfs_file,
+            "Y",
+            fit_orders,
+            "B1",
+        )
 
         # Beam 2
         dpp_file_b2 = measurement.path / cleaning_constants.CLEANED_DPP_FILE.format(beam=2)
-        self.r2scores['B2']['X'] = plot_chromaticity(self.plotChromaB2XWidget.canvas.fig,
-                                                     self.plotChromaB2XWidget.canvas.ax,
-                                                     dpp_file_b2, chroma_tfs_file, 'X', fit_orders, "B2")
-        self.r2scores['B2']['Y'] = plot_chromaticity(self.plotChromaB2YWidget.canvas.fig,
-                                                     self.plotChromaB2YWidget.canvas.ax,
-                                                     dpp_file_b2, chroma_tfs_file, 'Y', fit_orders, "B2")
+        self.r2scores["B2"]["X"] = plot_chromaticity(
+            self.plotChromaB2XWidget.canvas.fig,
+            self.plotChromaB2XWidget.canvas.ax,
+            dpp_file_b2,
+            chroma_tfs_file,
+            "X",
+            fit_orders,
+            "B2",
+        )
+        self.r2scores["B2"]["Y"] = plot_chromaticity(
+            self.plotChromaB2YWidget.canvas.fig,
+            self.plotChromaB2YWidget.canvas.ax,
+            dpp_file_b2,
+            chroma_tfs_file,
+            "Y",
+            fit_orders,
+            "B2",
+        )
 
         # Set the r2 scores
         self.updateR2scores()
@@ -1378,10 +1600,18 @@ class MainWindow(QMainWindow, main_window_class):
         path = self.measurement.path / "plots"
         path.mkdir(exist_ok=True)
 
-        save_chromaticity_plot(self.plotChromaB1XWidget.canvas.fig, path / "Beam1_Qx", formats=['png', 'pdf'])
-        save_chromaticity_plot(self.plotChromaB1YWidget.canvas.fig, path / "Beam1_Qy", formats=['png', 'pdf'])
-        save_chromaticity_plot(self.plotChromaB2XWidget.canvas.fig, path / "Beam2_Qx", formats=['png', 'pdf'])
-        save_chromaticity_plot(self.plotChromaB2YWidget.canvas.fig, path / "Beam2_Qy", formats=['png', 'pdf'])
+        save_chromaticity_plot(
+            self.plotChromaB1XWidget.canvas.fig, path / "Beam1_Qx", formats=["png", "pdf"]
+        )
+        save_chromaticity_plot(
+            self.plotChromaB1YWidget.canvas.fig, path / "Beam1_Qy", formats=["png", "pdf"]
+        )
+        save_chromaticity_plot(
+            self.plotChromaB2XWidget.canvas.fig, path / "Beam2_Qx", formats=["png", "pdf"]
+        )
+        save_chromaticity_plot(
+            self.plotChromaB2YWidget.canvas.fig, path / "Beam2_Qy", formats=["png", "pdf"]
+        )
         logger.info(f"Saved Chromaticity plots to {path}")
 
     def copyTableClicked(self):
@@ -1398,7 +1628,7 @@ class MainWindow(QMainWindow, main_window_class):
         if format_table == "Markdown":
             df_text = df.to_markdown(index=False)
         elif format_table == "LaTeX":
-            df.columns = [df.columns[0]] + [f'${c}$' for c in df.columns[1:]]
+            df.columns = [df.columns[0]] + [f"${c}$" for c in df.columns[1:]]
             df_text = df.to_latex(index=False)
             df_text = df_text.replace("(", "{(")
             df_text = df_text.replace(")", ")}")
@@ -1417,15 +1647,17 @@ class MainWindow(QMainWindow, main_window_class):
         raw_enabled = value == 2
 
         # Turn ON or OFF some features depending on if the user wants to use the raw BBQ or not
-        self.useNAFFCheckBox.setEnabled(True == raw_enabled)
-        self.secondsStep.setEnabled(True == raw_enabled)
-        self.kernelSize.setEnabled(True == raw_enabled)
-        self.q1Quartile.setEnabled(False == raw_enabled)
-        self.q3Quartile.setEnabled(False == raw_enabled)
+        self.useNAFFCheckBox.setEnabled(raw_enabled)
+        self.secondsStep.setEnabled(raw_enabled)
+        self.kernelSize.setEnabled(raw_enabled)
+        self.q1Quartile.setEnabled(not raw_enabled)
+        self.q3Quartile.setEnabled(not raw_enabled)
 
         # Enable or disable functionalities depending on the selected method
         if raw_enabled:
-            self.useNAFFCheckBoxClicked(int(self.useNAFFCheckBox.isChecked()) * 2)  # Send a 0 or 2 depending on the state
+            self.useNAFFCheckBoxClicked(
+                int(self.useNAFFCheckBox.isChecked()) * 2
+            )  # Send a 0 or 2 depending on the state
 
     def useNAFFCheckBoxClicked(self, value):
         """
@@ -1434,7 +1666,7 @@ class MainWindow(QMainWindow, main_window_class):
         """
         # Turn ON or OFF some raw bbq functions
         naff_enabled = value == 2
-        self.kernelSize.setEnabled(False == naff_enabled)
+        self.kernelSize.setEnabled(not naff_enabled)
 
     def timberVariableSelectionChanged(self, item):
         """
@@ -1453,7 +1685,9 @@ class MainWindow(QMainWindow, main_window_class):
 
     def updateTimberTable(self, measurement):
         # Get the available variables from the extracted data
-        available_variables = get_variables_names_from_csv(measurement.path / timber.constants.FILENAME)
+        available_variables = get_variables_names_from_csv(
+            measurement.path / timber.constants.FILENAME
+        )
         for variable in available_variables:
             item = QListWidgetItem(variable)
             item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsSelectable | Qt.ItemIsEnabled)
@@ -1471,16 +1705,21 @@ class MainWindow(QMainWindow, main_window_class):
         # Add the widgets to the layout
         self.timberDataLayout.addWidget(self.plotTimberWidget)
 
-        plot_timber(self.plotTimberWidget.canvas.fig,
-                    self.plotTimberWidget.canvas.ax,
-                    measurement.path / timber.constants.FILENAME,
-                    self.selectedTimberVariables)
+        plot_timber(
+            self.plotTimberWidget.canvas.fig,
+            self.plotTimberWidget.canvas.ax,
+            measurement.path / timber.constants.FILENAME,
+            self.selectedTimberVariables,
+        )
 
         self.plotTimberWidget.canvas.draw()
         self.plotTimberWidget.show()
 
     def setChromaticityOrders(self, orders):
-        all_orders = [int(self.chromaOrderComboBox.itemText(i)) for i in range(self.chromaOrderComboBox.count())]
+        all_orders = [
+            int(self.chromaOrderComboBox.itemText(i))
+            for i in range(self.chromaOrderComboBox.count())
+        ]
 
         for order in all_orders:
             index = self.chromaOrderComboBox.findText(str(order))
@@ -1544,34 +1783,36 @@ class MainWindow(QMainWindow, main_window_class):
 
         # The computations are too fast, add a cooldown so the user knobs it has computed
         for beam in self.corrections.keys():
-            text_edit = getattr(self, f'correction{beam}TextEdit')
+            text_edit = getattr(self, f"correction{beam}TextEdit")
             text_edit.setHtml("Computing...")
         QtTest.QTest.qWait(1000)
 
         logger.info("Starting Response Matrix creation")
-        self.startThread("computeCorrections",
-                         "correctionsFinished",
-                         optics_paths,
-                         self.measurement.path,
-                         method,
-                         observables,
-                         chroma_factor,
-                         rcond,
-                         keep_dq3_constant,
-                         keep_rdt_constant,
-                         clean_nan,
-                         clean_outliers,
-                         clean_IR,
-                         optics_name)
+        self.startThread(
+            "computeCorrections",
+            "correctionsFinished",
+            optics_paths,
+            self.measurement.path,
+            method,
+            observables,
+            chroma_factor,
+            rcond,
+            keep_dq3_constant,
+            keep_rdt_constant,
+            clean_nan,
+            clean_outliers,
+            clean_IR,
+            optics_name,
+        )
 
     def correctionsFinished(self):
         for beam in self.corrections.keys():
             if self.corrections[beam] is None:
                 continue
 
-            text = self.corrections[f'{beam}'].replace('\n', '<br>')
+            text = self.corrections[f"{beam}"].replace("\n", "<br>")
             text = text.replace(" ", "&nbsp;")
-            text_edit = getattr(self, f'correction{beam}TextEdit')
+            text_edit = getattr(self, f"correction{beam}TextEdit")
             text_edit.setHtml(text)
 
         logger.info("Corrections done!")
@@ -1580,6 +1821,7 @@ class MainWindow(QMainWindow, main_window_class):
     def rcParamsClicked(self):
         rcparams_dialog = MplRcParamsDialog(self)
         rcparams_dialog.show()
+
 
 class MplRcParamsDialog(QDialog, rcparams_window_class):
     def __init__(self, parent=None):
@@ -1626,6 +1868,7 @@ class MplRcParamsDialog(QDialog, rcparams_window_class):
 
         logger.info("Matplotlib rcParams written")
 
+
 class NewMeasurementDialog(QDialog, new_measurement_class):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
@@ -1661,17 +1904,20 @@ class NewMeasurementDialog(QDialog, new_measurement_class):
         return folder
 
     def createMeasurement(self):
-        model_path = {'B1': Path(self.modelB1LineEdit.text()),
-                      'B2': Path(self.modelB2LineEdit.text())
-                      }
+        model_path = {
+            "B1": Path(self.modelB1LineEdit.text()),
+            "B2": Path(self.modelB2LineEdit.text()),
+        }
         # Set the start and end time of the timber extraction to the current date
         now = datetime.now()
 
-        measurement = Measurement(path=Path(self.locationLineEdit.text()),
-                                  description=self.descriptionTextEdit.toPlainText(),
-                                  model_path=model_path,
-                                  start_time=now,
-                                  end_time=now)
+        measurement = Measurement(
+            path=Path(self.locationLineEdit.text()),
+            description=self.descriptionTextEdit.toPlainText(),
+            model_path=model_path,
+            start_time=now,
+            end_time=now,
+        )
         measurement.save_as_json()
 
         main_window = findMainWindow()

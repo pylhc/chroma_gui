@@ -1,3 +1,129 @@
 [build-system]
-requires = ["setuptools>64", "numpy"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "chroma_gui/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/.github",
+  "/doc",
+  "/tests",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["chroma_gui"]
+
+[project]
+name = "chroma-gui"
+readme = "README.md"
+description = "QT Graphical User Interface wrapper of the ``omc3`` package"
+authors = [
+    {name = "OMC Team", email = "pylhc@github.com"},  # see zenodo file / commits for details
+]
+license = "MIT"
+dynamic = ["version"]
+requires-python = ">=3.10"
+
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+
+dependencies = [
+    "matplotlib",
+    "tfs-pandas",
+    "pyqt5 >= 5.14",  # for Qt.MarkdownText
+    "pandas",
+    "numpy",
+    "scipy",
+    "tabulate",
+    "pyperclip",
+    "qtawesome",
+    "nafflib",
+    "tables",
+]
+
+
+[project.optional-dependencies]
+test = [
+  "pytest >= 7.0",
+]
+doc = [
+  "sphinx >= 7.0",
+  "sphinx_rtd_theme >= 2.0",
+]
+cern = [
+    "pytimber",
+]
+
+all = [
+  "chroma_gui[cern]",
+  "chroma_gui[test]",
+  "chroma_gui[doc]",
+]
+
+[project.urls]
+homepage = "https://github.com/pylhc/chroma_gui"
+repository = "https://github.com/pylhc/chroma_gui"
+documentation = "https://pylhc.github.io/chroma_gui/"
+changelog = "https://github.com/pylhc/chroma_gui/blob/master/CHANGELOG.md"
+
+# ----- Testing ----- #
+
+[tool.pytest.ini_options]
+markers = [
+    "basic: basic tests run for every commit",
+    "extended: test run on PRs",
+    "cern_network: tests that require access to afs or the technical network",
+]
+# Helpful for pytest-debugging (leave commented out on commit):
+#log_cli = true
+#log_cli_level = "DEBUG"
+
+
+# ----- Dev Tools Configuration ----- #
+
+[tool.ruff]
+exclude = [
+  ".eggs",
+  ".git",
+  ".mypy_cache",
+  ".venv",
+  "_build",
+  "build",
+  "dist",
+]
+
+# Assume Python 3.10+
+target-version = "py310"
+
+line-length = 100
+indent-width = 4
+
+[tool.ruff.lint]
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+ignore = [
+  "FBT001",  # boolean-type-hint-positional-argument
+  "FBT002",  # boolean-default-value-positional-argument
+  "PT019",  # pytest-fixture-param-without-value (but suggested solution fails)
+]
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []

@@ -1,3 +1,11 @@
+""" 
+Functions
+---------
+
+Functions to plot chromaticity data.
+"""
+from __future__ import annotations
+
 from datetime import datetime
 import matplotlib.dates as mdates
 from matplotlib.ticker import FormatStrFormatter
