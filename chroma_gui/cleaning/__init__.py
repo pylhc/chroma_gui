@@ -1,6 +1,6 @@
 """ 
-Cleaning
---------
+Cleaning Module
+---------------
 
 Functions to clean the chromaticity data.
 """

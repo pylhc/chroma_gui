@@ -703,7 +703,7 @@ class ResponseMatrix:
             scatter_plot(a, label="Removed BPM")
 
         # Get the unit of the y axis
-        j, k, l, m = [int(e) for e in rdt[1:-2]]
+        j, k, l, m = [int(e) for e in rdt[1:-2]]  # noqa: E741
         unit_magnet = -(j + k + l + m)  # unit is m^(-order)
         unit = unit_magnet + 1
         unit += (j + k) / 2 + (l + m) / 2

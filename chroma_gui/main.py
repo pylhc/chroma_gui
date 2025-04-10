@@ -1120,8 +1120,9 @@ class MainWindow(QMainWindow, main_window_class):
         Arguments:
             - main_function: method of the class `ExternalProgram` to be started as main function of the thread
             - finish_function: method of the class  `MainWindow` to be called when the thread has finished
-            - *args: arguments to be passed to the instantiation of the `ExternalProgram` class, those are the
-            `main_function` arguments
+            - args: arguments to be passed to the instantiation of the `ExternalProgram` class, 
+            those are the `main_function` arguments
+            
         """
         # Check if we've got a thread already running
         try:

@@ -1,6 +1,6 @@
 """ 
 Chromaticity Functions
----------------------
+----------------------
 
 Functions to compute the chromaticity.
 """
@@ -18,11 +18,16 @@ from scipy.optimize import curve_fit
 def chromaticity_func(x, *args):
     """
     Returns the taylor expansion of the chromaticity
-    q0
-      + q1 * x
-      + q2 * x**2 * 1/2!
-      + q3 * x**3 * 1/3!
-      ...
+    
+    
+    .. code-block::
+    
+        q0
+        + q1 * x
+        + q2 * x**2 * 1/2!
+        + q3 * x**3 * 1/3!
+        ...
+    
     """
     res = 0
     for order, val in enumerate(args):

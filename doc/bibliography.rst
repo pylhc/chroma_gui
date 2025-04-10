@@ -1,4 +1,4 @@
 Bibliography
 ************
 
-This bibliography is inentionally left blank.
+This bibliography is intentionally left blank.

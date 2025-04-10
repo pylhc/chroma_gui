@@ -1,6 +1,6 @@
 """ 
-Timber
-------
+Timber Module
+-------------
 
 This module contains all the functions to extract data from Timber.
 """

@@ -1,6 +1,6 @@
 """ 
-Chromaticity
-------------
+Chromaticity Module
+-------------------
 
 This module contains functions related to the chromaticity.
 """

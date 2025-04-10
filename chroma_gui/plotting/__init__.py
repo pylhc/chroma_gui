@@ -1,6 +1,6 @@
 """ 
-Plotting
---------
+Plotting Module
+---------------
 
 This module contains functions to plot chromaticity data.
 """
