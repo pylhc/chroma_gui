@@ -1,12 +1,19 @@
-import tfs
+""" 
+Clean
+-----
+
+Main functions to clean the chromaticity data.
+"""
+from __future__ import annotations
+
+import logging
+
+import nafflib
 import numpy as np
 import pandas as pd
-import logging
-from scipy import signal
-import nafflib
-
+import tfs
 from dateutil.parser import isoparse
-from pathlib import Path
+from scipy import signal
 
 logger = logging.getLogger('chroma_GUI - Cleaning')
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -168,7 +175,7 @@ def get_avg_tune_from_naff(raw_data, start_plateau, end_plateau, variables, seco
         # Process each chunk
         for i in range(chunks):
             data = merged_data[plane][elements_per_chunk * i: elements_per_chunk * (i+1)]
-            spectrum, _, _ = NAFFlib.get_tunes(data, 20)
+            spectrum, _, _ = nafflib.get_tunes(data, 20)
 
             for frequency in spectrum:
                 in_window = window[plane][0] <= frequency <= window[plane][1]

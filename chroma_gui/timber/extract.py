@@ -1,20 +1,27 @@
-from fileinput import filename
+""" 
+Extract
+-------
 
-import pytimber
-from datetime import datetime
-import os
+Functions to extract data from Timber.
+"""
+from __future__ import annotations
+
 import logging
+import os
+from datetime import datetime
+
 import pandas as pd
+import pytimber
 
 from chroma_gui.timber.constants import (
-    FILENAME,
     BACKUP_FILENAME,
-    TIMBER_VARS,
-    TIMBER_RAW_VARS,
-    FILENAME_PKL,
-    BACKUP_FILENAME_PKL,
-    FILENAME_HDF,
     BACKUP_FILENAME_HDF,
+    BACKUP_FILENAME_PKL,
+    FILENAME,
+    FILENAME_HDF,
+    FILENAME_PKL,
+    TIMBER_RAW_VARS,
+    TIMBER_VARS,
 )
 
 
@@ -57,7 +64,7 @@ def save_as_csv(path, start_time, end_time, data):
     # Make a symlink to TIMBER_DATA.csv
     try:
         os.remove(path / FILENAME)
-    except:
+    except OSError:
         pass
     os.symlink(backup_name, path / FILENAME)
 
@@ -77,7 +84,7 @@ def save_as_pickle(path, data):
     # Make a symlink to TIMBER_RAW_DATA.pkl.gz
     try:
         os.remove(filename)
-    except:
+    except OSError:
         pass
     os.symlink(backup_filename, filename)
 
@@ -97,7 +104,7 @@ def save_as_hdf(path, data):
     # Make a symlink to TIMBER_RAW_DATA.hdf
     try:
         os.remove(filename)
-    except:
+    except OSError:
         pass
     os.symlink(backup_filename, filename)
 

@@ -1,0 +1,12 @@
+# Runs all tests on master on Mondays at 3 am (UTC time)
+name: Cron Testing
+
+
+on: 
+  schedule:
+    - cron:  '* 3 * * mon'
+
+jobs:
+    tests:
+      if: false  # disabled for now
+      uses: pylhc/.github/.github/workflows/cron.yml@master

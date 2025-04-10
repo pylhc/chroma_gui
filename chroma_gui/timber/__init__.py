@@ -1,3 +1,10 @@
+""" 
+Timber
+------
+
+This module contains all the functions to extract data from Timber.
+"""
+# ruff: noqa
 from . import extract
 from . import constants
 

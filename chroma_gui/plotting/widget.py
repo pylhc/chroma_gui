@@ -1,18 +1,24 @@
-# Imports
-from PyQt5 import QtWidgets, QtGui, QtCore
-from matplotlib.figure import Figure
+""" 
+Widget
+------
+
+Defines the Matplotlib widget.
+"""
+from __future__ import annotations
+
+import matplotlib
+from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as Canvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT
-from matplotlib.backends.backend_agg import FigureCanvasAgg
-import matplotlib
-
+from matplotlib.figure import Figure
+from PyQt5 import QtGui, QtWidgets
 
 # Ensure using PyQt5 backend
 matplotlib.use('QT5Agg')
 
 
-# Matplotlib canvas class to create figure
 class MplCanvas(Canvas):
+    """ Matplotlib canvas class to create figure """
     def __init__(self):
         self.fig = Figure()
         self.ax = self.fig.add_subplot(111)
@@ -21,8 +27,9 @@ class MplCanvas(Canvas):
         Canvas.updateGeometry(self)
 
 
-# Matplotlib widget
 class MplWidget(QtWidgets.QWidget):
+    """ Matplotlib widget class """
+
     def __init__(self, parent=None):
         QtWidgets.QWidget.__init__(self, parent)   # Inherit from QWidget
         # Create the canvas object
@@ -36,7 +43,13 @@ class MplWidget(QtWidgets.QWidget):
         self.setLayout(self.vbl)
 
 
-def mathTex_to_QPixmap(mathTex, fs):
+def mathTex_to_QPixmap(mathTex: str, fs: int) -> QtGui.QPixmap:
+    """ Convert mathTex string to QPixmap 
+    
+    Args:
+        mathTex (str): mathTex string
+        fs (int): font size
+    """
     #---- set up a mpl figure instance ----
     fig = matplotlib.figure.Figure()
     fig.patch.set_facecolor('none')
