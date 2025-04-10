@@ -194,7 +194,7 @@ def plot_freq(fig,
     #                                                 ax3.get_legend_handles_labels())]
     leg = ax.legend(handles, labels, loc='upper left')
     leg = ax2.legend(handles, labels, loc='upper left')
-    for lh in leg.legendHandles:
+    for lh in leg.legend_handles:
         lh.set_alpha(1)
 
     ax.ticklabel_format(axis='y', style='sci', useMathText=True)
